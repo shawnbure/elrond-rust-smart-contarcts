@@ -65,3 +65,26 @@ withdrawNft() {
         --gas-limit=100000000 \
         --send || return
 }
+
+# $1 amount to deposit
+deposit() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --value=$1
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function deposit \
+        --arguments $1 $2 \
+        --gas-limit=100000000 \
+        --send || return
+}
+
+# $1 amount to deposit
+withdraw() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function withdraw \
+        --arguments $1 $2 \
+        --gas-limit=100000000 \
+        --send || return
+}

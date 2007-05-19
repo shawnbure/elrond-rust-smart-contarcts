@@ -206,11 +206,13 @@ pub trait NftTemplate {
         let delimiter = BoxedBytes::from(&b"/"[..]);
         let index = self.get_token_index(expected_nonce);
         let index_string = self.u16_to_string(index);
+        let image_extension = BoxedBytes::from(&b".png"[..]);
 
         let own_image_uri = BoxedBytes::from_concat(&[
             image_base_uri.as_slice(),
             delimiter.as_slice(),
             index_string.as_slice(),
+            image_extension.as_slice(),
         ]);
 
         let own_metadata_uri = BoxedBytes::from_concat(&[
