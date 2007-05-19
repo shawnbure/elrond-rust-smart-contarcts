@@ -39,22 +39,19 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
 
     #[view(getRemainingEpochsUntilClaim)]
     fn get_remaining_epochs_until_claim(&self, caller: Address) -> SCResult<u64> {
-        let last_epoch = self.creator_last_withdrawal_epoch(&caller).get();
         let curr_epoch = self.blockchain().get_block_epoch();
-
+        let last_epoch = self.creator_last_withdrawal_epoch(&caller).get();
+        let withdrawal_epochs = self.creator_withdrawal_waiting_epochs().get();
         require!(curr_epoch >= last_epoch, "last epoch greater than current");
 
         let curr_last_diff = curr_epoch - last_epoch;
-        let withdrawal_epochs = self.creator_withdrawal_waiting_epochs().get();
-        let remaining_epochs;
-
-        if curr_last_diff < withdrawal_epochs {
-            remaining_epochs = withdrawal_epochs - curr_epoch;
+        let result = if curr_last_diff < withdrawal_epochs {
+            withdrawal_epochs - curr_epoch
         } else {
-            remaining_epochs = withdrawal_epochs - (curr_last_diff - withdrawal_epochs);
-        }
+            withdrawal_epochs - (curr_last_diff - withdrawal_epochs)
+        };
 
-        Ok(remaining_epochs)
+        Ok(result)
     }
 
     fn increase_platform_royalties(&self, amount: &Self::BigUint) {
