@@ -148,3 +148,17 @@ endAuction() {
         --gas-limit=100000000 \
         --send || return
 }
+
+getRemainingEpochsUntilClaim() {
+    erdpy --verbose contract query ${CONTRACT_ADDRESS} \
+        --proxy=${PROXY} \
+        --function getRemainingEpochsUntilClaim \
+        --arguments $1
+}
+
+getCreatorLastWithdrawalEpoch() {
+    erdpy --verbose contract query ${CONTRACT_ADDRESS} \
+        --proxy=${PROXY} \
+        --function getCreatorLastWithdrawalEpoch \
+        --arguments $1
+}

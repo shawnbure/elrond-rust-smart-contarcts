@@ -44,14 +44,13 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
         let withdrawal_epochs = self.creator_withdrawal_waiting_epochs().get();
         require!(curr_epoch >= last_epoch, "last epoch greater than current");
 
-        let curr_last_diff = curr_epoch - last_epoch;
-        let result = if curr_last_diff < withdrawal_epochs {
-            withdrawal_epochs - curr_epoch
+        let remaining = if last_epoch != 0 {
+            (withdrawal_epochs - (curr_epoch - last_epoch) % withdrawal_epochs) % withdrawal_epochs
         } else {
-            withdrawal_epochs - (curr_last_diff - withdrawal_epochs)
+            0
         };
 
-        Ok(result)
+        Ok(remaining)
     }
 
     fn increase_platform_royalties(&self, amount: &Self::BigUint) {
