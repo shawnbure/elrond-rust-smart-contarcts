@@ -128,13 +128,13 @@ pub trait MarketplaceContract:
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.buy_nft_event(
-            nft_sale_info.owner.clone(),
-            caller.clone(),
+            nft_sale_info.owner,
+            caller,
             token_id,
             nonce,
             payment,
             timestamp,
-            tx_hash.clone(),
+            tx_hash,
         );
         Ok(())
     }
@@ -332,13 +332,13 @@ pub trait MarketplaceContract:
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.accept_offer_event(
-            caller.clone(),
+            caller,
             token_id,
             nonce,
-            offeror.clone(),
+            offeror,
             offer_amount,
             timestamp,
-            tx_hash.clone(),
+            tx_hash,
         );
         Ok(())
     }
@@ -381,13 +381,13 @@ pub trait MarketplaceContract:
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.accept_offer_event(
-            caller.clone(),
+            caller,
             token_id,
             nonce,
-            offeror.clone(),
+            offeror,
             offer_amount,
             timestamp,
-            tx_hash.clone(),
+            tx_hash,
         );
         Ok(())
     }
@@ -436,16 +436,15 @@ pub trait MarketplaceContract:
         );
         self.auction(&nft_id).set(&auction);
 
-        let tx_hash = self.blockchain().get_tx_hash();
         self.start_auction_event(
-            caller.clone(),
+            caller,
             token_id,
             nonce,
             min_bid,
             start_time,
             deadline,
             timestamp,
-            tx_hash,
+            self.blockchain().get_tx_hash(),
         );
         Ok(())
     }
@@ -483,14 +482,7 @@ pub trait MarketplaceContract:
 
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
-        self.place_bid_event(
-            caller.clone(),
-            token_id,
-            nonce,
-            bid_amount,
-            timestamp,
-            tx_hash.clone(),
-        );
+        self.place_bid_event(caller, token_id, nonce, bid_amount, timestamp, tx_hash);
         Ok(())
     }
 
