@@ -3,6 +3,7 @@ elrond_wasm::derive_imports!();
 
 #[elrond_wasm::module]
 pub trait EventsModule {
+    #[allow(clippy::too_many_arguments)]
     #[event("put_nft_for_sale")]
     fn put_nft_for_sale_event(
         self,
@@ -20,6 +21,7 @@ pub trait EventsModule {
         #[indexed] tx_hash: H256,
     );
 
+    #[allow(clippy::too_many_arguments)]
     #[event("buy_nft")]
     fn buy_nft_event(
         self,

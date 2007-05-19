@@ -14,12 +14,12 @@ pub trait ValidationModule:
     storage::StorageModule + config::ConfigModule + utils::UtilsModule
 {
     fn require_nft_for_sale(&self, nft_id: &NftId) -> SCResult<()> {
-        require!(!self.nft_sale_info(&nft_id).is_empty(), "Nft not for sale");
+        require!(!self.nft_sale_info(nft_id).is_empty(), "Nft not for sale");
         Ok(())
     }
 
     fn require_nft_not_for_sale(&self, nft_id: &NftId) -> SCResult<()> {
-        require!(self.nft_sale_info(&nft_id).is_empty(), "Nft is for sale");
+        require!(self.nft_sale_info(nft_id).is_empty(), "Nft is for sale");
         Ok(())
     }
 
@@ -39,7 +39,7 @@ pub trait ValidationModule:
     }
 
     fn require_valid_price(&self, price: &Self::BigUint) -> SCResult<()> {
-        require!(self.get_platform_cut(&price) != 0, "Invalid price");
+        require!(self.get_platform_cut(price) != 0, "Invalid price");
 
         let min_price = self.asset_min_price().get();
         require!(price >= &min_price, "Price too low");
@@ -56,7 +56,7 @@ pub trait ValidationModule:
             "Royalties too big"
         );
         require!(
-            &token_data.royalties + &platform_fee.into() < Self::BigUint::from(BP),
+            &token_data.royalties + &platform_fee.into() < BP,
             "Royalties too big"
         );
         Ok(())
