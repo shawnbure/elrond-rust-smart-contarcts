@@ -50,13 +50,14 @@ setSpecialRole() {
         --send || return
 }
 
-mintNft() {
+mintTokens() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} \
         --pem=${MY_WALLET_PEM} \
         --recall-nonce \
         --value 1000000000000000000 \
         --gas-limit 60000000 \
-        --function "mintNft" \
+        --function "mintTokens" \
+        --arguments $1 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --send || return
 }
