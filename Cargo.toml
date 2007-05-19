@@ -1,0 +1,5 @@
+[workspace]
+members = [
+  "marketplace",
+  "marketplace/abi",
+]
