@@ -76,3 +76,23 @@ mintTokens() {
         --send || return
 }
 
+requestWithdraw() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} \
+        --pem=${MY_WALLET_PEM} \
+        --recall-nonce \
+        --gas-limit 120000000 \
+        --function "requestWithdraw" \
+        --arguments $1 \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --send || return
+}
+
+withdraw() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} \
+        --pem=${MY_WALLET_PEM} \
+        --recall-nonce \
+        --gas-limit 120000000 \
+        --function "withdraw" \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --send || return
+}

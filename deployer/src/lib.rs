@@ -6,8 +6,7 @@ elrond_wasm::derive_imports!();
 #[elrond_wasm::contract]
 pub trait Deployer {
     #[init]
-    fn init(&self, deploy_price: BigUint, nft_template_address: ManagedAddress) {
-        self.deploy_price().set(&deploy_price);
+    fn init(&self, nft_template_address: ManagedAddress) {
         self.nft_template_address().set(&nft_template_address);
     }
 
@@ -15,27 +14,30 @@ pub trait Deployer {
     #[endpoint(deployNFTTemplateContract)]
     fn deploy_nft_template_contract(
         &self,
-        #[payment_amount] payment: BigUint,
         token_id: BoxedBytes,
         royalties: BigUint,
         token_name_base: BoxedBytes,
         image_base_uri: BoxedBytes,
-        metadata_base_uri: BoxedBytes,
+        image_extension: BoxedBytes,
         price: BigUint,
         max_supply: u64,
         sale_start_timestamp: u64,
+        #[var_args] metadata_base_uri_opt: OptionalArg<BoxedBytes>,
     ) -> SCResult<ManagedAddress> {
-        require!(payment == self.deploy_price().get(), "bad payment");
-
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         arg_buffer.push_arg(token_id);
         arg_buffer.push_arg(royalties);
         arg_buffer.push_arg(token_name_base);
         arg_buffer.push_arg(image_base_uri);
-        arg_buffer.push_arg(metadata_base_uri);
+        arg_buffer.push_arg(image_extension);
         arg_buffer.push_arg(price);
         arg_buffer.push_arg(max_supply);
         arg_buffer.push_arg(sale_start_timestamp);
+
+        let metadata_base_uri = metadata_base_uri_opt.into_option();
+        if metadata_base_uri.is_some() {
+            arg_buffer.push_arg(metadata_base_uri.unwrap());
+        }
 
         let (new_address, _) = self.raw_vm_api().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
@@ -81,10 +83,6 @@ pub trait Deployer {
             &[],
         );
     }
-
-    #[view(getDeployPrice)]
-    #[storage_mapper("deploy_price")]
-    fn deploy_price(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getNftTemplateAddress)]
     #[storage_mapper("nft_template_address")]
