@@ -26,6 +26,7 @@
                 "value": "0",
                 "contractCode": "file:../output/nft_template.wasm",
                 "arguments": [
+                    "address:owner",
                     "str:TOKEN-abcdef",
                     "750",
                     "str:TOKEN",
@@ -54,6 +55,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
+                        "str:marketplace_admin": "address:owner",
                         "str:image_base_uri": "str:https://image_base",
                         "str:image_extension": "str:.png",
                         "str:max_supply": "10,000",
@@ -85,6 +87,7 @@
                         }
                     },
                     "storage": {
+                        "str:marketplace_admin": "address:owner",
                         "str:image_base_uri": "str:https://image_base",
                         "str:image_extension": "str:.png",
                         "str:max_supply": "10,000",

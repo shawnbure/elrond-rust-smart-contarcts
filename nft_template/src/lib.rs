@@ -7,8 +7,12 @@ elrond_wasm::derive_imports!();
 mod random;
 use random::Random;
 
+const MAX_FEE_PERCENT: u64 = 10_000;
+const PLATFORM_MINT_DEFAULT_FEE_PERCENT: u64 = 150;
+
 const MIN_LOOP_ITERATION_GAS_LIMIT: u64 = 10_000_000;
 const ERDSEA_ERD721_STANDARD: &[u8] = b"Erdsea|ERD-721";
+const ERDSEA_WITHDRAW_MESSAGE: &[u8] = b"Erdsea website mint 1.5% fee";
 
 mod marketplace_proxy {
     elrond_wasm::imports!();
@@ -25,6 +29,7 @@ pub trait NftTemplate {
     #[init]
     fn init(
         &self,
+        marketplace_admin: Address,
         token_id: TokenIdentifier,
         royalties: Self::BigUint,
         token_name_base: BoxedBytes,
@@ -35,6 +40,7 @@ pub trait NftTemplate {
         sale_start: u64,
         #[var_args] metadata_base_uri: OptionalArg<BoxedBytes>,
     ) {
+        self.marketplace_admin().set(&marketplace_admin);
         self.token_id().set_if_empty(&token_id);
         self.royalties().set_if_empty(&royalties);
         self.token_name_base().set_if_empty(&token_name_base);
@@ -107,11 +113,40 @@ pub trait NftTemplate {
 
     #[payable("EGLD")]
     #[endpoint(mintTokens)]
-    fn mint_tokens(
+    fn mint_tokens_endpoint(
         &self,
         #[payment_amount] payment: Self::BigUint,
         #[var_args] number_of_tokens_desired_opt: OptionalArg<u16>,
     ) -> SCResult<()> {
+        self.mint_tokens(payment, number_of_tokens_desired_opt)?;
+        Ok(())
+    }
+
+    #[payable("EGLD")]
+    #[endpoint(mintTokensThroughMarketplace)]
+    fn mint_tokens_through_marketplace(
+        &self,
+        #[payment_amount] payment: Self::BigUint,
+        #[var_args] number_of_tokens_desired_opt: OptionalArg<u16>,
+    ) -> SCResult<()> {
+        require!(
+            self.minting_through_marketplace_allowed().get(),
+            "endpoint disabled"
+        );
+
+        let spent = self.mint_tokens(payment, number_of_tokens_desired_opt)?;
+        let marketplace_cut =
+            &spent * &PLATFORM_MINT_DEFAULT_FEE_PERCENT.into() / MAX_FEE_PERCENT.into();
+        self.marketplace_balance()
+            .update(|x| *x += &marketplace_cut);
+        Ok(())
+    }
+
+    fn mint_tokens(
+        &self,
+        payment: Self::BigUint,
+        number_of_tokens_desired_opt: OptionalArg<u16>,
+    ) -> SCResult<Self::BigUint> {
         let current_timestamp = self.blockchain().get_block_timestamp();
         let sale_start_timestamp = self.sale_start().get();
         require!(
@@ -162,12 +197,12 @@ pub trait NftTemplate {
             self.send().direct(&caller, &token_id, nonce, &big_one, &[]);
         }
 
-        let surplus = payment - price_for_tokens_to_sell;
+        let surplus = &payment - &price_for_tokens_to_sell;
         self.send()
             .direct_egld(&caller, &surplus, &ERDSEA_ERD721_STANDARD);
 
         self.total_sold().update(|x| *x += tokens_to_sell);
-        Ok(())
+        Ok(price_for_tokens_to_sell)
     }
 
     #[only_owner]
@@ -276,9 +311,6 @@ pub trait NftTemplate {
         vec.as_slice().into()
     }
 
-    #[proxy]
-    fn marketplace_proxy(&self, to: Address) -> marketplace_proxy::Proxy<Self::SendApi>;
-
     #[only_owner]
     #[endpoint(requestWithdraw)]
     fn request_withdraw(&self, marketplace: Address) -> AsyncCall<Self::SendApi> {
@@ -292,10 +324,45 @@ pub trait NftTemplate {
     fn withdraw(&self, #[var_args] amount_opt: OptionalArg<Self::BigUint>) {
         let amount = amount_opt.into_option().unwrap_or(
             self.blockchain()
-                .get_balance(&self.blockchain().get_sc_address()),
+                .get_sc_balance(&TokenIdentifier::egld(), 0)
+                - self.marketplace_balance().get(),
         );
+
+        let caller = self.blockchain().get_caller();
+        self.send().direct_egld(&caller, &amount, &[]);
+    }
+
+    #[endpoint(marketplaceWithdraw)]
+    fn marketplace_withdraw(
+        &self,
+        #[var_args] amount_opt: OptionalArg<Self::BigUint>,
+    ) -> SCResult<()> {
+        let caller = self.blockchain().get_caller();
+        require!(
+            caller == self.marketplace_admin().get(),
+            "not markeplace admin"
+        );
+
+        let amount = amount_opt
+            .into_option()
+            .unwrap_or(self.marketplace_balance().get());
+        self.marketplace_balance().update(|x| *x -= &amount);
+
         self.send()
-            .direct_egld(&self.blockchain().get_caller(), &amount, &[]);
+            .direct_egld(&caller, &amount, ERDSEA_WITHDRAW_MESSAGE);
+        Ok(())
+    }
+
+    #[only_owner]
+    #[endpoint(allowMintingThroughMarketplace)]
+    fn allow_minting_through_marketplace(&self) {
+        self.minting_through_marketplace_allowed().set(&true);
+    }
+
+    #[only_owner]
+    #[endpoint(denyMintingThroughMarketplace)]
+    fn deny_minting_through_marketplace(&self) {
+        self.minting_through_marketplace_allowed().set(&false);
     }
 
     #[only_owner]
@@ -325,6 +392,18 @@ pub trait NftTemplate {
     fn get_max_supply_and_total_sold(&self) -> MultiResult2<u16, u16> {
         MultiResult2::from((self.max_supply().get(), self.total_sold().get()))
     }
+
+    #[view(getMarketplaceBalance)]
+    #[storage_mapper("marketplace_balance")]
+    fn marketplace_balance(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+    #[view(getMarketplaceAdmin)]
+    #[storage_mapper("marketplace_admin")]
+    fn marketplace_admin(&self) -> SingleValueMapper<Self::Storage, Address>;
+
+    #[view(isMintingThroughMarketplaceAllowed)]
+    #[storage_mapper("minting_through_marketplace_allowed")]
+    fn minting_through_marketplace_allowed(&self) -> SingleValueMapper<Self::Storage, bool>;
 
     #[view(getTotalSold)]
     #[storage_mapper("total_sold")]
@@ -372,4 +451,7 @@ pub trait NftTemplate {
 
     #[storage_mapper("nonce_to_index")]
     fn nonce_to_index(&self, nonce_as_u16: u16) -> SingleValueMapper<Self::Storage, u16>;
+
+    #[proxy]
+    fn marketplace_proxy(&self, to: Address) -> marketplace_proxy::Proxy<Self::SendApi>;
 }

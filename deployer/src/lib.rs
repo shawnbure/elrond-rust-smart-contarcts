@@ -6,8 +6,9 @@ elrond_wasm::derive_imports!();
 #[elrond_wasm::contract]
 pub trait Deployer {
     #[init]
-    fn init(&self, nft_template_address: ManagedAddress) {
+    fn init(&self, nft_template_address: ManagedAddress, marketplace_admin: ManagedAddress) {
         self.nft_template_address().set(&nft_template_address);
+        self.marketplace_admin().set(&marketplace_admin);
     }
 
     #[payable("EGLD")]
@@ -25,6 +26,7 @@ pub trait Deployer {
         #[var_args] metadata_base_uri_opt: OptionalArg<BoxedBytes>,
     ) -> SCResult<ManagedAddress> {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        arg_buffer.push_arg(self.marketplace_admin().get());
         arg_buffer.push_arg(token_id);
         arg_buffer.push_arg(royalties);
         arg_buffer.push_arg(token_name_base);
@@ -43,7 +45,7 @@ pub trait Deployer {
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
             &self.nft_template_address().get(),
-            CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE | CodeMetadata::READABLE,
+            CodeMetadata::PAYABLE,
             &arg_buffer,
         );
 
@@ -82,6 +84,22 @@ pub trait Deployer {
         self.send()
             .direct_egld(&self.blockchain().get_caller(), &amount, &[]);
     }
+
+    #[only_owner]
+    #[endpoint(setMarketplaceAddress)]
+    fn set_marketplace_admin(&self, sc_address: ManagedAddress) {
+        self.marketplace_admin().set(&sc_address);
+    }
+
+    #[only_owner]
+    #[endpoint(setNftTemplateAddress)]
+    fn set_nft_template_address(&self, sc_address: ManagedAddress) {
+        self.nft_template_address().set(&sc_address);
+    }
+
+    #[view(getMarketplaceAddress)]
+    #[storage_mapper("marketplace_admin")]
+    fn marketplace_admin(&self) -> SingleValueMapper<ManagedAddress>;
 
     #[view(getNftTemplateAddress)]
     #[storage_mapper("nft_template_address")]
