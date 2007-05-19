@@ -173,8 +173,11 @@ pub trait NftTemplate {
             let random1 = random.next_u16() % max_supply + 1;
             let random2 = random.next_u16() % max_supply + 1;
 
-            self.nonce_to_index(random1).set(&random2);
-            self.nonce_to_index(random2).set(&random1);
+            let index1 = self.get_token_index(random1);
+            let index2 = self.get_token_index(random2);
+
+            self.nonce_to_index(index1).set(&index2);
+            self.nonce_to_index(index2).set(&index1);
 
             iterations += 1;
         }
@@ -183,10 +186,11 @@ pub trait NftTemplate {
     }
 
     fn get_token_index(&self, nonce: u16) -> u16 {
-        if !self.nonce_to_index(nonce).is_empty() {
-            self.nonce_to_index(nonce).get()
-        } else {
+        let index = self.nonce_to_index(nonce).get();
+        if index == 0 {
             nonce
+        } else {
+            index
         }
     }
 
