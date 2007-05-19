@@ -80,6 +80,7 @@ pub trait ValidationModule:
     }
 
     fn require_valid_collection_name(&self, collection_name: &BoxedBytes) -> SCResult<()> {
+        //TODO: should be printable
         require!(
             !collection_name.is_empty(),
             "Collection name cannot be empty"
@@ -92,6 +93,7 @@ pub trait ValidationModule:
     }
 
     fn require_valid_description(&self, description: &BoxedBytes) -> SCResult<()> {
+        //TODO: should be printable
         require!(
             description.len() < MAX_DESCRIPTION_LEN,
             "Description name too long"
