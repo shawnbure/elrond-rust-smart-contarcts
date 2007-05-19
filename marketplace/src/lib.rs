@@ -75,7 +75,10 @@ pub trait MarketplaceContract:
         );
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
-        self.put_nft_for_sale_event(caller, token_id, nonce, uri, collection, price, timestamp);
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.put_nft_for_sale_event(
+            caller, token_id, nonce, uri, collection, price, timestamp, tx_hash,
+        );
 
         Ok(())
     }
@@ -116,6 +119,8 @@ pub trait MarketplaceContract:
 
         let timestamp = self.blockchain().get_block_timestamp();
         self.nft_sale_info(&nft_id).clear();
+
+        let tx_hash = self.blockchain().get_tx_hash();
         self.buy_nft_event(
             nft_sale_info.owner,
             caller,
@@ -125,6 +130,7 @@ pub trait MarketplaceContract:
             nft_sale_info.collection,
             payment,
             timestamp,
+            tx_hash,
         );
 
         Ok(())
@@ -149,6 +155,8 @@ pub trait MarketplaceContract:
 
         let timestamp = self.blockchain().get_block_timestamp();
         self.nft_sale_info(&nft_id).clear();
+
+        let tx_hash = self.blockchain().get_tx_hash();
         self.withdraw_nft_event(
             caller,
             token_id,
@@ -157,6 +165,7 @@ pub trait MarketplaceContract:
             nft_sale_info.collection,
             nft_sale_info.price,
             timestamp,
+            tx_hash,
         );
 
         Ok(())
@@ -187,7 +196,16 @@ pub trait MarketplaceContract:
 
         let caller = self.blockchain().get_caller();
         let timestamp = self.blockchain().get_block_timestamp();
-        self.collection_register_event(caller, token_id, collection_name, description, timestamp);
+
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.collection_register_event(
+            caller,
+            token_id,
+            collection_name,
+            description,
+            timestamp,
+            tx_hash,
+        );
         Ok(())
     }
 }

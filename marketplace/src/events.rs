@@ -13,6 +13,7 @@ pub trait EventsModule {
         #[indexed] collection: BoxedBytes,
         #[indexed] price: Self::BigUint,
         #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
     );
 
     #[event("buy_nft")]
@@ -26,6 +27,7 @@ pub trait EventsModule {
         #[indexed] collection: BoxedBytes,
         #[indexed] price: Self::BigUint,
         #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
     );
 
     #[event("withdraw_nft")]
@@ -38,6 +40,7 @@ pub trait EventsModule {
         #[indexed] collection: BoxedBytes,
         #[indexed] price: Self::BigUint,
         #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
     );
 
     #[event("collection_register")]
@@ -48,5 +51,6 @@ pub trait EventsModule {
         #[indexed] collection: BoxedBytes,
         #[indexed] description: BoxedBytes,
         #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
     );
 }
