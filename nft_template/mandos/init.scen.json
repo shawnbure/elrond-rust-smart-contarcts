@@ -30,10 +30,11 @@
                     "750",
                     "str:TOKEN",
                     "str:https://image_base",
-                    "str:https://metadata_base",
+                    "str:.png",
                     "10,000",
                     "10,000",
-                    "10,000"
+                    "10,000",
+                    "str:https://metadata_base"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -54,6 +55,7 @@
                     "balance": "0",
                     "storage": {
                         "str:image_base_uri": "str:https://image_base",
+                        "str:image_extension": "str:.png",
                         "str:max_supply": "10,000",
                         "str:metadata_base_uri": "str:https://metadata_base",
                         "str:price": "10,000",
@@ -84,6 +86,7 @@
                     },
                     "storage": {
                         "str:image_base_uri": "str:https://image_base",
+                        "str:image_extension": "str:.png",
                         "str:max_supply": "10,000",
                         "str:metadata_base_uri": "str:https://metadata_base",
                         "str:price": "10,000",

@@ -39,7 +39,6 @@
                 "value": "0",
                 "contractCode": "file:../output/deployer.wasm",
                 "arguments": [
-                    "100",
                     "sc:nft_template"
                 ],
                 "gasLimit": "50,000,000",
@@ -66,10 +65,11 @@
                     "100",
                     "str:TOKEN",
                     "str:https...",
-                    "str:https...",
+                    "str:.png",
                     "100",
                     "100",
-                    "100"
+                    "100",
+                    "str:https..."
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"

@@ -8,6 +8,7 @@ mod random;
 use random::Random;
 
 const MIN_LOOP_ITERATION_GAS_LIMIT: u64 = 10_000_000;
+const ERDSEA_ERD721_STANDARD: &[u8] = b"Erdsea|ERD-721";
 
 mod marketplace_proxy {
     elrond_wasm::imports!();
@@ -28,16 +29,22 @@ pub trait NftTemplate {
         royalties: Self::BigUint,
         token_name_base: BoxedBytes,
         image_base_uri: BoxedBytes,
-        metadata_base_uri: BoxedBytes,
+        image_extension: BoxedBytes,
         price: Self::BigUint,
         max_supply: u16,
         sale_start: u64,
+        #[var_args] metadata_base_uri: OptionalArg<BoxedBytes>,
     ) {
         self.token_id().set_if_empty(&token_id);
         self.royalties().set_if_empty(&royalties);
         self.token_name_base().set_if_empty(&token_name_base);
         self.image_base_uri().set(&image_base_uri);
-        self.metadata_base_uri().set_if_empty(&metadata_base_uri);
+        self.image_extension().set(&image_extension);
+        self.metadata_base_uri().set_if_empty(
+            &metadata_base_uri
+                .into_option()
+                .unwrap_or(BoxedBytes::empty()),
+        );
         self.price().set_if_empty(&price);
         self.max_supply().set_if_empty(&max_supply);
         self.sale_start().set_if_empty(&sale_start);
@@ -51,11 +58,13 @@ pub trait NftTemplate {
     ) -> SCResult<u16> {
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
+        let image_extension = self.image_extension().get();
         let metadata_base_uri = self.metadata_base_uri().get();
         let empty_box = BoxedBytes::empty();
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
         let big_one = Self::BigUint::from(1u64);
+        let big_zero = Self::BigUint::zero();
         let mut total_amount = 0u16;
         let mut next_expected_nonce = self.total_sold().get() + 1;
 
@@ -72,6 +81,7 @@ pub trait NftTemplate {
                     &empty_box,
                     &self.compute_token_uris(
                         &image_base_uri,
+                        &image_extension,
                         &metadata_base_uri,
                         next_expected_nonce,
                     ),
@@ -82,6 +92,8 @@ pub trait NftTemplate {
                 self.send()
                     .direct(&address, &token_id, nonce, &big_one, &[]);
             }
+            self.send()
+                .direct_egld(&address, &big_zero, &ERDSEA_ERD721_STANDARD);
 
             total_amount += amount;
         }
@@ -120,6 +132,7 @@ pub trait NftTemplate {
 
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
+        let image_extension = self.image_extension().get();
         let metadata_base_uri = self.metadata_base_uri().get();
         let empty_box = BoxedBytes::empty();
         let token_id = self.token_id().get();
@@ -136,7 +149,12 @@ pub trait NftTemplate {
                 &royalties,
                 &empty_box,
                 &empty_box,
-                &self.compute_token_uris(&image_base_uri, &metadata_base_uri, next_expected_nonce),
+                &self.compute_token_uris(
+                    &image_base_uri,
+                    &image_extension,
+                    &metadata_base_uri,
+                    next_expected_nonce,
+                ),
             );
             require!(nonce as u16 == next_expected_nonce, "unexpected nonce");
             next_expected_nonce += 1;
@@ -145,7 +163,8 @@ pub trait NftTemplate {
         }
 
         let surplus = payment - price_for_tokens_to_sell;
-        self.safe_send_egld(&caller, &surplus);
+        self.send()
+            .direct_egld(&caller, &surplus, &ERDSEA_ERD721_STANDARD);
 
         self.total_sold().update(|x| *x += tokens_to_sell);
         Ok(())
@@ -199,6 +218,7 @@ pub trait NftTemplate {
     fn compute_token_uris(
         &self,
         image_base_uri: &BoxedBytes,
+        image_extension: &BoxedBytes,
         metadata_base_uri: &BoxedBytes,
         expected_nonce: u16,
     ) -> Vec<BoxedBytes> {
@@ -206,7 +226,6 @@ pub trait NftTemplate {
         let delimiter = BoxedBytes::from(&b"/"[..]);
         let index = self.get_token_index(expected_nonce);
         let index_string = self.u16_to_string(index);
-        let image_extension = BoxedBytes::from(&b".png"[..]);
 
         let own_image_uri = BoxedBytes::from_concat(&[
             image_base_uri.as_slice(),
@@ -214,15 +233,16 @@ pub trait NftTemplate {
             index_string.as_slice(),
             image_extension.as_slice(),
         ]);
-
-        let own_metadata_uri = BoxedBytes::from_concat(&[
-            metadata_base_uri.as_slice(),
-            delimiter.as_slice(),
-            index_string.as_slice(),
-        ]);
-
         result.push(own_image_uri);
-        result.push(own_metadata_uri);
+
+        if !metadata_base_uri.is_empty() {
+            let own_metadata_uri = BoxedBytes::from_concat(&[
+                metadata_base_uri.as_slice(),
+                delimiter.as_slice(),
+                index_string.as_slice(),
+            ]);
+            result.push(own_metadata_uri);
+        }
 
         result
     }
@@ -254,12 +274,6 @@ pub trait NftTemplate {
 
         vec.reverse();
         vec.as_slice().into()
-    }
-
-    fn safe_send_egld(&self, to: &Address, amount: &Self::BigUint) {
-        if amount > &0 {
-            self.send().direct_egld(to, amount, &[]);
-        }
     }
 
     #[proxy]
@@ -332,6 +346,10 @@ pub trait NftTemplate {
     #[view(getImageBaseUri)]
     #[storage_mapper("image_base_uri")]
     fn image_base_uri(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+
+    #[view(getImageExtension)]
+    #[storage_mapper("image_extension")]
+    fn image_extension(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
 
     #[view(getMetadataBaseUri)]
     #[storage_mapper("metadata_base_uri")]
