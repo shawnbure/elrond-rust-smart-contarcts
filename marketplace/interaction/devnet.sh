@@ -118,3 +118,13 @@ cancelOffer() {
         --gas-limit=100000000 \
         --send || return
 }
+
+startAuction() {
+    erdpy --verbose contract call ${MY_ADDRESS} --recall-nonce \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function ESDTNFTTransfer \
+        --arguments $1 $2 0x01 ${CONTRACT_ADDRESS_HEX} 0x737461727441756374696f6e 1000000000000000000 1699999999 \
+        --gas-limit=100000000 \
+        --send || return
+}

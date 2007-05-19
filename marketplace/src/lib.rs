@@ -168,10 +168,9 @@ pub trait MarketplaceContract:
         self.require_owns_nft(&caller, &nft_sale_info)?;
 
         self.send_nft(&caller, &token_id, nonce);
-
-        let timestamp = self.blockchain().get_block_timestamp();
         self.nft_sale_info(&nft_id).clear();
 
+        let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.withdraw_nft_event(
             caller,
@@ -190,13 +189,14 @@ pub trait MarketplaceContract:
         let caller = self.blockchain().get_caller();
         let auction_info = self.auction(&nft_id).get();
         self.require_auction_owner(&caller, &auction_info)?;
-        self.require_auction_ended_or_not_started(&auction_info)?;
+
+        let auction = self.auction(&nft_id).get();
+        self.increase_deposit(&auction.highest_bidder, &auction.bid);
 
         self.send_nft(&caller, &token_id, nonce);
-
-        let timestamp = self.blockchain().get_block_timestamp();
         self.auction(&nft_id).clear();
 
+        let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.withdraw_nft_event(
             caller,
