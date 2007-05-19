@@ -64,6 +64,8 @@
                 "arguments": [
                     "str:TOKEN-abcdef",
                     "100",
+                    "str:TOKEN",
+                    "str:https...",
                     "str:https...",
                     "100",
                     "100",
