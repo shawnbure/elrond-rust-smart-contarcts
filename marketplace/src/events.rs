@@ -59,6 +59,17 @@ pub trait EventsModule {
         #[indexed] tx_hash: H256,
     );
 
+    #[event("cancel_offer")]
+    fn cancel_offer_event(
+        &self,
+        #[indexed] owner: Address,
+        #[indexed] token_id: TokenIdentifier,
+        #[indexed] nonce: u64,
+        #[indexed] amount: Self::BigUint,
+        #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
+    );
+
     #[event("accept_offer")]
     fn accept_offer_event(
         &self,
