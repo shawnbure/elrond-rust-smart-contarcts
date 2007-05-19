@@ -267,10 +267,10 @@ pub trait NftTemplate {
 
     #[only_owner]
     #[endpoint(requestWithdraw)]
-    fn request_withdraw(&self, marketplace: Address) {
+    fn request_withdraw(&self, marketplace: Address) -> AsyncCall<Self::SendApi> {
         self.marketplace_proxy(marketplace)
             .withdraw_creator_royalties()
-            .execute_on_dest_context_ignore_result();
+            .async_call()
     }
 
     #[only_owner]
