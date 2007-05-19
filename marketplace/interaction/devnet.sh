@@ -15,7 +15,7 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments 0x1000 0x1000 \
+        --arguments 0x1000 \
         --send || return
 }
 
@@ -25,23 +25,7 @@ upgrade() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments 0x1000 0x1000 \
-        --send || return
-}
-
-# EBFMT-ebca88 4542464d542d656263613838
-# CryptoPunks 43727970746f50756e6b7342
-# $1 = token id in hex
-# $2 = collection name in hex
-# $3 = collection description in hex
-registerCollection() {
-    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
-        --pem=${MY_WALLET_PEM} \
-        --value=4096 \
-        --proxy=${PROXY} --chain=${CHAIN_ID} \
-        --function registerCollection \
-        --arguments $1 $2 $3 \
-        --gas-limit=100000000 \
+        --arguments 0x1000 \
         --send || return
 }
 

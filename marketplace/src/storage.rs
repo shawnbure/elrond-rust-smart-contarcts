@@ -17,7 +17,6 @@ impl NftId {
 pub struct NftSaleInfo<BigUint: BigUintApi> {
     pub owner: Address,
     pub uri: BoxedBytes,
-    pub collection: BoxedBytes,
     pub price: BigUint,
     pub platform_fee: u64,
     pub timestamp: u64,
@@ -27,7 +26,6 @@ impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
     pub fn new(
         owner: Address,
         uri: BoxedBytes,
-        collection: BoxedBytes,
         price: BigUint,
         platform_fee: u64,
         timestamp: u64,
@@ -35,46 +33,17 @@ impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
         NftSaleInfo {
             owner,
             uri,
-            collection,
             price,
             platform_fee,
             timestamp,
         }
     }
 }
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct Collection {
-    pub name: BoxedBytes,
-    pub description: BoxedBytes,
-}
-
-impl Collection {
-    pub fn new(name: BoxedBytes, description: BoxedBytes) -> Self {
-        Collection { name, description }
-    }
-}
-
 #[elrond_wasm::module]
 pub trait StorageModule {
     #[view(getPlatformFeePercent)]
     #[storage_mapper("platform_fee_percent")]
     fn platform_fee_percent(&self) -> SingleValueMapper<Self::Storage, u64>;
-
-    #[view(getCollectionRegisterPrice)]
-    #[storage_mapper("collection_register_price")]
-    fn collection_register_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
-
-    #[view(getCollectionName)]
-    #[storage_mapper("collections")]
-    fn collections(
-        &self,
-        token_id: &TokenIdentifier,
-    ) -> SingleValueMapper<Self::Storage, Collection>;
-
-    #[view(getAllCollectionNames)]
-    #[storage_mapper("all_collection_names")]
-    fn all_collection_names(&self) -> SafeSetMapper<Self::Storage, BoxedBytes>;
 
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(

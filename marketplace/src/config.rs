@@ -5,8 +5,6 @@ use super::storage;
 
 pub const BP: u64 = 10_000;
 pub const DEFAULT_FEE_PERCENT: u64 = 250;
-pub const MAX_COLLECTION_NAME_LEN: usize = 30;
-pub const MAX_DESCRIPTION_LEN: usize = 500;
 
 #[elrond_wasm::module]
 pub trait ConfigModule: storage::StorageModule {
@@ -14,12 +12,6 @@ pub trait ConfigModule: storage::StorageModule {
     #[endpoint(setPlatformFeePercent)]
     fn set_platform_fee_percent(&self, fee_percent: u64) -> SCResult<()> {
         self.try_set_platform_fee_percent(fee_percent)
-    }
-
-    #[only_owner]
-    #[endpoint(setCollectionRegisterPrice)]
-    fn set_collection_register_price(&self, price: Self::BigUint) {
-        self.collection_register_price().set(&price);
     }
 
     #[only_owner]

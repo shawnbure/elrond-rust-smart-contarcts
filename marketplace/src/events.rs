@@ -10,7 +10,6 @@ pub trait EventsModule {
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] uri: BoxedBytes,
-        #[indexed] collection: BoxedBytes,
         #[indexed] price: Self::BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
@@ -24,7 +23,6 @@ pub trait EventsModule {
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] uri: BoxedBytes,
-        #[indexed] collection: BoxedBytes,
         #[indexed] price: Self::BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
@@ -37,19 +35,7 @@ pub trait EventsModule {
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] uri: BoxedBytes,
-        #[indexed] collection: BoxedBytes,
         #[indexed] price: Self::BigUint,
-        #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
-    );
-
-    #[event("collection_register")]
-    fn collection_register_event(
-        self,
-        #[indexed] caller: Address,
-        #[indexed] token_id: TokenIdentifier,
-        #[indexed] collection: BoxedBytes,
-        #[indexed] description: BoxedBytes,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );

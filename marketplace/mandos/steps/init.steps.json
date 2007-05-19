@@ -50,8 +50,7 @@
                 "value": "0",
                 "contractCode": "file:../../output/marketplace.wasm",
                 "arguments": [
-                    "250",
-                    "100"
+                    "250"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -71,8 +70,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:platform_fee_percent": "250",
-                        "str:collection_register_price": "100"
+                        "str:platform_fee_percent": "250"
                     },
                     "code": "file:../../output/marketplace.wasm",
                     "owner": "address:owner"

@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::config::{BP, MAX_COLLECTION_NAME_LEN, MAX_DESCRIPTION_LEN};
+use crate::config::BP;
 use crate::storage::NftSaleInfo;
 
 use super::config;
@@ -54,48 +54,6 @@ pub trait ValidationModule:
 
     fn require_uris_not_empty(&self, token_data: &EsdtTokenData<Self::BigUint>) -> SCResult<()> {
         require!(!token_data.uris.is_empty(), "Empty uris");
-        Ok(())
-    }
-
-    fn require_good_register_collection_payment(&self, payment: &Self::BigUint) -> SCResult<()> {
-        let required = self.collection_register_price().get();
-        require!(payment >= &required, "Not enough payment");
-        Ok(())
-    }
-
-    fn require_token_id_not_registered_already(&self, token_id: &TokenIdentifier) -> SCResult<()> {
-        require!(
-            self.collections(token_id).is_empty(),
-            "Token id already registered"
-        );
-        Ok(())
-    }
-
-    fn require_collection_name_unique(&self, collection_name: &BoxedBytes) -> SCResult<()> {
-        require!(
-            !self.all_collection_names().contains(collection_name),
-            "Name already taken"
-        );
-        Ok(())
-    }
-
-    fn require_valid_collection_name(&self, collection_name: &BoxedBytes) -> SCResult<()> {
-        require!(
-            !collection_name.is_empty(),
-            "Collection name cannot be empty"
-        );
-        require!(
-            collection_name.len() < MAX_COLLECTION_NAME_LEN,
-            "Collection name too long"
-        );
-        Ok(())
-    }
-
-    fn require_valid_description(&self, description: &BoxedBytes) -> SCResult<()> {
-        require!(
-            description.len() < MAX_DESCRIPTION_LEN,
-            "Description name too long"
-        );
         Ok(())
     }
 

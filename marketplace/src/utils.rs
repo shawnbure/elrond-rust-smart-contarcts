@@ -51,12 +51,4 @@ pub trait UtilsModule: storage::StorageModule {
             self.send().direct(to, token_id, nonce, amount, &[]);
         }
     }
-
-    fn get_collection_name_or_default(&self, token_id: &TokenIdentifier) -> BoxedBytes {
-        if !self.collections(token_id).is_empty() {
-            self.collections(token_id).get().name
-        } else {
-            BoxedBytes::empty()
-        }
-    }
 }

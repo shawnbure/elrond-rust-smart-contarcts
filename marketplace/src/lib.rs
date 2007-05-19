@@ -11,7 +11,7 @@ pub mod utils;
 pub mod validation;
 pub mod views;
 
-use storage::{Collection, NftId, NftSaleInfo};
+use storage::{NftId, NftSaleInfo};
 
 const NFT_AMOUNT: u64 = 1;
 
@@ -26,13 +26,7 @@ pub trait MarketplaceContract:
     + global_op::GlobalOperationModule
 {
     #[init]
-    fn init(
-        &self,
-        platform_fee_percent: u64,
-        collection_register_price: Self::BigUint,
-    ) -> SCResult<()> {
-        self.collection_register_price()
-            .set(&collection_register_price);
+    fn init(&self, platform_fee_percent: u64) -> SCResult<()> {
         self.try_set_platform_fee_percent(platform_fee_percent)
     }
 
@@ -60,7 +54,6 @@ pub trait MarketplaceContract:
         self.require_nft_not_for_sale(&nft_id)?;
 
         let uri = token_data.uris.last().unwrap().clone();
-        let collection = self.get_collection_name_or_default(&token_id);
 
         let caller = self.blockchain().get_caller();
         let timestamp = self.blockchain().get_block_timestamp();
@@ -68,7 +61,6 @@ pub trait MarketplaceContract:
         let nft_sale_info = NftSaleInfo::new(
             caller.clone(),
             uri.clone(),
-            collection.clone(),
             price.clone(),
             fee_percent,
             timestamp,
@@ -76,9 +68,7 @@ pub trait MarketplaceContract:
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
         let tx_hash = self.blockchain().get_tx_hash();
-        self.put_nft_for_sale_event(
-            caller, token_id, nonce, uri, collection, price, timestamp, tx_hash,
-        );
+        self.put_nft_for_sale_event(caller, token_id, nonce, uri, price, timestamp, tx_hash);
 
         Ok(())
     }
@@ -127,7 +117,6 @@ pub trait MarketplaceContract:
             token_id,
             nonce,
             nft_sale_info.uri,
-            nft_sale_info.collection,
             payment,
             timestamp,
             tx_hash,
@@ -162,50 +151,11 @@ pub trait MarketplaceContract:
             token_id,
             nonce,
             nft_sale_info.uri,
-            nft_sale_info.collection,
             nft_sale_info.price,
             timestamp,
             tx_hash,
         );
 
-        Ok(())
-    }
-
-    #[payable("EGLD")]
-    #[endpoint(registerCollection)]
-    fn register_collection(
-        &self,
-        #[payment_amount] payment: Self::BigUint,
-        token_id: TokenIdentifier,
-        collection_name: BoxedBytes,
-        description: BoxedBytes,
-    ) -> SCResult<()> {
-        self.require_global_op_not_ongoing()?;
-
-        self.require_valid_token_id(&token_id)?;
-        self.require_valid_collection_name(&collection_name)?;
-        self.require_valid_description(&description)?;
-
-        self.require_good_register_collection_payment(&payment)?;
-        self.require_token_id_not_registered_already(&token_id)?;
-        self.require_collection_name_unique(&collection_name)?;
-
-        let collection = Collection::new(collection_name.clone(), description.clone());
-        self.collections(&token_id).set(&collection);
-        self.all_collection_names().insert(collection_name.clone());
-
-        let caller = self.blockchain().get_caller();
-        let timestamp = self.blockchain().get_block_timestamp();
-
-        let tx_hash = self.blockchain().get_tx_hash();
-        self.collection_register_event(
-            caller,
-            token_id,
-            collection_name,
-            description,
-            timestamp,
-            tx_hash,
-        );
         Ok(())
     }
 }
