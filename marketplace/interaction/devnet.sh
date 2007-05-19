@@ -4,8 +4,8 @@ PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqmrlwwymaql72ug2f6dchjp86fkkzlga6t9ust3yc4p"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500d8fee7137d07fcae2149d3717904fa4dac2fa3ba5979"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqj8vnqw76wq333qwx2wjf2nyn89dc8jhct9usvxzd7g"
+CONTRACT_ADDRESS_HEX="0x0000000000000000050091d9303bda70231881c653a4954c93395b83caf85979"
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 

@@ -4,8 +4,8 @@ PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
-MY_TOKEN_NAME="0x57414d454e" #Example: 0x4d594e4654
-MY_TOKEN_TICKER="0x57414d454e" #Example: 0x4d594e4654
+MY_TOKEN_NAME="0x415045" #Example: 0x4d594e4654
+MY_TOKEN_TICKER="0x415045" #Example: 0x4d594e4654
 
 # This is how you get your token ID
 issueNft() {
@@ -21,10 +21,11 @@ issueNft() {
 }
 
 WASM="../output/nft_template.wasm"
-MY_TOKEN_ID="0x57414d454e2d303833623530" #Fill this after issue
+MY_TOKEN_ID="0x4150452d353437356136" #Fill this after issue
 ROYALTIES=0x02EE #7.5%
-MY_TOKEN_BASE_URI="0x68747470733a2f2f776f772d70726f642d6e6674726962652e73332e65752d776573742d322e616d617a6f6e6177732e636f6d2f74"
+MY_TOKEN_BASE_URI="0x68747470733a2f2f67616c6163746963617065732e6d7970696e6174612e636c6f75642f697066732f516d63583667327858694650356a31694166585245755039457563525270754d43416e6f596156596a74724a654b"
 PRICE=1000000000000000000 #1EGLD
+MAX_SUPPLY=10000
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -32,12 +33,22 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_BASE_URI} ${PRICE} \
+        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_BASE_URI} ${PRICE} ${MAX_SUPPLY} \
         --send || return
 }
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq62cm9582mf7435qdts9hunk84hnr0ekft9us7flg4l"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500d2b1b2d0eada7d58d00d5c0b7e4ec7ade637e6c95979"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq3uvfynvpvcs8aldhuyrseuyepmp0cj7at9usgefv56"
+CONTRACT_ADDRESS_HEX="0x000000000000000005008f18924d8166207efdb7e1070cf0990ec2fc4bdd5979"
+
+upgrade() {
+    erdpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
+        --bytecode=${WASM} \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --gas-limit=100000000 \
+        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_BASE_URI} ${PRICE} ${MAX_SUPPLY} \
+        --send || return
+}
 
 setSpecialRole() {
     erdpy --verbose contract call erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u \
@@ -54,7 +65,7 @@ mintTokens() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} \
         --pem=${MY_WALLET_PEM} \
         --recall-nonce \
-        --value 1000000000000000000 \
+        --value 3000000000000000000 \
         --gas-limit 60000000 \
         --function "mintTokens" \
         --arguments $1 \
