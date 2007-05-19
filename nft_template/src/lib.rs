@@ -196,6 +196,12 @@ pub trait NftTemplate {
     }
 
     #[only_owner]
+    #[endpoint(setPrice)]
+    fn set_price(&self, price: Self::BigUint) {
+        self.price().set(&price);
+    }
+
+    #[only_owner]
     #[endpoint(pauseSale)]
     fn pause_sale(&self) {
         self.sale_paused().set(&true);
