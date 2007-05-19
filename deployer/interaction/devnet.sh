@@ -8,8 +8,11 @@ MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqupgxrdhphusx5crgvg454u9k4zqsp5mst9usqlrfyy"
 CONTRACT_ADDRESS_HEX="0x00000000000000000500e05061b6e1bf206a6068622b4af0b6a88100d3705979"
 
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq42mfpjw6fnksq50cy2luseegqxwyd7gct9usecz4q9"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500aab690c9da4ced0051f822bfc86728019c46f9185979"
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq59hz4j3f4dc6mvd7zpa6j2f4py4qe4ywt9us5la775"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500a16e2aca29ab71adb1be107ba92935092a0cd48e5979"
+
+MARKETPLACE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqg5fsxjxhvqj4naqp0msld0g4slfctc39t9us6ksjjx"
+MARKETPLACE_CONTRACT_ADDRESS_HEX="0x0000000000000000050045130348d7602559f4017ee1f6bd1587d385e2255979"
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -17,8 +20,8 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
-        --gas-limit=200000000 \
-        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} \
+        --gas-limit=50000000 \
+        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_CONTRACT_ADDRESS_HEX} \
         --send || return
 }
 
