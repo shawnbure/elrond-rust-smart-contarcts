@@ -392,6 +392,69 @@ pub trait MarketplaceContract:
         Ok(())
     }
 
+    #[endpoint(cancelOffer)]
+    fn cancel_offer(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        self.require_global_op_not_ongoing()?;
+
+        self.require_valid_token_id(&token_id)?;
+        self.require_valid_nonce(nonce)?;
+        self.require_valid_price(&amount)?;
+
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        if self.is_nft_for_sale(&nft_id) {
+            self.cancel_offer_for_nft_on_sale(token_id, nonce, amount)
+        } else if self.is_nft_on_auction(&nft_id) {
+            self.cancel_offer_for_nft_on_auction(token_id, nonce, amount)
+        } else {
+            self.error_nft_not_found()
+        }
+    }
+
+    fn cancel_offer_for_nft_on_sale(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        let caller = self.blockchain().get_caller();
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        let nft_sale_info = self.nft_sale_info(&nft_id).get();
+
+        let list_timestamp = nft_sale_info.timestamp;
+        self.require_offer_exists(&caller, &nft_id, list_timestamp)?;
+        self.offer(&caller, &nft_id, list_timestamp).clear();
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.cancel_offer_event(caller, token_id, nonce, amount, timestamp, tx_hash);
+        Ok(())
+    }
+
+    fn cancel_offer_for_nft_on_auction(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        let caller = self.blockchain().get_caller();
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        let nft_sale_info = self.auction(&nft_id).get();
+
+        let list_timestamp = nft_sale_info.created_at;
+        self.require_offer_exists(&caller, &nft_id, list_timestamp)?;
+        self.offer(&caller, &nft_id, list_timestamp).clear();
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.cancel_offer_event(caller, token_id, nonce, amount, timestamp, tx_hash);
+        Ok(())
+    }
+
     #[payable("*")]
     #[endpoint(startAuction)]
     fn start_auction(
