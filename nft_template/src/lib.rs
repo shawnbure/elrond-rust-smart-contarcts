@@ -13,12 +13,55 @@ pub trait NftTemplate {
         base_uri: BoxedBytes,
         price: Self::BigUint,
         max_supply: u64,
+        sale_start_timestamp: u64,
     ) {
         self.token_id().set_if_empty(&token_id);
         self.base_uri().set_if_empty(&base_uri);
         self.royalties().set_if_empty(&royalties);
         self.price().set_if_empty(&price);
-        self.max_supply().set_if_empty(&max_supply)
+        self.max_supply().set_if_empty(&max_supply);
+        self.sale_start_timestamp()
+            .set_if_empty(&sale_start_timestamp);
+    }
+
+    #[only_owner]
+    #[endpoint(giveaway)]
+    fn giveaway(
+        &self,
+        #[var_args] addr_amount_args: MultiArgVec<MultiArg2<Address, u64>>,
+    ) -> SCResult<u64> {
+        let uris = [self.base_uri().get()];
+        let empty_box = BoxedBytes::empty();
+        let token_id = self.token_id().get();
+        let royalties = self.royalties().get();
+        let big_one = Self::BigUint::from(1u64);
+        let mut total_amount = 0u64;
+
+        for entry in addr_amount_args.into_vec() {
+            let (address, amount) = entry.into_tuple();
+
+            for _ in 0..amount {
+                let nonce = self.send().esdt_nft_create(
+                    &token_id,
+                    &big_one,
+                    &empty_box,
+                    &royalties,
+                    &empty_box,
+                    &empty_box,
+                    &uris[..],
+                );
+                self.send()
+                    .direct(&address, &token_id, nonce, &big_one, &[]);
+            }
+
+            total_amount += amount;
+        }
+
+        let tokens_left_for_sale = self.get_left_for_sale();
+        require!(tokens_left_for_sale >= total_amount, "no tokens left");
+
+        self.total_sold().update(|x| *x += total_amount);
+        Ok(total_amount)
     }
 
     #[payable("EGLD")]
@@ -28,6 +71,13 @@ pub trait NftTemplate {
         #[payment_amount] payment: Self::BigUint,
         number_of_tokens_desired: u64,
     ) -> SCResult<()> {
+        let current_timestamp = self.blockchain().get_block_timestamp();
+        let sale_start_timestamp = self.sale_start_timestamp().get();
+        require!(
+            current_timestamp >= sale_start_timestamp,
+            "sale did not start"
+        );
+        require!(!self.sale_paused().get(), "sale is paused");
         require!(number_of_tokens_desired > 0, "cannot mint zero tokens");
 
         let tokens_left_for_sale = self.get_left_for_sale();
@@ -82,6 +132,18 @@ pub trait NftTemplate {
         );
     }
 
+    #[only_owner]
+    #[endpoint(pauseSale)]
+    fn pause_sale(&self) {
+        self.sale_paused().set(&true);
+    }
+
+    #[only_owner]
+    #[endpoint(resumeSale)]
+    fn resume_sale(&self) {
+        self.sale_paused().set(&false);
+    }
+
     #[view(getLeftForSale)]
     fn get_left_for_sale(&self) -> u64 {
         self.max_supply().get() - self.total_sold().get()
@@ -115,4 +177,12 @@ pub trait NftTemplate {
     #[view(getTokenId)]
     #[storage_mapper("token_id")]
     fn token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+
+    #[view(getSaleStartTimestamp)]
+    #[storage_mapper("sale_start_timestamp")]
+    fn sale_start_timestamp(&self) -> SingleValueMapper<Self::Storage, u64>;
+
+    #[view(isSalePaused)]
+    #[storage_mapper("sale_paused")]
+    fn sale_paused(&self) -> SingleValueMapper<Self::Storage, bool>;
 }
