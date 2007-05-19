@@ -52,7 +52,7 @@ pub trait ConfigModule: storage::StorageModule {
         min_price: Self::BigUint,
         max_price: Self::BigUint,
     ) -> SCResult<()> {
-        require!(max_price != 0, "Max price cannot be zero");
+        require!(min_price != 0, "Min price cannot be zero");
         require!(max_price >= min_price, "Max cannot be lower than min");
         self.asset_min_price().set(&min_price);
         self.asset_max_price().set(&max_price);
