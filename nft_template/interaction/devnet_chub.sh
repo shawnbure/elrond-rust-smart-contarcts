@@ -1,5 +1,5 @@
 #Fill this with the good values
-MY_WALLET_PEM="~/Wallets/WalletKey.pem"
+MY_WALLET_PEM="/pems/WalletKey.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"

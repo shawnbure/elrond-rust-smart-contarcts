@@ -1,5 +1,5 @@
-MY_WALLET_PEM="~/Wallets/WalletKey.pem"
-MY_OTHER_WALLET_PEM="~/Wallets/OtherWalletKey.pem"
+MY_WALLET_PEM="/pems/WalletKey.pem"
+MY_OTHER_WALLET_PEM="/pems/OtherWalletKey.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/deployer.wasm"

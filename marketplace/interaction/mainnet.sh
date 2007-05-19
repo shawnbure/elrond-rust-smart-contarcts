@@ -1,11 +1,11 @@
-MY_WALLET_PEM="/home/elrond/Wallets/mainnet/mainnet_thingy.pem"
+MY_WALLET_PEM="/pems/mainnet/mainnet_thingy.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
 WASM="../output/marketplace.wasm"
 
 CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqrrrz9m9sxvz05c72yuq7y9amfn3fcjmvcfqsr9r366"
 CONTRACT_ADDRESS_HEX="0x0000000000000000050018c622ecb03304fa63ca2701e217bb4ce29c4b6cc241"
-MY_ADDRESS="erd126v5rfxenay3ma8s7qddugae24ull6mmxsl8lh5pkh5ffluqcfqseu5kr8"
+MY_ADDRESS="erd126"
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \

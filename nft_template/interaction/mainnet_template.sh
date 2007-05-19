@@ -1,9 +1,9 @@
 #Fill this with the good values
-MY_WALLET_PEM="/home/elrond/Wallets/mainnet/mainnet_thingy.pem"
+MY_WALLET_PEM="/pems/mainnet/mainnet_thingy.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
-MY_ADDRESS="erd126v5rfxenay3ma8s7qddugae24ull6mmxsl8lh5pkh5ffluqcfqseu5kr8"
-MY_ADDRESS_HEX="0x569941a4d99f491df4f0f01ade23b95579ffeb7b343e7fde81b5e894ff80c241"
+MY_ADDRESS="erd126"
+MY_ADDRESS_HEX="0x56994"
 
 MY_TOKEN_NAME="0x54454d50"
 MY_TOKEN_TICKER="0x54454d50"
