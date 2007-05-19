@@ -63,15 +63,18 @@ pub trait NftTemplate {
             let (address, amount) = entry.into_tuple();
 
             for _ in 0..amount {
-                let index = self.get_token_index(next_expected_nonce);
                 let nonce = self.send().esdt_nft_create(
                     &token_id,
                     &big_one,
-                    &self.compute_token_name(&token_name_base, index),
+                    &self.compute_token_name(&token_name_base, next_expected_nonce),
                     &royalties,
                     &empty_box,
                     &empty_box,
-                    &self.compute_token_uris(&image_base_uri, &metadata_base_uri, index),
+                    &self.compute_token_uris(
+                        &image_base_uri,
+                        &metadata_base_uri,
+                        next_expected_nonce,
+                    ),
                 );
                 require!(nonce as u16 == next_expected_nonce, "unexpected nonce");
                 next_expected_nonce += 1;
@@ -126,15 +129,14 @@ pub trait NftTemplate {
         let mut next_expected_nonce = self.total_sold().get() + 1;
 
         for _ in 0..tokens_to_sell {
-            let index = self.get_token_index(next_expected_nonce);
             let nonce = self.send().esdt_nft_create(
                 &token_id,
                 &big_one,
-                &self.compute_token_name(&token_name_base, index),
+                &self.compute_token_name(&token_name_base, next_expected_nonce),
                 &royalties,
                 &empty_box,
                 &empty_box,
-                &self.compute_token_uris(&image_base_uri, &metadata_base_uri, index),
+                &self.compute_token_uris(&image_base_uri, &metadata_base_uri, next_expected_nonce),
             );
             require!(nonce as u16 == next_expected_nonce, "unexpected nonce");
             next_expected_nonce += 1;
@@ -198,10 +200,11 @@ pub trait NftTemplate {
         &self,
         image_base_uri: &BoxedBytes,
         metadata_base_uri: &BoxedBytes,
-        index: u16,
+        expected_nonce: u16,
     ) -> Vec<BoxedBytes> {
         let mut result = Vec::new();
         let delimiter = BoxedBytes::from(&b"/"[..]);
+        let index = self.get_token_index(expected_nonce);
         let index_string = self.u16_to_string(index);
 
         let own_image_uri = BoxedBytes::from_concat(&[
@@ -222,14 +225,14 @@ pub trait NftTemplate {
         result
     }
 
-    fn compute_token_name(&self, token_name_base: &BoxedBytes, index: u16) -> BoxedBytes {
+    fn compute_token_name(&self, token_name_base: &BoxedBytes, expected_nonce: u16) -> BoxedBytes {
         let delimiter = BoxedBytes::from(&b" #"[..]);
-        let index_string = self.u16_to_string(index);
+        let expected_nonce_string = self.u16_to_string(expected_nonce);
 
         BoxedBytes::from_concat(&[
             token_name_base.as_slice(),
             delimiter.as_slice(),
-            index_string.as_slice(),
+            expected_nonce_string.as_slice(),
         ])
     }
 
