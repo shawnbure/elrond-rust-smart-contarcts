@@ -46,13 +46,14 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
 
         let curr_last_diff = curr_epoch - last_epoch;
         let withdrawal_epochs = self.creator_withdrawal_waiting_epochs().get();
-        let mut remaining_epochs = 0;
+        let remaining_epochs;
 
         if curr_last_diff < withdrawal_epochs {
             remaining_epochs = withdrawal_epochs - curr_epoch;
+        } else {
+            remaining_epochs = withdrawal_epochs - (curr_last_diff - withdrawal_epochs);
         }
 
-        remaining_epochs = withdrawal_epochs - (curr_last_diff - withdrawal_epochs);
         Ok(remaining_epochs)
     }
 
