@@ -8,7 +8,7 @@ mod random;
 use random::Random;
 
 const MIN_LOOP_ITERATION_GAS_LIMIT: u64 = 10_000_000;
-const ERDSEA_ERC721_STANDARD: &[u8] = b"Erdsea|ERC-721";
+const ERDSEA_ERD721_STANDARD: &[u8] = b"Erdsea|ERD-721";
 
 mod marketplace_proxy {
     elrond_wasm::imports!();
@@ -64,6 +64,7 @@ pub trait NftTemplate {
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
         let big_one = Self::BigUint::from(1u64);
+        let big_zero = Self::BigUint::zero();
         let mut total_amount = 0u16;
         let mut next_expected_nonce = self.total_sold().get() + 1;
 
@@ -88,14 +89,11 @@ pub trait NftTemplate {
                 require!(nonce as u16 == next_expected_nonce, "unexpected nonce");
                 next_expected_nonce += 1;
 
-                self.send().direct(
-                    &address,
-                    &token_id,
-                    nonce,
-                    &big_one,
-                    &ERDSEA_ERC721_STANDARD,
-                );
+                self.send()
+                    .direct(&address, &token_id, nonce, &big_one, &[]);
             }
+            self.send()
+                .direct_egld(&address, &big_zero, &ERDSEA_ERD721_STANDARD);
 
             total_amount += amount;
         }
@@ -161,12 +159,12 @@ pub trait NftTemplate {
             require!(nonce as u16 == next_expected_nonce, "unexpected nonce");
             next_expected_nonce += 1;
 
-            self.send()
-                .direct(&caller, &token_id, nonce, &big_one, &ERDSEA_ERC721_STANDARD);
+            self.send().direct(&caller, &token_id, nonce, &big_one, &[]);
         }
 
         let surplus = payment - price_for_tokens_to_sell;
-        self.safe_send_egld(&caller, &surplus);
+        self.send()
+            .direct_egld(&caller, &surplus, &ERDSEA_ERD721_STANDARD);
 
         self.total_sold().update(|x| *x += tokens_to_sell);
         Ok(())
@@ -276,12 +274,6 @@ pub trait NftTemplate {
 
         vec.reverse();
         vec.as_slice().into()
-    }
-
-    fn safe_send_egld(&self, to: &Address, amount: &Self::BigUint) {
-        if amount > &0 {
-            self.send().direct_egld(to, amount, &[]);
-        }
     }
 
     #[proxy]

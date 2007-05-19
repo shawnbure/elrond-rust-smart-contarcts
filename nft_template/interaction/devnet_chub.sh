@@ -25,6 +25,7 @@ MY_TOKEN_ID="0x434855422d646334393036" #Fill this after issue
 ROYALTIES=0x02EE #7.5%
 MY_TOKEN_NAME_BASE="0x4368756262696672656e73"
 MY_TOKEN_IMAGE_BASE_URI="0x68747470733a2f2f7777772e63687562626976657273652e636f6d2f6672656e"
+MY_TOKEN_IMAGE_EXTENSION="0x2e706e67"
 MY_TOKEN_METADATA_BASE_URI="0x68747470733a2f2f7777772e63687562626976657273652e636f6d2f6170692f6d6574612f31"
 PRICE=1000000000000000000 #1EGLD
 MAX_SUPPLY=10000
@@ -36,7 +37,7 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_METADATA_BASE_URI} ${PRICE} ${MAX_SUPPLY} ${SALE_START} \
+        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
 
@@ -49,7 +50,7 @@ upgrade() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_METADATA_BASE_URI} ${PRICE} ${MAX_SUPPLY} ${SALE_START} \
+        --arguments ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
 
@@ -68,7 +69,7 @@ mintTokens() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} \
         --pem=${MY_WALLET_PEM} \
         --recall-nonce \
-        --value 1000000000000000000 \
+        --value 10000000000000000 \
         --gas-limit 60000000 \
         --function "mintTokens" \
         --arguments $1 \
