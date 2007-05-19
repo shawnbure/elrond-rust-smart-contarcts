@@ -84,4 +84,34 @@ pub trait ValidationModule:
         require!(address != &nft_sale_info.owner, "Is owner");
         Ok(())
     }
+
+    fn require_same_amounts(&self, a: &Self::BigUint, b: &Self::BigUint) -> SCResult<()> {
+        require!(a == b, "Amounts differ");
+        Ok(())
+    }
+
+    fn require_has_amount_in_deposit(
+        &self,
+        address: &Address,
+        amount: &Self::BigUint,
+    ) -> SCResult<()> {
+        require!(
+            &self.egld_deposit(address).get() >= amount,
+            "not enough amount in deposit"
+        );
+        Ok(())
+    }
+
+    fn require_offer_exists(
+        &self,
+        address: &Address,
+        nft_id: &NftId,
+        timestamp: u64,
+    ) -> SCResult<()> {
+        require!(
+            !self.offer(address, nft_id, timestamp).is_empty(),
+            "offer does not exist"
+        );
+        Ok(())
+    }
 }

@@ -18,7 +18,7 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
     #[endpoint(withdrawCreatorRoyalties)]
     fn withdraw_creator_royalties(&self) -> SCResult<()> {
         let caller = &self.blockchain().get_caller();
-        require!(self.creator_not_blacklisted(&caller), "blacklisted");
+        require!(self.creator_not_blacklisted(caller), "blacklisted");
 
         let current_epoch = self.blockchain().get_block_epoch();
         let creator_withdrawal_waiting_epochs = self.creator_withdrawal_waiting_epochs().get();
