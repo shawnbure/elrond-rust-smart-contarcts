@@ -592,6 +592,9 @@ pub trait MarketplaceContract:
         let mut auction_info = self.auction(&nft_id).get();
         self.require_deadline_passed(&auction_info)?;
 
+        let caller = self.blockchain().get_caller();
+        self.require_owner_or_winner(&caller, &auction_info)?;
+
         if self.auction_has_winner(&auction_info) {
             //Winner funds are already substracted at this point.
 
@@ -615,7 +618,6 @@ pub trait MarketplaceContract:
 
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
-        let caller = self.blockchain().get_caller();
         self.end_auction_event(
             caller,
             token_id,

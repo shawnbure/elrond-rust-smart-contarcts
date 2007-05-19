@@ -157,6 +157,18 @@ pub trait ValidationModule:
         Ok(())
     }
 
+    fn require_owner_or_winner(
+        &self,
+        address: &Address,
+        auction_info: &AuctionInfo<Self::BigUint>,
+    ) -> SCResult<()> {
+        require!(
+            address == &auction_info.owner || address == &auction_info.highest_bidder,
+            "Not owner or winner"
+        );
+        Ok(())
+    }
+
     fn require_auction_owner(
         &self,
         address: &Address,
