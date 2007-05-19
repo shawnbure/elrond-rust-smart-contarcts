@@ -20,7 +20,7 @@ pub trait Deployer {
         image_base_uri: BoxedBytes,
         image_extension: BoxedBytes,
         price: BigUint,
-        max_supply: u64,
+        max_supply: u16,
         sale_start_timestamp: u64,
         #[var_args] metadata_base_uri_opt: OptionalArg<BoxedBytes>,
     ) -> SCResult<ManagedAddress> {
