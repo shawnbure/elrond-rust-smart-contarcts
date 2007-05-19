@@ -13,24 +13,26 @@ pub trait DepositModule:
     #[endpoint(deposit)]
     fn deposit(&self, #[payment_amount] amount: Self::BigUint) {
         let caller = self.blockchain().get_caller();
-        let amount = self.increate_deposit(&caller, &amount);
-        self.deposit_update_event(caller, amount);
+        self.increase_deposit(&caller, &amount);
     }
 
     #[endpoint(withdraw)]
-    fn withdraw(&self) {
+    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<Self::BigUint>) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
-        let amount = &self.egld_deposit(&caller).get();
-        self.send_egld(&caller, amount);
-        self.egld_deposit(&caller).clear();
-        self.deposit_update_event(caller, 0u64.into());
+        let amount = opt_amount
+            .into_option()
+            .unwrap_or_else(|| self.egld_deposit(&caller).get());
+        self.try_decrease_deposit(&caller, &amount)?;
+        self.send_egld(&caller, &amount);
+        Ok(())
     }
 
-    fn increate_deposit(&self, address: &Address, amount: &Self::BigUint) -> Self::BigUint {
+    fn increase_deposit(&self, address: &Address, amount: &Self::BigUint) -> Self::BigUint {
         let mut deposit = self.egld_deposit(address).get();
         deposit += amount;
 
         self.egld_deposit(address).set(&deposit);
+        self.deposit_update_event(address.clone(), deposit.clone());
         deposit
     }
 
@@ -45,6 +47,7 @@ pub trait DepositModule:
         deposit -= amount;
 
         self.egld_deposit(address).set(&deposit);
+        self.deposit_update_event(address.clone(), deposit.clone());
         Ok(deposit)
     }
 
@@ -61,6 +64,7 @@ pub trait DepositModule:
         deposit -= to_decrease;
 
         self.egld_deposit(address).set(&deposit);
+        self.deposit_update_event(address.clone(), deposit.clone());
         Ok(deposit)
     }
 }
