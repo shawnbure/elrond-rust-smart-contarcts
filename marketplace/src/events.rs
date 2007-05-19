@@ -46,5 +46,5 @@ pub trait EventsModule {
     );
 
     #[event("deposit_update")]
-    fn deposit_update(&self, #[indexed] address: Address, #[indexed] amount: Self::BigUint);
+    fn deposit_update_event(&self, #[indexed] address: Address, #[indexed] amount: Self::BigUint);
 }

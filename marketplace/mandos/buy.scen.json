@@ -167,6 +167,7 @@
                         "str:creator_withdrawal_waiting_epochs": "30",
                         "str:platform_royalties": "12,500",
                         "str:egld_deposit|address:owner": "475,000",
+                        "str:egld_deposit|address:a_user": "200,000",
                         "str:creator_royalties|address:creator": "12,500"
                     },
                     "code": "file:../output/marketplace.wasm",

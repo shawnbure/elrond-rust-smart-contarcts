@@ -136,8 +136,8 @@ pub trait MarketplaceContract:
             timestamp,
             tx_hash,
         );
-        self.deposit_update(caller, caller_deposit);
-        self.deposit_update(nft_sale_info.owner, seller_deposit);
+        self.deposit_update_event(caller, caller_deposit);
+        self.deposit_update_event(nft_sale_info.owner, seller_deposit);
         Ok(())
     }
 

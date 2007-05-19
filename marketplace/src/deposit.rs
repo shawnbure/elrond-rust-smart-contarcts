@@ -14,7 +14,7 @@ pub trait DepositModule:
     fn deposit(&self, #[payment_amount] amount: Self::BigUint) {
         let caller = self.blockchain().get_caller();
         let amount = self.increate_deposit(&caller, &amount);
-        self.deposit_update(caller, amount);
+        self.deposit_update_event(caller, amount);
     }
 
     #[endpoint(withdraw)]
@@ -23,7 +23,7 @@ pub trait DepositModule:
         let amount = &self.egld_deposit(&caller).get();
         self.send_egld(&caller, amount);
         self.egld_deposit(&caller).clear();
-        self.deposit_update(caller, Self::BigUint::zero());
+        self.deposit_update_event(caller, 0u64.into());
     }
 
     fn increate_deposit(&self, address: &Address, amount: &Self::BigUint) -> Self::BigUint {
