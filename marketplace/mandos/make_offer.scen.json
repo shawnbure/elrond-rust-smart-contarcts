@@ -74,7 +74,7 @@
                         "str:asset_max_price": "1,000,000",
                         "str:creator_withdrawal_waiting_epochs": "30",
                         "str:egld_deposit|address:a_user": "50,000",
-                        "str:offer|address:a_user|nested:str:NFT1-abcdef|u64:100|u64:0": "50,000"
+                        "str:offers|address:a_user|nested:str:NFT1-abcdef|u64:100|u64:0": "biguint:50,000|u64:31,556,952"
                     },
                     "code": "file:../output/marketplace.wasm",
                     "owner": "address:owner"

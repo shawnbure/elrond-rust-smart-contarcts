@@ -68,6 +68,27 @@ impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
     }
 }
 
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+pub struct Offer<BigUint: BigUintApi> {
+    pub amount: BigUint,
+    pub expire: u64,
+}
+
+impl<BigUint: BigUintApi> Offer<BigUint> {
+    pub fn new(amount: BigUint, expire: u64) -> Self {
+        Offer { amount, expire }
+    }
+}
+
+impl<BigUint: BigUintApi> Default for Offer<BigUint> {
+    fn default() -> Self {
+        Offer {
+            amount: BigUint::zero(),
+            expire: 0,
+        }
+    }
+}
+
 #[elrond_wasm::module]
 pub trait StorageModule {
     #[view(getPlatformFeePercent)]
@@ -124,13 +145,13 @@ pub trait StorageModule {
     ) -> SingleValueMapper<Self::Storage, NftSaleInfo<Self::BigUint>>;
 
     #[view(getOffer)]
-    #[storage_mapper("offer")]
-    fn offer(
+    #[storage_mapper("offers")]
+    fn offers(
         &self,
         caller: &Address,
         nft_id: &NftId,
         nft_list_timestamp: u64,
-    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    ) -> SingleValueMapper<Self::Storage, Offer<Self::BigUint>>;
 
     #[view(getAuction)]
     #[storage_mapper("auction")]

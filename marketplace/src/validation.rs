@@ -7,7 +7,7 @@ use crate::storage::NftSaleInfo;
 
 use super::config;
 use super::storage;
-use super::storage::NftId;
+use super::storage::{NftId, Offer};
 use super::utils;
 
 #[elrond_wasm::module]
@@ -110,7 +110,7 @@ pub trait ValidationModule:
         timestamp: u64,
     ) -> SCResult<()> {
         require!(
-            !self.offer(address, nft_id, timestamp).is_empty(),
+            !self.offers(address, nft_id, timestamp).is_empty(),
             "offer does not exist"
         );
         Ok(())
@@ -118,6 +118,22 @@ pub trait ValidationModule:
 
     fn require_valid_start_time(&self, start: u64, current: u64) -> SCResult<()> {
         require!(start >= current, "start time in the past");
+        Ok(())
+    }
+
+    fn require_valid_expire(&self, expire: u64) -> SCResult<()> {
+        require!(
+            expire >= self.blockchain().get_block_timestamp(),
+            "expire in the past"
+        );
+        Ok(())
+    }
+
+    fn require_not_expired(&self, offer: &Offer<Self::BigUint>) -> SCResult<()> {
+        require!(
+            offer.expire >= self.blockchain().get_block_timestamp(),
+            "offer expired"
+        );
         Ok(())
     }
 

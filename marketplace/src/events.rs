@@ -55,6 +55,7 @@ pub trait EventsModule {
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: Self::BigUint,
+        #[indexed] expire: u64,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
