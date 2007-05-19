@@ -1,5 +1,5 @@
 MY_WALLET_PEM="~/Wallets/WalletKey.pem"
-MY_OTHER_WALLET_PEM="OtherWalletKey.pem"
+MY_OTHER_WALLET_PEM="~/Wallets/OtherWalletKey.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
@@ -69,11 +69,10 @@ withdrawNft() {
 # $1 amount to deposit
 deposit() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
-        --value=$1
-        --pem=${MY_WALLET_PEM} \
+        --value=$1 \
+        --pem=${MY_OTHER_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function deposit \
-        --arguments $1 $2 \
         --gas-limit=100000000 \
         --send || return
 }
@@ -81,10 +80,41 @@ deposit() {
 # $1 amount to deposit
 withdraw() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
-        --pem=${MY_WALLET_PEM} \
+        --pem=${MY_OTHER_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function withdraw \
-        --arguments $1 $2 \
+        --gas-limit=100000000 \
+        --send || return
+}
+
+# $1 token id in hex
+# $2 nonce
+makeOffer() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_OTHER_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --arguments $1 $2 1000000000000000000 \
+        --function makeOffer \
+        --gas-limit=100000000 \
+        --send || return
+}
+
+acceptOffer() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --arguments $1 $2 0x88c3a92928a3b006897c72d7412a6ffc0fc78c3f982e43375ed6e4b335e54dbd 1000000000000000000 \
+        --function acceptOffer \
+        --gas-limit=100000000 \
+        --send || return
+}
+
+cancelOffer() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --arguments $1 $2 1000000000000000000 \
+        --function cancelOffer \
         --gas-limit=100000000 \
         --send || return
 }
