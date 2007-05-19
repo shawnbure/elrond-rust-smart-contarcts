@@ -1,8 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use super::config::BP;
-use super::config::DEFAULT_FEE_PERCENT;
+use super::config::{BP, DEFAULT_FEE_PERCENT, ROYALTIES_MAX_FEE_PERCENT};
 use super::storage;
 
 #[elrond_wasm::module]
@@ -14,6 +13,16 @@ pub trait UtilsModule: storage::StorageModule {
             fee
         } else {
             DEFAULT_FEE_PERCENT
+        }
+    }
+
+    fn get_royalties_max_fee_percent_or_default(&self) -> u64 {
+        let fee = self.royalties_max_fee_percent().get();
+
+        if fee != 0 {
+            fee
+        } else {
+            ROYALTIES_MAX_FEE_PERCENT
         }
     }
 

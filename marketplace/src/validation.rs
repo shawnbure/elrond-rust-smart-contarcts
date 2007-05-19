@@ -48,6 +48,10 @@ pub trait ValidationModule:
     fn require_valid_royalties(&self, token_data: &EsdtTokenData<Self::BigUint>) -> SCResult<()> {
         let platform_fee = self.get_platform_fee_percent_or_default();
         require!(
+            token_data.royalties <= self.get_royalties_max_fee_percent_or_default(),
+            "Royalties too big"
+        );
+        require!(
             &token_data.royalties + &platform_fee.into() < Self::BigUint::from(BP),
             "Royalties too big"
         );

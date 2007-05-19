@@ -43,6 +43,7 @@
                     "storage": {
                         "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|u32:0|biguint:200,000|u64:250|u64:0",
                         "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
                         "str:asset_max_price": "1,000,000"
                     },
@@ -90,6 +91,7 @@
                     "storage": {
                         "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|u32:0|biguint:200,000|u64:250|u64:0",
                         "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
                         "str:asset_max_price": "1,000,000"
                     },
@@ -130,6 +132,7 @@
                     "balance": "0",
                     "storage": {
                         "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
                         "str:asset_max_price": "1,000,000"
                     },

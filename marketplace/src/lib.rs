@@ -27,10 +27,12 @@ pub trait MarketplaceContract:
     fn init(
         &self,
         platform_fee_percent: u64,
+        royalties_max_fee_percent: u64,
         asset_min_price: Self::BigUint,
         asset_max_price: Self::BigUint,
     ) -> SCResult<()> {
         self.try_set_platform_fee_percent(platform_fee_percent)?;
+        self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)
     }
 
@@ -72,7 +74,16 @@ pub trait MarketplaceContract:
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
         let tx_hash = self.blockchain().get_tx_hash();
-        self.put_nft_for_sale_event(caller, token_id, nonce, uri, price, timestamp, tx_hash);
+        self.put_nft_for_sale_event(
+            caller,
+            token_id,
+            nonce,
+            uri,
+            price,
+            token_data.royalties,
+            timestamp,
+            tx_hash,
+        );
 
         Ok(())
     }

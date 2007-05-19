@@ -51,6 +51,7 @@
                 "contractCode": "file:../../output/marketplace.wasm",
                 "arguments": [
                     "250",
+                    "1000",
                     "100",
                     "1,000,000"
                 ],
@@ -73,6 +74,7 @@
                     "balance": "0",
                     "storage": {
                         "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
                         "str:asset_max_price": "1,000,000"
                     },

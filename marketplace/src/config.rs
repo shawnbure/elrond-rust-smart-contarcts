@@ -5,6 +5,7 @@ use super::storage;
 
 pub const BP: u64 = 10_000;
 pub const DEFAULT_FEE_PERCENT: u64 = 250;
+pub const ROYALTIES_MAX_FEE_PERCENT: u64 = 1_000;
 
 #[elrond_wasm::module]
 pub trait ConfigModule: storage::StorageModule {
@@ -21,6 +22,12 @@ pub trait ConfigModule: storage::StorageModule {
     #[endpoint(setPlatformFeePercent)]
     fn set_platform_fee_percent(&self, fee_percent: u64) -> SCResult<()> {
         self.try_set_platform_fee_percent(fee_percent)
+    }
+
+    #[only_owner]
+    #[endpoint(setRoyaltiesMaxFeePercent)]
+    fn set_royalties_max_fee_percent(&self, fee_percent: u64) -> SCResult<()> {
+        self.try_set_royalties_max_fee_percent(fee_percent)
     }
 
     #[only_owner]
@@ -49,6 +56,15 @@ pub trait ConfigModule: storage::StorageModule {
         require!(max_price >= min_price, "Max cannot be lower than min");
         self.asset_min_price().set(&min_price);
         self.asset_max_price().set(&max_price);
+        Ok(())
+    }
+
+    fn try_set_royalties_max_fee_percent(&self, fee_percent: u64) -> SCResult<()> {
+        require!(
+            fee_percent <= ROYALTIES_MAX_FEE_PERCENT,
+            "Royalties fee too high"
+        );
+        self.royalties_max_fee_percent().set(&fee_percent);
         Ok(())
     }
 }
