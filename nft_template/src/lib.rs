@@ -130,7 +130,7 @@ pub trait NftTemplate {
         #[var_args] number_of_tokens_desired_opt: OptionalArg<u16>,
     ) -> SCResult<()> {
         require!(
-            self.minting_through_marketplace_allowed().get(),
+            !self.minting_through_marketplace_denied().get(),
             "endpoint disabled"
         );
 
@@ -356,13 +356,13 @@ pub trait NftTemplate {
     #[only_owner]
     #[endpoint(allowMintingThroughMarketplace)]
     fn allow_minting_through_marketplace(&self) {
-        self.minting_through_marketplace_allowed().set(&true);
+        self.minting_through_marketplace_denied().set(&false);
     }
 
     #[only_owner]
     #[endpoint(denyMintingThroughMarketplace)]
     fn deny_minting_through_marketplace(&self) {
-        self.minting_through_marketplace_allowed().set(&false);
+        self.minting_through_marketplace_denied().set(&true);
     }
 
     #[only_owner]
@@ -401,9 +401,9 @@ pub trait NftTemplate {
     #[storage_mapper("marketplace_admin")]
     fn marketplace_admin(&self) -> SingleValueMapper<Self::Storage, Address>;
 
-    #[view(isMintingThroughMarketplaceAllowed)]
-    #[storage_mapper("minting_through_marketplace_allowed")]
-    fn minting_through_marketplace_allowed(&self) -> SingleValueMapper<Self::Storage, bool>;
+    #[view(isMintingThroughMarketplaceDenied)]
+    #[storage_mapper("minting_through_marketplace_denied")]
+    fn minting_through_marketplace_denied(&self) -> SingleValueMapper<Self::Storage, bool>;
 
     #[view(getTotalSold)]
     #[storage_mapper("total_sold")]
