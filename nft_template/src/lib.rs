@@ -3,6 +3,16 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+mod marketplace_proxy {
+    elrond_wasm::imports!();
+
+    #[elrond_wasm::proxy]
+    pub trait MarketPlace {
+        #[endpoint(withdrawCreatorRoyalties)]
+        fn withdraw_creator_royalties(&self);
+    }
+}
+
 #[elrond_wasm::contract]
 pub trait NftTemplate {
     #[init]
@@ -157,6 +167,17 @@ pub trait NftTemplate {
         if amount > &0 {
             self.send().direct_egld(to, amount, &[]);
         }
+    }
+
+    #[proxy]
+    fn marketplace_proxy(&self, to: Address) -> marketplace_proxy::Proxy<Self::SendApi>;
+
+    #[only_owner]
+    #[endpoint(requestWithdraw)]
+    fn request_withdraw(&self, marketplace: Address) {
+        self.marketplace_proxy(marketplace)
+            .withdraw_creator_royalties()
+            .execute_on_dest_context_ignore_result();
     }
 
     #[only_owner]

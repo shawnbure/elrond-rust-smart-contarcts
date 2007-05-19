@@ -1,0 +1,143 @@
+{
+    "name": "deployer",
+    "comment": "add then check",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1,000,000,100",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:nft_template": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../../nft_template/output/nft_template.wasm"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:deployer"
+                },
+                {
+                    "creatorAddress": "sc:deployer",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:new_nft_sc"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../output/deployer.wasm",
+                "arguments": [
+                    "100",
+                    "sc:nft_template"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:deployer",
+                "value": "100",
+                "function": "deployNFTTemplateContract",
+                "arguments": [
+                    "str:TOKEN-abcdef",
+                    "100",
+                    "str:https...",
+                    "100",
+                    "100",
+                    "100"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "sc:new_nft_sc"
+                ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "2",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:deployer",
+                "value": "0",
+                "function": "changeOwner",
+                "arguments": [
+                    "sc:new_nft_sc"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "1,000,000,000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:deployer": {
+                    "nonce": "*",
+                    "balance": "100",
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../output/deployer.wasm"
+                },
+                "sc:nft_template": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../../nft_template/output/nft_template.wasm"
+                },
+                "sc:new_nft_sc": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {
+                        "+": ""
+                    },
+                    "code": "file:../../nft_template/output/nft_template.wasm"
+                }
+            }
+        }
+    ]
+}
