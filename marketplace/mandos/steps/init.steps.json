@@ -85,6 +85,12 @@
                 },
                 "+": ""
             }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockEpoch": "100"
+            }
         }
     ]
 }
