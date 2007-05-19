@@ -24,8 +24,8 @@ upgrade() {
         --bytecode=${WASM} \
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
-        --gas-limit=100000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 \
+        --gas-limit=200000000 \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \
         --send || return
 }
 
@@ -111,7 +111,7 @@ acceptOffer() {
 
 cancelOffer() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
-        --pem=${MY_WALLET_PEM} \
+        --pem=${MY_OTHER_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --arguments $1 $2 1000000000000000000 \
         --function cancelOffer \
@@ -124,7 +124,27 @@ startAuction() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function ESDTNFTTransfer \
-        --arguments $1 $2 0x01 ${CONTRACT_ADDRESS_HEX} 0x737461727441756374696f6e 1000000000000000000 1699999999 \
+        --arguments $1 $2 0x01 ${CONTRACT_ADDRESS_HEX} 0x737461727441756374696f6e 1000000000000000000 $3 \
+        --gas-limit=100000000 \
+        --send || return
+}
+
+placeBid() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_OTHER_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function placeBid \
+        --arguments $1 $2 $3 \
+        --gas-limit=100000000 \
+        --send || return
+}
+
+endAuction() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_OTHER_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function endAuction \
+        --arguments $1 $2 \
         --gas-limit=100000000 \
         --send || return
 }
