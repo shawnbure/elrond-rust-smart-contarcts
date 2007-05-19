@@ -4,4 +4,6 @@ members = [
   "marketplace/abi",
   "nft_template",
   "nft_template/abi",
+  "deployer",
+  "deployer/abi",
 ]

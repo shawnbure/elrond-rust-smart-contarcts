@@ -3,6 +3,16 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+mod marketplace_proxy {
+    elrond_wasm::imports!();
+
+    #[elrond_wasm::proxy]
+    pub trait MarketPlace {
+        #[endpoint(withdrawCreatorRoyalties)]
+        fn withdraw_creator_royalties(&self);
+    }
+}
+
 #[elrond_wasm::contract]
 pub trait NftTemplate {
     #[init]
@@ -30,12 +40,13 @@ pub trait NftTemplate {
         &self,
         #[var_args] addr_amount_args: MultiArgVec<MultiArg2<Address, u64>>,
     ) -> SCResult<u64> {
-        let uris = [self.base_uri().get()];
+        let base_uri = self.base_uri().get();
         let empty_box = BoxedBytes::empty();
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
         let big_one = Self::BigUint::from(1u64);
         let mut total_amount = 0u64;
+        let mut next_expected_nonce = self.total_sold().get() + 1;
 
         for entry in addr_amount_args.into_vec() {
             let (address, amount) = entry.into_tuple();
@@ -48,8 +59,11 @@ pub trait NftTemplate {
                     &royalties,
                     &empty_box,
                     &empty_box,
-                    &uris[..],
+                    &self.compute_token_uris(&base_uri, next_expected_nonce),
                 );
+                require!(nonce == next_expected_nonce, "unexpected nonce");
+                next_expected_nonce += 1;
+
                 self.send()
                     .direct(&address, &token_id, nonce, &big_one, &[]);
             }
@@ -87,12 +101,13 @@ pub trait NftTemplate {
         let price_for_tokens_to_sell = self.price().get() * tokens_to_sell.into();
         require!(payment >= price_for_tokens_to_sell, "payment too low");
 
-        let uris = [self.base_uri().get()];
+        let base_uri = self.base_uri().get();
         let empty_box = BoxedBytes::empty();
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
         let big_one = Self::BigUint::from(1u64);
         let caller = self.blockchain().get_caller();
+        let mut next_expected_nonce = self.total_sold().get() + 1;
 
         for _ in 0..tokens_to_sell {
             let nonce = self.send().esdt_nft_create(
@@ -102,8 +117,11 @@ pub trait NftTemplate {
                 &royalties,
                 &empty_box,
                 &empty_box,
-                &uris[..],
+                &self.compute_token_uris(&base_uri, next_expected_nonce),
             );
+            require!(nonce == next_expected_nonce, "unexpected nonce");
+            next_expected_nonce += 1;
+
             self.send().direct(&caller, &token_id, nonce, &big_one, &[]);
         }
 
@@ -114,10 +132,52 @@ pub trait NftTemplate {
         Ok(())
     }
 
+    fn compute_token_uris(&self, base_uri: &BoxedBytes, nonce: u64) -> Vec<BoxedBytes> {
+        let mut result = Vec::new();
+        let delimiter = b"/";
+
+        let own_uri = BoxedBytes::from_concat(&[
+            base_uri.as_slice(),
+            &delimiter[..],
+            &self.u64_to_string(nonce).as_slice(),
+        ]);
+
+        result.push(own_uri);
+        result.push(base_uri.clone());
+
+        result
+    }
+
+    fn u64_to_string(&self, a: u64) -> BoxedBytes {
+        let ascii_zero_char = 48;
+        let mut vec = Vec::new();
+        let mut num = a;
+
+        while {
+            vec.push(ascii_zero_char + (num % 10) as u8);
+            num /= 10;
+            num != 0
+        } {}
+
+        vec.reverse();
+        vec.as_slice().into()
+    }
+
     fn safe_send_egld(&self, to: &Address, amount: &Self::BigUint) {
         if amount > &0 {
             self.send().direct_egld(to, amount, &[]);
         }
+    }
+
+    #[proxy]
+    fn marketplace_proxy(&self, to: Address) -> marketplace_proxy::Proxy<Self::SendApi>;
+
+    #[only_owner]
+    #[endpoint(requestWithdraw)]
+    fn request_withdraw(&self, marketplace: Address) {
+        self.marketplace_proxy(marketplace)
+            .withdraw_creator_royalties()
+            .execute_on_dest_context_ignore_result();
     }
 
     #[only_owner]
