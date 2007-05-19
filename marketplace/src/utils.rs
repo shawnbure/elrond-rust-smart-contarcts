@@ -1,6 +1,8 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use crate::storage::AuctionInfo;
+
 use super::config::{BP, DEFAULT_FEE_PERCENT, ROYALTIES_MAX_FEE_PERCENT};
 use super::storage;
 
@@ -55,5 +57,9 @@ pub trait UtilsModule: storage::StorageModule {
 
     fn send_egld(&self, to: &Address, amount: &Self::BigUint) {
         self.send().direct_egld(to, amount, &[]);
+    }
+
+    fn auction_has_winner(&self, auction_info: &AuctionInfo<Self::BigUint>) -> bool {
+        auction_info.highest_bidder != Address::zero()
     }
 }

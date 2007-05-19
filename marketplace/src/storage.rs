@@ -29,6 +29,40 @@ impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
         }
     }
 }
+
+#[derive(TopEncode, TopDecode, TypeAbi)]
+pub struct AuctionInfo<BigUint: BigUintApi> {
+    pub owner: Address,
+    pub min_bid: BigUint,
+    pub start_time: u64,
+    pub deadline: u64,
+    pub created_at: u64,
+    pub highest_bidder: Address,
+    pub bid: BigUint,
+}
+
+impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
+    pub fn new(
+        owner: Address,
+        min_bid: BigUint,
+        start_time: u64,
+        deadline: u64,
+        created_at: u64,
+        highest_bidder: Address,
+        bid: BigUint,
+    ) -> Self {
+        AuctionInfo {
+            owner,
+            min_bid,
+            start_time,
+            deadline,
+            created_at,
+            highest_bidder,
+            bid,
+        }
+    }
+}
+
 #[elrond_wasm::module]
 pub trait StorageModule {
     #[view(getPlatformFeePercent)]
@@ -92,4 +126,11 @@ pub trait StorageModule {
         nft_id: &NftId,
         nft_list_timestamp: u64,
     ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+    #[view(getAuction)]
+    #[storage_mapper("auction")]
+    fn auction(
+        &self,
+        nft_id: &NftId,
+    ) -> SingleValueMapper<Self::Storage, AuctionInfo<Self::BigUint>>;
 }

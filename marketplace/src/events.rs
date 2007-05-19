@@ -46,13 +46,7 @@ pub trait EventsModule {
     );
 
     #[event("deposit_update")]
-    fn deposit_update_event(
-        &self,
-        #[indexed] address: Address,
-        #[indexed] amount: Self::BigUint,
-        #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
-    );
+    fn deposit_update_event(&self, #[indexed] address: Address, #[indexed] amount: Self::BigUint);
 
     #[event("make_offer")]
     fn make_offer_event(
@@ -73,6 +67,42 @@ pub trait EventsModule {
         #[indexed] nonce: u64,
         #[indexed] offeror: Address,
         #[indexed] amount: Self::BigUint,
+        #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
+    );
+
+    #[event("start_auction")]
+    fn start_auction_event(
+        &self,
+        #[indexed] caller: Address,
+        #[indexed] token_id: TokenIdentifier,
+        #[indexed] nonce: u64,
+        #[indexed] min_bid: Self::BigUint,
+        #[indexed] start_time: u64,
+        #[indexed] deadline: u64,
+        #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
+    );
+
+    #[event("place_bid")]
+    fn place_bid_event(
+        &self,
+        #[indexed] caller: Address,
+        #[indexed] token_id: TokenIdentifier,
+        #[indexed] nonce: u64,
+        #[indexed] bid: Self::BigUint,
+        #[indexed] timestamp: u64,
+        #[indexed] tx_hash: H256,
+    );
+
+    #[event("end_auction")]
+    fn end_auction_event(
+        &self,
+        #[indexed] caller: Address,
+        #[indexed] token_id: TokenIdentifier,
+        #[indexed] nonce: u64,
+        #[indexed] winner: Address,
+        #[indexed] bid: Self::BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );

@@ -12,7 +12,7 @@ pub mod storage;
 pub mod utils;
 pub mod validation;
 
-use storage::{NftId, NftSaleInfo};
+use storage::{AuctionInfo, NftId, NftSaleInfo};
 
 #[elrond_wasm::contract]
 pub trait MarketplaceContract:
@@ -53,7 +53,7 @@ pub trait MarketplaceContract:
 
         self.require_valid_token_id(&token_id)?;
         self.require_valid_nonce(nonce)?;
-        self.require_valid_amount(&amount)?;
+        self.require_valid_nft_amount(&amount)?;
         self.require_valid_price(&price)?;
 
         let token_data = self.get_token_data(&token_id, nonce);
@@ -108,7 +108,7 @@ pub trait MarketplaceContract:
         self.require_not_owns_nft(&caller, &nft_sale_info)?;
 
         let price = &nft_sale_info.price;
-        let caller_deposit = self.try_increase_decrease_deposit(&caller, &payment, price)?;
+        self.try_increase_decrease_deposit(&caller, &payment, price)?;
 
         let token_data = self.get_token_data(&token_id, nonce);
         let creator_cut = self.get_creator_cut(&payment, &token_data);
@@ -119,7 +119,7 @@ pub trait MarketplaceContract:
         self.increase_platform_royalties(&platform_cut);
 
         let nft_owner_cut = &payment - &platform_cut - creator_cut;
-        let nft_owner_deposit = self.increate_deposit(&nft_sale_info.owner, &nft_owner_cut);
+        self.increase_deposit(&nft_sale_info.owner, &nft_owner_cut);
 
         self.send_nft(&caller, &token_id, nonce);
         self.nft_sale_info(&nft_id).clear();
@@ -135,8 +135,6 @@ pub trait MarketplaceContract:
             timestamp,
             tx_hash.clone(),
         );
-        self.deposit_update_event(caller, caller_deposit, timestamp, tx_hash.clone());
-        self.deposit_update_event(nft_sale_info.owner, nft_owner_deposit, timestamp, tx_hash);
         Ok(())
     }
 
@@ -229,7 +227,7 @@ pub trait MarketplaceContract:
         self.require_offer_exists(&offeror, &nft_id, list_timestamp)?;
         let offer_amount = self.offer(&offeror, &nft_id, list_timestamp).get();
         self.require_same_amounts(&amount, &offer_amount)?;
-        let offeror_deposit = self.try_decrease_deposit(&offeror, &offer_amount)?;
+        self.try_decrease_deposit(&offeror, &offer_amount)?;
 
         let token_data = self.get_token_data(&token_id, nonce);
         let creator_cut = self.get_creator_cut(&offer_amount, &token_data);
@@ -240,7 +238,7 @@ pub trait MarketplaceContract:
         self.increase_platform_royalties(&platform_cut);
 
         let nft_owner_cut = &offer_amount - &platform_cut - creator_cut;
-        let nft_owner_deposit = self.increate_deposit(&nft_sale_info.owner, &nft_owner_cut);
+        self.increase_deposit(&nft_sale_info.owner, &nft_owner_cut);
 
         self.send_nft(&offeror, &token_id, nonce);
         self.nft_sale_info(&nft_id).clear();
@@ -257,8 +255,154 @@ pub trait MarketplaceContract:
             timestamp,
             tx_hash.clone(),
         );
-        self.deposit_update_event(caller, nft_owner_deposit, timestamp, tx_hash.clone());
-        self.deposit_update_event(offeror, offeror_deposit, timestamp, tx_hash);
+        Ok(())
+    }
+
+    #[payable("*")]
+    #[endpoint(startAuction)]
+    fn start_auction(
+        &self,
+        #[payment_token] token_id: TokenIdentifier,
+        #[payment_nonce] nonce: u64,
+        #[payment_amount] amount: Self::BigUint,
+        min_bid: Self::BigUint,
+        deadline: u64,
+        #[var_args] opt_start_time: OptionalArg<u64>,
+    ) -> SCResult<()> {
+        self.require_global_op_not_ongoing()?;
+
+        self.require_valid_token_id(&token_id)?;
+        self.require_valid_nonce(nonce)?;
+        self.require_valid_nft_amount(&amount)?;
+        self.require_valid_price(&min_bid)?;
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let start_time = opt_start_time.into_option().unwrap_or(timestamp);
+        self.require_valid_start_time(start_time, timestamp)?;
+        self.require_valid_deadline(deadline, start_time)?;
+
+        let token_data = self.get_token_data(&token_id, nonce);
+        self.require_valid_royalties(&token_data)?;
+        self.require_uris_not_empty(&token_data)?;
+
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        self.require_nft_not_on_auction(&nft_id)?;
+
+        let caller = self.blockchain().get_caller();
+        let auction = AuctionInfo::new(
+            caller.clone(),
+            min_bid.clone(),
+            start_time,
+            deadline,
+            timestamp,
+            Address::zero(),
+            0u64.into(),
+        );
+        self.auction(&nft_id).set(&auction);
+
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.start_auction_event(
+            caller.clone(),
+            token_id,
+            nonce,
+            min_bid,
+            start_time,
+            deadline,
+            timestamp,
+            tx_hash,
+        );
+        Ok(())
+    }
+
+    #[payable("EGLD")]
+    #[endpoint(placeBid)]
+    fn place_bid(
+        &self,
+        #[payment_amount] payment: Self::BigUint,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        bid_amount: Self::BigUint,
+    ) -> SCResult<()> {
+        self.require_global_op_not_ongoing()?;
+
+        self.require_valid_token_id(&token_id)?;
+        self.require_valid_nonce(nonce)?;
+        self.require_valid_price(&bid_amount)?;
+
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        self.require_nft_on_auction(&nft_id)?;
+
+        let caller = self.blockchain().get_caller();
+        let mut auction_info = self.auction(&nft_id).get();
+        self.require_not_auction_owner(&caller, &auction_info)?;
+        self.require_is_auction_ongoing(&auction_info)?;
+        self.require_valid_new_bid(&bid_amount, &auction_info)?;
+
+        self.increase_deposit(&auction_info.highest_bidder, &auction_info.bid);
+        self.try_increase_decrease_deposit(&caller, &payment, &bid_amount)?;
+
+        auction_info.highest_bidder = caller.clone();
+        auction_info.bid = bid_amount.clone();
+        self.auction(&nft_id).set(&auction_info);
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.place_bid_event(
+            caller.clone(),
+            token_id,
+            nonce,
+            bid_amount,
+            timestamp,
+            tx_hash.clone(),
+        );
+        Ok(())
+    }
+
+    #[endpoint(endAuction)]
+    fn end_auction(&self, token_id: TokenIdentifier, nonce: u64) -> SCResult<()> {
+        self.require_global_op_not_ongoing()?;
+
+        self.require_valid_token_id(&token_id)?;
+        self.require_valid_nonce(nonce)?;
+
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        self.require_nft_on_auction(&nft_id)?;
+
+        let auction_info = self.auction(&nft_id).get();
+        self.require_deadline_passed(&auction_info)?;
+
+        if self.auction_has_winner(&auction_info) {
+            //Winner funds are already substracted at this point.
+
+            let token_data = self.get_token_data(&token_id, nonce);
+            let creator_cut = self.get_creator_cut(&auction_info.bid, &token_data);
+            self.set_creator_last_withdrawal_epoch_if_empty(&token_data.creator);
+            self.increase_creator_royalties(&token_data.creator, &creator_cut);
+
+            let platform_cut = self.get_platform_cut(&auction_info.bid);
+            self.increase_platform_royalties(&platform_cut);
+
+            let nft_owner_cut = &auction_info.bid - &platform_cut - creator_cut;
+            self.increase_deposit(&auction_info.owner, &nft_owner_cut);
+
+            self.send_nft(&auction_info.highest_bidder, &token_id, nonce);
+        } else {
+            self.send_nft(&auction_info.owner, &token_id, nonce);
+        }
+        self.auction(&nft_id).clear();
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let tx_hash = self.blockchain().get_tx_hash();
+        let caller = self.blockchain().get_caller();
+        self.end_auction_event(
+            caller,
+            token_id,
+            nonce,
+            auction_info.highest_bidder,
+            auction_info.bid,
+            timestamp,
+            tx_hash,
+        );
         Ok(())
     }
 }

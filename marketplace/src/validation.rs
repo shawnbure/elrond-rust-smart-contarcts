@@ -2,6 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use crate::config::BP;
+use crate::storage::AuctionInfo;
 use crate::storage::NftSaleInfo;
 
 use super::config;
@@ -33,7 +34,7 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_valid_amount(&self, amount: &Self::BigUint) -> SCResult<()> {
+    fn require_valid_nft_amount(&self, amount: &Self::BigUint) -> SCResult<()> {
         require!(amount == &1, "Invalid amount");
         Ok(())
     }
@@ -111,6 +112,67 @@ pub trait ValidationModule:
         require!(
             !self.offer(address, nft_id, timestamp).is_empty(),
             "offer does not exist"
+        );
+        Ok(())
+    }
+
+    fn require_valid_start_time(&self, start: u64, current: u64) -> SCResult<()> {
+        require!(start >= current, "start time in the past");
+        Ok(())
+    }
+
+    fn require_valid_deadline(&self, deadline: u64, start: u64) -> SCResult<()> {
+        require!(deadline >= start, "deadline before start");
+        Ok(())
+    }
+
+    fn require_nft_not_on_auction(&self, nft_id: &NftId) -> SCResult<()> {
+        require!(self.auction(nft_id).is_empty(), "Nft is on auction");
+        Ok(())
+    }
+
+    fn require_nft_on_auction(&self, nft_id: &NftId) -> SCResult<()> {
+        require!(!self.auction(nft_id).is_empty(), "Nft is not on auction");
+        Ok(())
+    }
+
+    fn require_not_auction_owner(
+        &self,
+        address: &Address,
+        auction_info: &AuctionInfo<Self::BigUint>,
+    ) -> SCResult<()> {
+        require!(address != &auction_info.owner, "Is owner");
+        Ok(())
+    }
+
+    fn require_is_auction_ongoing(
+        &self,
+        auction_info: &AuctionInfo<Self::BigUint>,
+    ) -> SCResult<()> {
+        let current_time = self.blockchain().get_block_timestamp();
+        require!(
+            auction_info.start_time <= current_time,
+            "Auction did not start"
+        );
+        require!(current_time <= auction_info.deadline, "Auction ended");
+        Ok(())
+    }
+
+    fn require_valid_new_bid(
+        &self,
+        new_bid: &Self::BigUint,
+        auction_info: &AuctionInfo<Self::BigUint>,
+    ) -> SCResult<()> {
+        require!(new_bid >= &auction_info.min_bid, "Lower than min bid");
+        require!(new_bid > &auction_info.bid, "Lower than highest bid");
+        Ok(())
+    }
+
+    fn require_deadline_passed(&self, auction_info: &AuctionInfo<Self::BigUint>) -> SCResult<()> {
+        let current_time = self.blockchain().get_block_timestamp();
+        require!(
+            current_time > auction_info.deadline,
+            "Auction deadline not passed"
         );
         Ok(())
     }
