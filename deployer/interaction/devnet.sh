@@ -15,6 +15,7 @@ deploy() {
     erdpy --verbose contract deploy --recall-nonce \
         --bytecode=${WASM} \
         --pem=${MY_WALLET_PEM} \
+        --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
         --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} \

@@ -43,7 +43,7 @@ pub trait Deployer {
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
             &self.nft_template_address().get(),
-            CodeMetadata::PAYABLE,
+            CodeMetadata::UPGRADEABLE | CodeMetadata::PAYABLE | CodeMetadata::READABLE,
             &arg_buffer,
         );
 
@@ -74,14 +74,13 @@ pub trait Deployer {
 
     #[only_owner]
     #[endpoint(withdraw)]
-    fn withdraw(&self) {
-        self.send().direct_egld(
-            &self.blockchain().get_caller(),
-            &self
-                .blockchain()
+    fn withdraw(&self, #[var_args] amount_opt: OptionalArg<BigUint>) {
+        let amount = amount_opt.into_option().unwrap_or(
+            self.blockchain()
                 .get_balance(&self.blockchain().get_sc_address()),
-            &[],
         );
+        self.send()
+            .direct_egld(&self.blockchain().get_caller(), &amount, &[]);
     }
 
     #[view(getNftTemplateAddress)]

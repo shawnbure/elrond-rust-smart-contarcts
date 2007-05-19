@@ -13,6 +13,7 @@ deploy() {
     erdpy --verbose contract deploy --recall-nonce \
         --bytecode=${WASM} \
         --pem=${MY_WALLET_PEM} \
+        --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
         --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \
@@ -23,6 +24,7 @@ upgrade() {
     erdpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
         --bytecode=${WASM} \
         --pem=${MY_WALLET_PEM} \
+        --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
         --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \

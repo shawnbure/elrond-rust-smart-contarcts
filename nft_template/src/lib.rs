@@ -289,14 +289,13 @@ pub trait NftTemplate {
 
     #[only_owner]
     #[endpoint(withdraw)]
-    fn withdraw(&self) {
-        self.send().direct_egld(
-            &self.blockchain().get_caller(),
-            &self
-                .blockchain()
+    fn withdraw(&self, #[var_args] amount_opt: OptionalArg<Self::BigUint>) {
+        let amount = amount_opt.into_option().unwrap_or(
+            self.blockchain()
                 .get_balance(&self.blockchain().get_sc_address()),
-            &[],
         );
+        self.send()
+            .direct_egld(&self.blockchain().get_caller(), &amount, &[]);
     }
 
     #[only_owner]

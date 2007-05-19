@@ -8,11 +8,14 @@ use super::utils;
 pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
     #[only_owner]
     #[endpoint(withdrawPlatformRoyalties)]
-    fn withdraw_platform_royalties(&self) {
+    fn withdraw_platform_royalties(&self, #[var_args] amount_opt: OptionalArg<Self::BigUint>) {
+        let amount = amount_opt
+            .into_option()
+            .unwrap_or(self.platform_royalties().get());
+
         let caller = &self.blockchain().get_caller();
-        let royalties = &self.platform_royalties().get();
-        self.send_egld(caller, royalties);
-        self.platform_royalties().clear();
+        self.send_egld(caller, &amount);
+        self.platform_royalties().update(|x| *x -= amount);
     }
 
     #[endpoint(withdrawCreatorRoyalties)]
