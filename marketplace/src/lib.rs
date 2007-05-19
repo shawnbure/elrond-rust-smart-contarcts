@@ -190,13 +190,20 @@ pub trait MarketplaceContract:
         let auction_info = self.auction(&nft_id).get();
         self.require_auction_owner(&caller, &auction_info)?;
 
+        let timestamp = self.blockchain().get_block_timestamp();
+        let deadline_passed = timestamp > auction_info.deadline;
+        let auction_has_winner = auction_info.highest_bidder != Address::zero();
+        require!(
+            !(deadline_passed && auction_has_winner),
+            "auction has a winner"
+        );
+
         let auction = self.auction(&nft_id).get();
         self.increase_deposit(&auction.highest_bidder, &auction.bid);
 
         self.send_nft(&caller, &token_id, nonce);
         self.auction(&nft_id).clear();
 
-        let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.withdraw_nft_event(
             caller,
@@ -373,7 +380,16 @@ pub trait MarketplaceContract:
         let auction_info = self.auction(&nft_id).get();
         self.require_auction_owner(&caller, &auction_info)?;
         self.require_not_auction_owner(&offeror, &auction_info)?;
-        self.require_auction_ended_or_not_started(&auction_info)?;
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let auction_not_started = timestamp < auction_info.start_time;
+        let deadline_passed = timestamp > auction_info.deadline;
+        let has_no_winner = auction_info.highest_bidder == Address::zero();
+        let deadline_passed_and_has_no_winner = deadline_passed && has_no_winner;
+        require!(
+            auction_not_started || deadline_passed_and_has_no_winner,
+            "auction ongoing or ended with a winner"
+        );
 
         let list_timestamp = auction_info.created_at;
         self.require_offer_exists(&offeror, &nft_id, list_timestamp)?;
@@ -399,7 +415,6 @@ pub trait MarketplaceContract:
         self.auction(&nft_id).clear();
         self.offers(&offeror, &nft_id, list_timestamp).clear();
 
-        let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
         self.accept_offer_event(
             caller,
@@ -515,7 +530,6 @@ pub trait MarketplaceContract:
             timestamp,
             Address::zero(),
             0u64.into(),
-            false,
         );
         self.auction(&nft_id).set(&auction);
 
@@ -589,32 +603,27 @@ pub trait MarketplaceContract:
         let nft_id = NftId::new(token_id.clone(), nonce);
         self.require_nft_on_auction(&nft_id)?;
 
-        let mut auction_info = self.auction(&nft_id).get();
+        let auction_info = self.auction(&nft_id).get();
         self.require_deadline_passed(&auction_info)?;
+        self.require_auction_has_winner(&auction_info)?;
 
         let caller = self.blockchain().get_caller();
         self.require_owner_or_winner(&caller, &auction_info)?;
 
-        if self.auction_has_winner(&auction_info) {
-            //Winner funds are already substracted at this point.
+        //Winner funds are already substracted at this point.
+        let token_data = self.get_token_data(&token_id, nonce);
+        let creator_cut = self.get_creator_cut(&auction_info.bid, &token_data);
+        self.set_creator_last_withdrawal_epoch_if_empty(&token_data.creator);
+        self.increase_creator_royalties(&token_data.creator, &creator_cut);
 
-            let token_data = self.get_token_data(&token_id, nonce);
-            let creator_cut = self.get_creator_cut(&auction_info.bid, &token_data);
-            self.set_creator_last_withdrawal_epoch_if_empty(&token_data.creator);
-            self.increase_creator_royalties(&token_data.creator, &creator_cut);
+        let platform_cut = self.get_platform_cut(&auction_info.bid);
+        self.increase_platform_royalties(&platform_cut);
 
-            let platform_cut = self.get_platform_cut(&auction_info.bid);
-            self.increase_platform_royalties(&platform_cut);
+        let nft_owner_cut = &auction_info.bid - &platform_cut - creator_cut;
+        self.increase_deposit(&auction_info.owner, &nft_owner_cut);
 
-            let nft_owner_cut = &auction_info.bid - &platform_cut - creator_cut;
-            self.increase_deposit(&auction_info.owner, &nft_owner_cut);
-
-            self.send_nft(&auction_info.highest_bidder, &token_id, nonce);
-            self.auction(&nft_id).clear();
-        } else {
-            auction_info.is_ended = true;
-            self.auction(&nft_id).set(&auction_info);
-        }
+        self.send_nft(&auction_info.highest_bidder, &token_id, nonce);
+        self.auction(&nft_id).clear();
 
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();

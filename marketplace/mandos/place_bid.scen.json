@@ -73,7 +73,7 @@
                         }
                     },
                     "storage": {
-                        "str:auction|nested:str:NFT1-abcdef|u64:100": "address:owner|biguint:100,000|u64:150|u64:200|u64:100|address:a_user|biguint:100,000|u8:0",
+                        "str:auction|nested:str:NFT1-abcdef|u64:100": "address:owner|biguint:100,000|u64:150|u64:200|u64:100|address:a_user|biguint:100,000",
                         "str:platform_fee_percent": "250",
                         "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",

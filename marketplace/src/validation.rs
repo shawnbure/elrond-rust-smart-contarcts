@@ -210,14 +210,13 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_auction_ended_or_not_started(
+    fn require_auction_has_winner(
         &self,
         auction_info: &AuctionInfo<Self::BigUint>,
     ) -> SCResult<()> {
-        let current_time = self.blockchain().get_block_timestamp();
         require!(
-            auction_info.is_ended || current_time < auction_info.start_time,
-            "Action started and did not end"
+            auction_info.highest_bidder != Address::zero(),
+            "Auction has no winner"
         );
         Ok(())
     }
