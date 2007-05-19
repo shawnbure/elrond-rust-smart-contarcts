@@ -1,6 +1,8 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use crate::storage::{AuctionInfo, NftId};
+
 use super::config::{BP, DEFAULT_FEE_PERCENT, ROYALTIES_MAX_FEE_PERCENT};
 use super::storage;
 
@@ -49,15 +51,27 @@ pub trait UtilsModule: storage::StorageModule {
             .get_esdt_token_data(sc_address, token_id, nonce)
     }
 
-    fn safe_send(
-        &self,
-        to: &Address,
-        token_id: &TokenIdentifier,
-        nonce: u64,
-        amount: &Self::BigUint,
-    ) {
-        if amount > &0 && to != &Address::zero() {
-            self.send().direct(to, token_id, nonce, amount, &[]);
-        }
+    fn send_nft(&self, to: &Address, token_id: &TokenIdentifier, nonce: u64) {
+        self.send().direct(to, token_id, nonce, &1u64.into(), &[]);
+    }
+
+    fn send_egld(&self, to: &Address, amount: &Self::BigUint) {
+        self.send().direct_egld(to, amount, &[]);
+    }
+
+    fn auction_has_winner(&self, auction_info: &AuctionInfo<Self::BigUint>) -> bool {
+        auction_info.highest_bidder != Address::zero()
+    }
+
+    fn is_nft_for_sale(&self, nft_id: &NftId) -> bool {
+        !self.nft_sale_info(nft_id).is_empty()
+    }
+
+    fn is_nft_on_auction(&self, nft_id: &NftId) -> bool {
+        !self.auction(nft_id).is_empty()
+    }
+
+    fn error_nft_not_found(&self) -> SCResult<()> {
+        sc_error!("Nft not found")
     }
 }
