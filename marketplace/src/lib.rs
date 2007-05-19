@@ -59,18 +59,9 @@ pub trait MarketplaceContract:
         let nft_id = NftId::new(token_id.clone(), nonce);
         self.require_nft_not_for_sale(&nft_id)?;
 
-        let uri = token_data.uris.last().unwrap().clone();
-
         let caller = self.blockchain().get_caller();
         let timestamp = self.blockchain().get_block_timestamp();
-        let fee_percent = self.get_platform_fee_percent_or_default();
-        let nft_sale_info = NftSaleInfo::new(
-            caller.clone(),
-            uri.clone(),
-            price.clone(),
-            fee_percent,
-            timestamp,
-        );
+        let nft_sale_info = NftSaleInfo::new(caller.clone(), price.clone(), timestamp);
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
         let tx_hash = self.blockchain().get_tx_hash();
@@ -78,7 +69,11 @@ pub trait MarketplaceContract:
             caller,
             token_id,
             nonce,
-            uri,
+            token_data.name,
+            token_data.uris.first().unwrap().clone(),
+            token_data.uris.last().unwrap().clone(),
+            token_data.hash,
+            token_data.attributes,
             price,
             token_data.royalties.to_u64().unwrap(),
             timestamp,
@@ -131,7 +126,6 @@ pub trait MarketplaceContract:
             caller,
             token_id,
             nonce,
-            nft_sale_info.uri,
             payment,
             timestamp,
             tx_hash,
@@ -165,7 +159,6 @@ pub trait MarketplaceContract:
             caller,
             token_id,
             nonce,
-            nft_sale_info.uri,
             nft_sale_info.price,
             timestamp,
             tx_hash,

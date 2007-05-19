@@ -4,8 +4,8 @@ PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
-MY_TOKEN_NAME="YOUR_TOKEN_NAME_HERE_IN_HEX" #Example: 0x4d594e4654
-MY_TOKEN_TICKER="YOUR_TOKEN_TICKER_HERE_IN_HEX" #Example: 0x4d594e4654
+MY_TOKEN_NAME="0x57414d454e" #Example: 0x4d594e4654
+MY_TOKEN_TICKER="0x57414d454e" #Example: 0x4d594e4654
 
 # This is how you get your token ID
 issueNft() {
@@ -21,9 +21,9 @@ issueNft() {
 }
 
 WASM="../output/nft_template.wasm"
-MY_TOKEN_ID="0x414243" #Fill this after issue
+MY_TOKEN_ID="0x57414d454e2d303833623530" #Fill this after issue
 ROYALTIES=0x02EE #7.5%
-MY_TOKEN_BASE_URI="0xDEADBEEF"
+MY_TOKEN_BASE_URI="0x68747470733a2f2f776f772d70726f642d6e6674726962652e73332e65752d776573742d322e616d617a6f6e6177732e636f6d2f74"
 PRICE=1000000000000000000 #1EGLD
 
 deploy() {
@@ -36,8 +36,8 @@ deploy() {
         --send || return
 }
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq6ywxegjzqcpavljdtfmnt05h63a9d0zvt9usr9vez2"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500d11c6ca2420603d67e4d5a7735be97d47a56bc4c5979"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq62cm9582mf7435qdts9hunk84hnr0ekft9us7flg4l"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500d2b1b2d0eada7d58d00d5c0b7e4ec7ade637e6c95979"
 
 setSpecialRole() {
     erdpy --verbose contract call erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u \

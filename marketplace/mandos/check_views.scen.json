@@ -21,7 +21,7 @@
             },
             "expect": {
                 "out": [
-                    "address:owner|u32:0|biguint:100,000|u64:250|u64:0"
+                    "address:owner|biguint:100,000|u64:0"
                 ],
                 "status": "",
                 "message": "*",

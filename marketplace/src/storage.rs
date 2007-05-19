@@ -16,25 +16,15 @@ impl NftId {
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct NftSaleInfo<BigUint: BigUintApi> {
     pub owner: Address,
-    pub uri: BoxedBytes,
     pub price: BigUint,
-    pub platform_fee: u64,
     pub timestamp: u64,
 }
 
 impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
-    pub fn new(
-        owner: Address,
-        uri: BoxedBytes,
-        price: BigUint,
-        platform_fee: u64,
-        timestamp: u64,
-    ) -> Self {
+    pub fn new(owner: Address, price: BigUint, timestamp: u64) -> Self {
         NftSaleInfo {
             owner,
-            uri,
             price,
-            platform_fee,
             timestamp,
         }
     }

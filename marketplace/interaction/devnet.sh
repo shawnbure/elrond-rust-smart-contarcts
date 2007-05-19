@@ -4,8 +4,8 @@ PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq3k89y42xjk2z05zu5vtjkcgsvhvjhu6nt9usruf2td"
-CONTRACT_ADDRESS_HEX="0x000000000000000005008d8e525546959427d05ca3172b611065d92bf3535979"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqmrlwwymaql72ug2f6dchjp86fkkzlga6t9ust3yc4p"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500d8fee7137d07fcae2149d3717904fa4dac2fa3ba5979"
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
@@ -15,7 +15,7 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments 0x1000 \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 \
         --send || return
 }
 
@@ -25,7 +25,7 @@ upgrade() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments 0x1000 \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 \
         --send || return
 }
 
@@ -36,7 +36,7 @@ putNftForSale() {
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function ESDTNFTTransfer \
-        --arguments $1 $2 0x01 ${CONTRACT_ADDRESS_HEX} 0x7075744e6674466f7253616c65 0x1000 \
+        --arguments $1 $2 0x01 ${CONTRACT_ADDRESS_HEX} 0x7075744e6674466f7253616c65 0x0DE0B6B3A7640000 \
         --gas-limit=100000000 \
         --send || return
 }
@@ -46,7 +46,7 @@ putNftForSale() {
 buyNft() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${MY_OTHER_WALLET_PEM} \
-        --value=4096 \
+        --value=1000000000000000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function buyNft \
         --arguments $1 $2 \
