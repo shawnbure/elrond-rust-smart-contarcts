@@ -118,8 +118,8 @@ pub trait MarketplaceContract:
         let platform_cut = self.get_platform_cut(&payment);
         self.increase_platform_royalties(&platform_cut);
 
-        let seller_cut = &payment - &platform_cut - creator_cut;
-        let seller_deposit = self.increate_deposit(&nft_sale_info.owner, &seller_cut);
+        let nft_owner_cut = &payment - &platform_cut - creator_cut;
+        let nft_owner_deposit = self.increate_deposit(&nft_sale_info.owner, &nft_owner_cut);
 
         self.send_nft(&caller, &token_id, nonce);
 
@@ -137,7 +137,7 @@ pub trait MarketplaceContract:
             tx_hash,
         );
         self.deposit_update_event(caller, caller_deposit);
-        self.deposit_update_event(nft_sale_info.owner, seller_deposit);
+        self.deposit_update_event(nft_sale_info.owner, nft_owner_deposit);
         Ok(())
     }
 
