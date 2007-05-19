@@ -58,15 +58,15 @@ pub trait NftTemplate {
         }
 
         let surplus = payment - price_for_tokens_to_sell;
-        self.safe_send_egld(&caller, &amount);
+        self.safe_send_egld(&caller, &surplus);
 
         self.total_sold().update(|x| *x += tokens_to_sell);
         Ok(())
     }
 
-    fn safe_send_egld(&self, to: Address, amount: BigUint) {
-        if amount > 0 {
-            self.send().direct_egld(&to, &amount, &[]);
+    fn safe_send_egld(&self, to: &Address, amount: &Self::BigUint) {
+        if amount > &0 {
+            self.send().direct_egld(to, amount, &[]);
         }
     }
 
