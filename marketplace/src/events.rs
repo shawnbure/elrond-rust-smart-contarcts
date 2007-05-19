@@ -91,6 +91,7 @@ pub trait EventsModule {
         #[indexed] min_bid: Self::BigUint,
         #[indexed] start_time: u64,
         #[indexed] deadline: u64,
+        #[indexed] royalties_percent: u64,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );

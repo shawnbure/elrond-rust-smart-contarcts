@@ -506,6 +506,7 @@ pub trait MarketplaceContract:
             min_bid,
             start_time,
             deadline,
+            token_data.royalties.to_u64().unwrap(),
             timestamp,
             self.blockchain().get_tx_hash(),
         );
