@@ -59,7 +59,7 @@ pub trait MarketplaceContract:
         let nft_id = NftId::new(token_id.clone(), nonce);
         self.require_nft_not_for_sale(&nft_id)?;
 
-        let uri = token_data.uris[0].clone();
+        let uri = token_data.uris.last().unwrap().clone();
         let collection = self.get_collection_name_or_default(&token_id);
 
         let caller = self.blockchain().get_caller();
