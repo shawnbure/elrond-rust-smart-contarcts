@@ -1,18 +1,17 @@
-MY_WALLET_PEM="~/Wallets/WalletKey.pem"
-MY_OTHER_WALLET_PEM="~/Wallets/OtherWalletKey.pem"
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN_ID="D"
+MY_WALLET_PEM="/home/elrond/Wallets/mainnet/mainnet_thingy.pem"
+PROXY="https://gateway.elrond.com"
+CHAIN_ID="1"
 WASM="../output/deployer.wasm"
 
-MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqupgxrdhphusx5crgvg454u9k4zqsp5mst9usqlrfyy"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500e05061b6e1bf206a6068622b4af0b6a88100d3705979"
+MY_ADDRESS="erd126v5rfxenay3ma8s7qddugae24ull6mmxsl8lh5pkh5ffluqcfqseu5kr8"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqnrv58g83nfp3qpvh9sh6h5k7kamx3fqkcfqsuvg768"
+CONTRACT_ADDRESS_HEX="0x0000000000000000050098d943a0f19a431005972c2fabd2deb77668a416c241"
 
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq59hz4j3f4dc6mvd7zpa6j2f4py4qe4ywt9us5la775"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500a16e2aca29ab71adb1be107ba92935092a0cd48e5979"
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqz9ktexrk53p6v43rhc93723vhxxj95qxcfqsmngnk9"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500116cbc9876a443a65623be0b1f2a2cb98d22d006c241"
 
-MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgqg5fsxjxhvqj4naqp0msld0g4slfctc39t9us6ksjjx"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x0000000000000000050045130348d7602559f4017ee1f6bd1587d385e2255979"
+MARKETPLACE_ADMIN_ADDRESS="erd126v5rfxenay3ma8s7qddugae24ull6mmxsl8lh5pkh5ffluqcfqseu5kr8"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0x569941a4d99f491df4f0f01ade23b95579ffeb7b343e7fde81b5e894ff80c241"
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
