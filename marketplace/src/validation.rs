@@ -145,6 +145,15 @@ pub trait ValidationModule:
         Ok(())
     }
 
+    fn require_auction_owner(
+        &self,
+        address: &Address,
+        auction_info: &AuctionInfo<Self::BigUint>,
+    ) -> SCResult<()> {
+        require!(address == &auction_info.owner, "Not owner");
+        Ok(())
+    }
+
     fn require_is_auction_ongoing(
         &self,
         auction_info: &AuctionInfo<Self::BigUint>,
@@ -173,6 +182,18 @@ pub trait ValidationModule:
         require!(
             current_time > auction_info.deadline,
             "Auction deadline not passed"
+        );
+        Ok(())
+    }
+
+    fn require_auction_ended_or_not_started(
+        &self,
+        auction_info: &AuctionInfo<Self::BigUint>,
+    ) -> SCResult<()> {
+        let current_time = self.blockchain().get_block_timestamp();
+        require!(
+            auction_info.is_ended || current_time < auction_info.start_time,
+            "Action started and did not end"
         );
         Ok(())
     }

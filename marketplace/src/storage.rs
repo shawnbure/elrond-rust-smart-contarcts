@@ -39,6 +39,7 @@ pub struct AuctionInfo<BigUint: BigUintApi> {
     pub created_at: u64,
     pub highest_bidder: Address,
     pub bid: BigUint,
+    pub is_ended: bool,
 }
 
 impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
@@ -50,6 +51,7 @@ impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
         created_at: u64,
         highest_bidder: Address,
         bid: BigUint,
+        is_ended: bool,
     ) -> Self {
         AuctionInfo {
             owner,
@@ -59,6 +61,7 @@ impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
             created_at,
             highest_bidder,
             bid,
+            is_ended,
         }
     }
 }

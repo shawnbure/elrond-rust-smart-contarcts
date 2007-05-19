@@ -62,6 +62,7 @@ pub trait MarketplaceContract:
 
         let nft_id = NftId::new(token_id.clone(), nonce);
         self.require_nft_not_for_sale(&nft_id)?;
+        self.require_nft_not_on_auction(&nft_id)?;
 
         let caller = self.blockchain().get_caller();
         let timestamp = self.blockchain().get_block_timestamp();
@@ -146,8 +147,17 @@ pub trait MarketplaceContract:
         self.require_valid_nonce(nonce)?;
 
         let nft_id = NftId::new(token_id.clone(), nonce);
-        self.require_nft_for_sale(&nft_id)?;
+        if self.is_nft_for_sale(&nft_id) {
+            self.withdraw_nft_from_sale(token_id, nonce)
+        } else if self.is_nft_on_auction(&nft_id) {
+            self.withdraw_nft_from_auction(token_id, nonce)
+        } else {
+            self.error_nft_not_found()
+        }
+    }
 
+    fn withdraw_nft_from_sale(&self, token_id: TokenIdentifier, nonce: u64) -> SCResult<()> {
+        let nft_id = NftId::new(token_id.clone(), nonce);
         let caller = self.blockchain().get_caller();
         let nft_sale_info = self.nft_sale_info(&nft_id).get();
         self.require_owns_nft(&caller, &nft_sale_info)?;
@@ -163,6 +173,31 @@ pub trait MarketplaceContract:
             token_id,
             nonce,
             nft_sale_info.price,
+            timestamp,
+            tx_hash,
+        );
+
+        Ok(())
+    }
+
+    fn withdraw_nft_from_auction(&self, token_id: TokenIdentifier, nonce: u64) -> SCResult<()> {
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        let caller = self.blockchain().get_caller();
+        let auction_info = self.auction(&nft_id).get();
+        self.require_auction_owner(&caller, &auction_info)?;
+        self.require_auction_ended_or_not_started(&auction_info)?;
+
+        self.send_nft(&caller, &token_id, nonce);
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        self.auction(&nft_id).clear();
+
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.withdraw_nft_event(
+            caller,
+            token_id,
+            nonce,
+            auction_info.min_bid,
             timestamp,
             tx_hash,
         );
@@ -187,12 +222,47 @@ pub trait MarketplaceContract:
         self.require_has_amount_in_deposit(&caller, &amount)?;
 
         let nft_id = NftId::new(token_id.clone(), nonce);
-        self.require_nft_for_sale(&nft_id)?;
+        if self.is_nft_for_sale(&nft_id) {
+            self.make_offer_for_nft_on_sale(token_id, nonce, amount)
+        } else if self.is_nft_on_auction(&nft_id) {
+            self.make_offer_for_nft_on_auction(token_id, nonce, amount)
+        } else {
+            self.error_nft_not_found()
+        }
+    }
 
+    fn make_offer_for_nft_on_sale(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        let caller = self.blockchain().get_caller();
+        let nft_id = NftId::new(token_id.clone(), nonce);
         let nft_sale_info = self.nft_sale_info(&nft_id).get();
         self.require_not_owns_nft(&caller, &nft_sale_info)?;
 
         let list_timestamp = nft_sale_info.timestamp;
+        self.offer(&caller, &nft_id, list_timestamp).set(&amount);
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.make_offer_event(caller, token_id, nonce, amount, timestamp, tx_hash);
+        Ok(())
+    }
+
+    fn make_offer_for_nft_on_auction(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        let caller = self.blockchain().get_caller();
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        let auction_info = self.auction(&nft_id).get();
+        self.require_not_auction_owner(&caller, &auction_info)?;
+
+        let list_timestamp = auction_info.created_at;
         self.offer(&caller, &nft_id, list_timestamp).set(&amount);
 
         let timestamp = self.blockchain().get_block_timestamp();
@@ -216,8 +286,23 @@ pub trait MarketplaceContract:
         self.require_valid_price(&amount)?;
 
         let nft_id = NftId::new(token_id.clone(), nonce);
-        self.require_nft_for_sale(&nft_id)?;
+        if self.is_nft_for_sale(&nft_id) {
+            self.accept_offer_for_nft_on_sale(token_id, nonce, offeror, amount)
+        } else if self.is_nft_on_auction(&nft_id) {
+            self.accept_offer_for_nft_on_auction(token_id, nonce, offeror, amount)
+        } else {
+            self.error_nft_not_found()
+        }
+    }
 
+    fn accept_offer_for_nft_on_sale(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        offeror: Address,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        let nft_id = NftId::new(token_id.clone(), nonce);
         let caller = self.blockchain().get_caller();
         let nft_sale_info = self.nft_sale_info(&nft_id).get();
         self.require_owns_nft(&caller, &nft_sale_info)?;
@@ -258,6 +343,55 @@ pub trait MarketplaceContract:
         Ok(())
     }
 
+    fn accept_offer_for_nft_on_auction(
+        &self,
+        token_id: TokenIdentifier,
+        nonce: u64,
+        offeror: Address,
+        amount: Self::BigUint,
+    ) -> SCResult<()> {
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        let caller = self.blockchain().get_caller();
+        let auction_info = self.auction(&nft_id).get();
+        self.require_auction_owner(&caller, &auction_info)?;
+        self.require_not_auction_owner(&offeror, &auction_info)?;
+        self.require_auction_ended_or_not_started(&auction_info)?;
+
+        let list_timestamp = auction_info.created_at;
+        self.require_offer_exists(&offeror, &nft_id, list_timestamp)?;
+        let offer_amount = self.offer(&offeror, &nft_id, list_timestamp).get();
+        self.require_same_amounts(&amount, &offer_amount)?;
+        self.try_decrease_deposit(&offeror, &offer_amount)?;
+
+        let token_data = self.get_token_data(&token_id, nonce);
+        let creator_cut = self.get_creator_cut(&offer_amount, &token_data);
+        self.set_creator_last_withdrawal_epoch_if_empty(&token_data.creator);
+        self.increase_creator_royalties(&token_data.creator, &creator_cut);
+
+        let platform_cut = self.get_platform_cut(&offer_amount);
+        self.increase_platform_royalties(&platform_cut);
+
+        let nft_owner_cut = &offer_amount - &platform_cut - creator_cut;
+        self.increase_deposit(&auction_info.owner, &nft_owner_cut);
+
+        self.send_nft(&offeror, &token_id, nonce);
+        self.auction(&nft_id).clear();
+        self.offer(&offeror, &nft_id, list_timestamp).clear();
+
+        let timestamp = self.blockchain().get_block_timestamp();
+        let tx_hash = self.blockchain().get_tx_hash();
+        self.accept_offer_event(
+            caller.clone(),
+            token_id,
+            nonce,
+            offeror.clone(),
+            offer_amount,
+            timestamp,
+            tx_hash.clone(),
+        );
+        Ok(())
+    }
+
     #[payable("*")]
     #[endpoint(startAuction)]
     fn start_auction(
@@ -276,6 +410,10 @@ pub trait MarketplaceContract:
         self.require_valid_nft_amount(&amount)?;
         self.require_valid_price(&min_bid)?;
 
+        let nft_id = NftId::new(token_id.clone(), nonce);
+        self.require_nft_not_on_auction(&nft_id)?;
+        self.require_nft_not_for_sale(&nft_id)?;
+
         let timestamp = self.blockchain().get_block_timestamp();
         let start_time = opt_start_time.into_option().unwrap_or(timestamp);
         self.require_valid_start_time(start_time, timestamp)?;
@@ -284,9 +422,6 @@ pub trait MarketplaceContract:
         let token_data = self.get_token_data(&token_id, nonce);
         self.require_valid_royalties(&token_data)?;
         self.require_uris_not_empty(&token_data)?;
-
-        let nft_id = NftId::new(token_id.clone(), nonce);
-        self.require_nft_not_on_auction(&nft_id)?;
 
         let caller = self.blockchain().get_caller();
         let auction = AuctionInfo::new(
@@ -297,6 +432,7 @@ pub trait MarketplaceContract:
             timestamp,
             Address::zero(),
             0u64.into(),
+            false,
         );
         self.auction(&nft_id).set(&auction);
 
@@ -368,7 +504,7 @@ pub trait MarketplaceContract:
         let nft_id = NftId::new(token_id.clone(), nonce);
         self.require_nft_on_auction(&nft_id)?;
 
-        let auction_info = self.auction(&nft_id).get();
+        let mut auction_info = self.auction(&nft_id).get();
         self.require_deadline_passed(&auction_info)?;
 
         if self.auction_has_winner(&auction_info) {
@@ -386,10 +522,11 @@ pub trait MarketplaceContract:
             self.increase_deposit(&auction_info.owner, &nft_owner_cut);
 
             self.send_nft(&auction_info.highest_bidder, &token_id, nonce);
+            self.auction(&nft_id).clear();
         } else {
-            self.send_nft(&auction_info.owner, &token_id, nonce);
+            auction_info.is_ended = true;
+            self.auction(&nft_id).set(&auction_info);
         }
-        self.auction(&nft_id).clear();
 
         let timestamp = self.blockchain().get_block_timestamp();
         let tx_hash = self.blockchain().get_tx_hash();
