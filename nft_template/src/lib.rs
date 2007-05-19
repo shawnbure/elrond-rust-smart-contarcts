@@ -139,7 +139,7 @@ pub trait NftTemplate {
         let own_uri = BoxedBytes::from_concat(&[
             base_uri.as_slice(),
             &delimiter[..],
-            &self.u64_to_string(nonce).as_slice(),
+            self.u64_to_string(nonce).as_slice(),
         ]);
 
         result.push(own_uri);
@@ -153,11 +153,14 @@ pub trait NftTemplate {
         let mut vec = Vec::new();
         let mut num = a;
 
-        while {
+        loop {
             vec.push(ascii_zero_char + (num % 10) as u8);
             num /= 10;
-            num != 0
-        } {}
+
+            if num == 0 {
+                break;
+            }
+        }
 
         vec.reverse();
         vec.as_slice().into()
