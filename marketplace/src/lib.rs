@@ -80,7 +80,7 @@ pub trait MarketplaceContract:
             nonce,
             uri,
             price,
-            token_data.royalties,
+            token_data.royalties.to_u64().unwrap(),
             timestamp,
             tx_hash,
         );

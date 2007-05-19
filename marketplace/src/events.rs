@@ -11,7 +11,7 @@ pub trait EventsModule {
         #[indexed] nonce: u64,
         #[indexed] uri: BoxedBytes,
         #[indexed] price: Self::BigUint,
-        #[indexed] royalties_percent: Self::BigUint,
+        #[indexed] royalties_percent: u64,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
