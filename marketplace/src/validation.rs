@@ -116,11 +116,6 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_valid_start_time(&self, start: u64, current: u64) -> SCResult<()> {
-        require!(start >= current, "start time in the past");
-        Ok(())
-    }
-
     fn require_valid_expire(&self, expire: u64) -> SCResult<()> {
         require!(
             expire >= self.blockchain().get_block_timestamp(),
@@ -137,8 +132,9 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_valid_deadline(&self, deadline: u64, start: u64) -> SCResult<()> {
-        require!(deadline >= start, "deadline before start");
+    fn require_valid_deadline(&self, deadline: u64, start: u64, current: u64) -> SCResult<()> {
+        require!(deadline > start, "deadline before start");
+        require!(deadline > current, "deadline in the past");
         Ok(())
     }
 

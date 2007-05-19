@@ -500,8 +500,7 @@ pub trait MarketplaceContract:
 
         let timestamp = self.blockchain().get_block_timestamp();
         let start_time = opt_start_time.into_option().unwrap_or(timestamp);
-        self.require_valid_start_time(start_time, timestamp)?;
-        self.require_valid_deadline(deadline, start_time)?;
+        self.require_valid_deadline(deadline, start_time, timestamp)?;
 
         let token_data = self.get_token_data(&token_id, nonce);
         self.require_valid_royalties(&token_data)?;
