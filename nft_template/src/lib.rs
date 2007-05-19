@@ -87,6 +87,11 @@ pub trait NftTemplate {
         self.max_supply().get() - self.total_sold().get()
     }
 
+    #[view(getMaxSupplyAndTotalSold)]
+    fn get_max_supply_and_total_sold(&self) -> MultiResult2<u64, u64> {
+        MultiResult2::from((self.max_supply().get(), self.total_sold().get()))
+    }
+
     #[view(getTotalSold)]
     #[storage_mapper("total_sold")]
     fn total_sold(&self) -> SingleValueMapper<Self::Storage, u64>;
