@@ -1,0 +1,152 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "sell.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "withdrawNft",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "100"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|biguint:200,000|u64:250|u64:0",
+                        "str:platform_fee_percent": "250"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "withdrawNft",
+                "arguments": [
+                    "str:NFT2-abcdef",
+                    "200"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|biguint:200,000|u64:250|u64:0",
+                        "str:platform_fee_percent": "250"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "withdrawNft",
+                "arguments": [
+                    "str:NFT2-abcdef",
+                    "200"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:platform_fee_percent": "250"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "address:owner": {
+                    "nonce": "6",
+                    "balance": "1,000,000,000,000",
+                    "storage": {},
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "nonce": "100",
+                            "balance": "1"
+                        },
+                        "str:NFT2-abcdef": {
+                            "nonce": "200",
+                            "balance": "2"
+                        }
+                    }
+                },
+                "+": ""
+            }
+        }
+    ]
+}

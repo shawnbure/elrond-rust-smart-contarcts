@@ -1,0 +1,82 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "sell.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getNftPrice",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "100"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "100,000"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getNftPrice",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "111"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "getNftSaleInfo",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "100"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "address:owner|biguint:100,000|u64:250|u64:0"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

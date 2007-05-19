@@ -1,0 +1,195 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "sell.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "100,000",
+                "function": "buyNft",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "100"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "2,500",
+                    "esdt": {
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|biguint:200,000|u64:250|u64:0",
+                        "str:platform_fee_percent": "250"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "address:a_user": {
+                    "nonce": "1",
+                    "balance": "999,999,900,000",
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "balance": "1",
+                            "nonce": "100"
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:owner": {
+                    "nonce": "4",
+                    "balance": "1,000,000,095,000",
+                    "esdt": {
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:creator": {
+                    "nonce": "0",
+                    "balance": "1,000,000,002,500",
+                    "storage": {}
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "100,000",
+                "function": "buyNft",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "100"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "100,000",
+                "function": "buyNft",
+                "arguments": [
+                    "str:NFT2-abcdef",
+                    "200"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "400,000",
+                "function": "buyNft",
+                "arguments": [
+                    "str:NFT2-abcdef",
+                    "200"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "12,500",
+                    "esdt": {},
+                    "storage": {
+                        "str:platform_fee_percent": "250"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "address:a_user": {
+                    "nonce": "4",
+                    "balance": "999,999,500,000",
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "balance": "1",
+                            "nonce": "100"
+                        },
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:owner": {
+                    "nonce": "4",
+                    "balance": "1,000,000,475,000",
+                    "esdt": {
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {}
+                },
+                "address:creator": {
+                    "nonce": "0",
+                    "balance": "1,000,000,012,500",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

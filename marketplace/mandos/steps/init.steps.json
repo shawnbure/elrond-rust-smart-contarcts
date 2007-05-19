@@ -1,0 +1,82 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "storage": {},
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "nonce": "100",
+                            "creator": "address:creator",
+                            "royalties": "250",
+                            "balance": "1"
+                        },
+                        "str:NFT2-abcdef": {
+                            "nonce": "200",
+                            "creator": "address:creator",
+                            "royalties": "250",
+                            "balance": "2"
+                        }
+                    }
+                },
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "storage": {}
+                },
+                "address:creator": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "storage": {}
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../../output/marketplace.wasm",
+                "arguments": [
+                    "250"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:platform_fee_percent": "250"
+                    },
+                    "code": "file:../../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        }
+    ]
+}
