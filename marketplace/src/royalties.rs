@@ -24,7 +24,7 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
         let creator_withdrawal_waiting_epochs = self.creator_withdrawal_waiting_epochs().get();
         let last_withdrawal_epoch = self.creator_last_withdrawal_epoch(caller).get();
         require!(
-            current_epoch >= last_withdrawal_epoch + creator_withdrawal_waiting_epochs,
+            current_epoch == last_withdrawal_epoch + creator_withdrawal_waiting_epochs,
             "withdrawal called too early"
         );
 

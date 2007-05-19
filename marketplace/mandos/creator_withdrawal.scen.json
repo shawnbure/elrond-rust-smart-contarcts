@@ -35,7 +35,7 @@
             "step": "scCall",
             "txId": "1",
             "tx": {
-                "from": "address:owner",
+                "from": "address:creator",
                 "to": "sc:contract",
                 "value": "0",
                 "function": "withdrawCreatorRoyalties",
