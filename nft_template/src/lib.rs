@@ -14,11 +14,11 @@ pub trait NftTemplate {
         price: Self::BigUint,
         max_supply: u64,
     ) {
-        self.token_id().set(&token_id);
-        self.base_uri().set(&base_uri);
-        self.royalties().set(&royalties);
-        self.price().set(&price);
-        self.max_supply().set(&max_supply)
+        self.token_id().set_if_empty(&token_id);
+        self.base_uri().set_if_empty(&base_uri);
+        self.royalties().set_if_empty(&royalties);
+        self.price().set_if_empty(&price);
+        self.max_supply().set_if_empty(&max_supply)
     }
 
     #[payable("EGLD")]
