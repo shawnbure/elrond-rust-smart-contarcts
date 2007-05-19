@@ -19,6 +19,16 @@ deploy() {
         --send || return
 }
 
+upgrade() {
+    erdpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
+        --bytecode=${WASM} \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --gas-limit=100000000 \
+        --arguments 0x1000 0x1000 \
+        --send || return
+}
+
 # EBFMT-ebca88 4542464d542d656263613838
 # CryptoPunks 43727970746f50756e6b7342
 # $1 = token id in hex
