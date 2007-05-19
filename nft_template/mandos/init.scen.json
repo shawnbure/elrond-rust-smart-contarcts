@@ -1,0 +1,101 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "1,000,000,000,000",
+                    "storage": {}
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "value": "0",
+                "contractCode": "file:../output/nft_template.wasm",
+                "arguments": [
+                    "str:TOKEN-abcdef",
+                    "750",
+                    "str:TOKEN",
+                    "str:https://image_base",
+                    "str:https://metadata_base",
+                    "10,000",
+                    "10,000",
+                    "10,000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:image_base_uri": "str:https://image_base",
+                        "str:max_supply": "10,000",
+                        "str:metadata_base_uri": "str:https://metadata_base",
+                        "str:price": "10,000",
+                        "str:royalties": "750",
+                        "str:sale_start": "10,000",
+                        "str:token_id": "str:TOKEN-abcdef",
+                        "str:token_name_base": "str:TOKEN"
+                    },
+                    "code": "file:../output/nft_template.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TOKEN-abcdef": {
+                            "roles": [
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTBurn"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:image_base_uri": "str:https://image_base",
+                        "str:max_supply": "10,000",
+                        "str:metadata_base_uri": "str:https://metadata_base",
+                        "str:price": "10,000",
+                        "str:royalties": "750",
+                        "str:sale_start": "10,000",
+                        "str:token_id": "str:TOKEN-abcdef",
+                        "str:token_name_base": "str:TOKEN"
+                    },
+                    "code": "file:../output/nft_template.wasm",
+                    "owner": "address:owner"
+                }
+            }
+        }
+    ]
+}

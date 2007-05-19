@@ -1,0 +1,177 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x840261070923755164257237239942780480202052617882268634172091090965313957502374653015645144777955"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "shuffle",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "*"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x576276690833659806097922080752569442712315000932661740578494350531541538667053646247903672862518"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "shuffle",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "*"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x204213981495258469080673852567201724027611828495642354867907936794099200186467675504141379302615"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "shuffle",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "*"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x394193480811246964554299554413435808055256843639154116269730327720767426323951943663574085095317"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "shuffle",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "*"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x470248411895629646976551859424230362155539493539789607487153936610543099813969648939538305315008"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "shuffle",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "*"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockRandomSeed": "0x611872006025963536650161555158680164539005614630199719827699736394194008719234914164519538711339"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "shuffle",
+                "arguments": [],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "*"
+                ],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
