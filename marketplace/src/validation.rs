@@ -84,13 +84,4 @@ pub trait ValidationModule:
         require!(address != &nft_sale_info.owner, "Is owner");
         Ok(())
     }
-
-    fn require_good_payment(
-        &self,
-        payment: &Self::BigUint,
-        nft_sale_info: &NftSaleInfo<Self::BigUint>,
-    ) -> SCResult<()> {
-        require!(payment >= &nft_sale_info.price, "Not enough payment");
-        Ok(())
-    }
 }

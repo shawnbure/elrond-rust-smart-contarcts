@@ -44,4 +44,7 @@ pub trait EventsModule {
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
+
+    #[event("deposit_update")]
+    fn deposit_update(&self, #[indexed] address: Address, #[indexed] amount: Self::BigUint);
 }

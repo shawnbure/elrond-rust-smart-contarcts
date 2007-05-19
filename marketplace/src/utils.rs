@@ -49,15 +49,11 @@ pub trait UtilsModule: storage::StorageModule {
             .get_esdt_token_data(sc_address, token_id, nonce)
     }
 
-    fn safe_send(
-        &self,
-        to: &Address,
-        token_id: &TokenIdentifier,
-        nonce: u64,
-        amount: &Self::BigUint,
-    ) {
-        if amount > &0 && to != &Address::zero() {
-            self.send().direct(to, token_id, nonce, amount, &[]);
-        }
+    fn send_nft(&self, to: &Address, token_id: &TokenIdentifier, nonce: u64) {
+        self.send().direct(to, token_id, nonce, &1u64.into(), &[]);
+    }
+
+    fn send_egld(&self, to: &Address, amount: &Self::BigUint) {
+        self.send().direct_egld(to, amount, &[]);
     }
 }

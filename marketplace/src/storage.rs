@@ -47,10 +47,49 @@ pub trait StorageModule {
     #[storage_mapper("royalties_max_fee_percent")]
     fn royalties_max_fee_percent(&self) -> SingleValueMapper<Self::Storage, u64>;
 
+    #[view(getCreatorWithdrawalWaitingEpochs)]
+    #[storage_mapper("creator_withdrawal_waiting_epochs")]
+    fn creator_withdrawal_waiting_epochs(&self) -> SingleValueMapper<Self::Storage, u64>;
+
+    #[view(isCreatorBlacklisted)]
+    #[storage_mapper("creator_blacklist")]
+    fn creator_blacklist(&self, address: &Address) -> SingleValueMapper<Self::Storage, bool>;
+
+    #[view(getEgldDeposit)]
+    #[storage_mapper("egld_deposit")]
+    fn egld_deposit(&self, address: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+    #[view(getCreatorRoyalties)]
+    #[storage_mapper("creator_royalties")]
+    fn creator_royalties(
+        &self,
+        address: &Address,
+    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+    #[view(getCreatorLastWithdrawalEpoch)]
+    #[storage_mapper("creator_last_withdrawal_epoch")]
+    fn creator_last_withdrawal_epoch(
+        &self,
+        address: &Address,
+    ) -> SingleValueMapper<Self::Storage, u64>;
+
+    #[view(getPlatformRoyalties)]
+    #[storage_mapper("platform_royalties")]
+    fn platform_royalties(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
     #[view(getNftSaleInfo)]
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(
         &self,
         nft_id: &NftId,
     ) -> SingleValueMapper<Self::Storage, NftSaleInfo<Self::BigUint>>;
+
+    #[view(getOffer)]
+    #[storage_mapper("offer")]
+    fn offer(
+        &self,
+        caller: &Address,
+        nft_id: &NftId,
+        nft_list_timestamp: u64,
+    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 }

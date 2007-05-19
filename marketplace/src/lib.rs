@@ -4,15 +4,15 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 pub mod config;
+pub mod deposit;
 pub mod events;
 pub mod global_op;
+pub mod royalties;
 pub mod storage;
 pub mod utils;
 pub mod validation;
 
 use storage::{NftId, NftSaleInfo};
-
-const NFT_AMOUNT: u64 = 1;
 
 #[elrond_wasm::contract]
 pub trait MarketplaceContract:
@@ -22,6 +22,8 @@ pub trait MarketplaceContract:
     + config::ConfigModule
     + utils::UtilsModule
     + global_op::GlobalOperationModule
+    + deposit::DepositModule
+    + royalties::RoyaltiesModule
 {
     #[init]
     fn init(
@@ -30,10 +32,12 @@ pub trait MarketplaceContract:
         royalties_max_fee_percent: u64,
         asset_min_price: Self::BigUint,
         asset_max_price: Self::BigUint,
+        creator_withdrawal_waiting_epochs: u64,
     ) -> SCResult<()> {
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
-        self.try_set_asset_price_range(asset_min_price, asset_max_price)
+        self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
+        self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)
     }
 
     #[payable("*")]
@@ -102,35 +106,38 @@ pub trait MarketplaceContract:
         let caller = self.blockchain().get_caller();
         let nft_sale_info = self.nft_sale_info(&nft_id).get();
         self.require_not_owns_nft(&caller, &nft_sale_info)?;
-        self.require_good_payment(&payment, &nft_sale_info)?;
 
-        let egld = TokenIdentifier::egld();
+        let caller_deposit =
+            self.try_increase_decrease_deposit(&caller, &payment, &nft_sale_info.price)?;
         let token_data = self.get_token_data(&token_id, nonce);
 
         let creator_cut = self.get_creator_cut(&payment, &token_data);
-        self.safe_send(&token_data.creator, &egld, 0, &creator_cut);
+        self.set_creator_last_withdrawal_epoch_if_empty(&token_data.creator);
+        self.increase_creator_royalties(&token_data.creator, &creator_cut);
 
         let platform_cut = self.get_platform_cut(&payment);
-        let seller_cut = &payment - &platform_cut - creator_cut;
-        self.safe_send(&nft_sale_info.owner, &egld, 0, &seller_cut);
+        self.increase_platform_royalties(&platform_cut);
 
-        let nft_amount = NFT_AMOUNT.into();
-        self.safe_send(&caller, &token_id, nonce, &nft_amount);
+        let seller_cut = &payment - &platform_cut - creator_cut;
+        let seller_deposit = self.increate_deposit(&nft_sale_info.owner, &seller_cut);
+
+        self.send_nft(&caller, &token_id, nonce);
 
         let timestamp = self.blockchain().get_block_timestamp();
         self.nft_sale_info(&nft_id).clear();
 
         let tx_hash = self.blockchain().get_tx_hash();
         self.buy_nft_event(
-            nft_sale_info.owner,
-            caller,
+            nft_sale_info.owner.clone(),
+            caller.clone(),
             token_id,
             nonce,
             payment,
             timestamp,
             tx_hash,
         );
-
+        self.deposit_update(caller, caller_deposit);
+        self.deposit_update(nft_sale_info.owner, seller_deposit);
         Ok(())
     }
 
@@ -148,8 +155,7 @@ pub trait MarketplaceContract:
         let nft_sale_info = self.nft_sale_info(&nft_id).get();
         self.require_owns_nft(&caller, &nft_sale_info)?;
 
-        let nft_amount = NFT_AMOUNT.into();
-        self.safe_send(&caller, &token_id, nonce, &nft_amount);
+        self.send_nft(&caller, &token_id, nonce);
 
         let timestamp = self.blockchain().get_block_timestamp();
         self.nft_sale_info(&nft_id).clear();

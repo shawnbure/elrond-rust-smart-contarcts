@@ -33,7 +33,7 @@
             "accounts": {
                 "sc:contract": {
                     "nonce": "0",
-                    "balance": "2,500",
+                    "balance": "100,000",
                     "esdt": {
                         "str:NFT2-abcdef": {
                             "balance": "1",
@@ -45,7 +45,11 @@
                         "str:platform_fee_percent": "250",
                         "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
-                        "str:asset_max_price": "1,000,000"
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30",
+                        "str:platform_royalties": "2,500",
+                        "str:egld_deposit|address:owner": "95,000",
+                        "str:creator_royalties|address:creator": "2,500"
                     },
                     "code": "file:../output/marketplace.wasm",
                     "owner": "address:owner"
@@ -63,7 +67,7 @@
                 },
                 "address:owner": {
                     "nonce": "4",
-                    "balance": "1,000,000,095,000",
+                    "balance": "1,000,000,000,000",
                     "esdt": {
                         "str:NFT2-abcdef": {
                             "balance": "1",
@@ -74,7 +78,7 @@
                 },
                 "address:creator": {
                     "nonce": "0",
-                    "balance": "1,000,000,002,500",
+                    "balance": "1,000,000,000,000",
                     "storage": {}
                 }
             }
@@ -153,13 +157,17 @@
             "accounts": {
                 "sc:contract": {
                     "nonce": "0",
-                    "balance": "12,500",
+                    "balance": "500,000",
                     "esdt": {},
                     "storage": {
                         "str:platform_fee_percent": "250",
                         "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
-                        "str:asset_max_price": "1,000,000"
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30",
+                        "str:platform_royalties": "12,500",
+                        "str:egld_deposit|address:owner": "475,000",
+                        "str:creator_royalties|address:creator": "12,500"
                     },
                     "code": "file:../output/marketplace.wasm",
                     "owner": "address:owner"
@@ -181,7 +189,7 @@
                 },
                 "address:owner": {
                     "nonce": "4",
-                    "balance": "1,000,000,475,000",
+                    "balance": "1,000,000,000,000",
                     "esdt": {
                         "str:NFT2-abcdef": {
                             "balance": "1",
@@ -192,7 +200,7 @@
                 },
                 "address:creator": {
                     "nonce": "0",
-                    "balance": "1,000,000,012,500",
+                    "balance": "1,000,000,000,000",
                     "storage": {}
                 }
             }

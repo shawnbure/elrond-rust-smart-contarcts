@@ -45,7 +45,8 @@
                         "str:platform_fee_percent": "250",
                         "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
-                        "str:asset_max_price": "1,000,000"
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30"
                     },
                     "code": "file:../output/marketplace.wasm",
                     "owner": "address:owner"
@@ -93,7 +94,8 @@
                         "str:platform_fee_percent": "250",
                         "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
-                        "str:asset_max_price": "1,000,000"
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30"
                     },
                     "code": "file:../output/marketplace.wasm",
                     "owner": "address:owner"
@@ -134,7 +136,8 @@
                         "str:platform_fee_percent": "250",
                         "str:royalties_max_fee_percent": "1,000",
                         "str:asset_min_price": "100",
-                        "str:asset_max_price": "1,000,000"
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30"
                     },
                     "code": "file:../output/marketplace.wasm",
                     "owner": "address:owner"
