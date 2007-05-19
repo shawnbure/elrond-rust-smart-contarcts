@@ -76,8 +76,12 @@ pub trait MarketplaceContract:
             token_id,
             nonce,
             token_data.name,
-            token_data.uris.first().unwrap().clone(),
-            token_data.uris.last().unwrap().clone(),
+            token_data.uris.get(0).unwrap().clone(),
+            token_data
+                .uris
+                .get(1)
+                .unwrap_or(&BoxedBytes::empty())
+                .clone(),
             token_data.hash,
             token_data.attributes,
             price,
@@ -521,8 +525,12 @@ pub trait MarketplaceContract:
             token_id,
             nonce,
             token_data.name,
-            token_data.uris.first().unwrap().clone(),
-            token_data.uris.last().unwrap().clone(),
+            token_data.uris.get(0).unwrap().clone(),
+            token_data
+                .uris
+                .get(1)
+                .unwrap_or(&BoxedBytes::empty())
+                .clone(),
             token_data.hash,
             token_data.attributes,
             min_bid,

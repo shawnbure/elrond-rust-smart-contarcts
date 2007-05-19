@@ -18,7 +18,9 @@ pub trait Deployer {
         #[payment_amount] payment: BigUint,
         token_id: BoxedBytes,
         royalties: BigUint,
-        base_uri: BoxedBytes,
+        token_name_base: BoxedBytes,
+        image_base_uri: BoxedBytes,
+        metadata_base_uri: BoxedBytes,
         price: BigUint,
         max_supply: u64,
         sale_start_timestamp: u64,
@@ -28,7 +30,9 @@ pub trait Deployer {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
         arg_buffer.push_arg(token_id);
         arg_buffer.push_arg(royalties);
-        arg_buffer.push_arg(base_uri);
+        arg_buffer.push_arg(token_name_base);
+        arg_buffer.push_arg(image_base_uri);
+        arg_buffer.push_arg(metadata_base_uri);
         arg_buffer.push_arg(price);
         arg_buffer.push_arg(max_supply);
         arg_buffer.push_arg(sale_start_timestamp);
