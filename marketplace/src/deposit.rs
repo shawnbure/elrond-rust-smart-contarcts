@@ -17,11 +17,13 @@ pub trait DepositModule:
     }
 
     #[endpoint(withdraw)]
-    fn withdraw(&self) -> SCResult<()> {
+    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<Self::BigUint>) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
-        let amount = &self.egld_deposit(&caller).get();
-        self.try_decrease_deposit(&caller, amount)?;
-        self.send_egld(&caller, amount);
+        let amount = opt_amount
+            .into_option()
+            .unwrap_or_else(|| self.egld_deposit(&caller).get());
+        self.try_decrease_deposit(&caller, &amount)?;
+        self.send_egld(&caller, &amount);
         Ok(())
     }
 
