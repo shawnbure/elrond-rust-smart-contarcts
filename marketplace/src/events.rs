@@ -46,6 +46,7 @@ pub trait EventsModule {
         #[indexed] caller: Address,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] collection: BoxedBytes,
+        #[indexed] description: BoxedBytes,
         #[indexed] timestamp: u64,
     );
 }

@@ -6,6 +6,7 @@ use super::storage;
 pub const BP: u64 = 10_000;
 pub const DEFAULT_FEE_PERCENT: u64 = 250;
 pub const MAX_COLLECTION_NAME_LEN: usize = 30;
+pub const MAX_DESCRIPTION_LEN: usize = 500;
 
 #[elrond_wasm::module]
 pub trait ConfigModule: storage::StorageModule {

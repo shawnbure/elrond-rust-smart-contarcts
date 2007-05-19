@@ -1,8 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::config::BP;
-use crate::config::MAX_COLLECTION_NAME_LEN;
+use crate::config::{BP, MAX_COLLECTION_NAME_LEN, MAX_DESCRIPTION_LEN};
 use crate::storage::NftSaleInfo;
 
 use super::config;
@@ -66,7 +65,7 @@ pub trait ValidationModule:
 
     fn require_token_id_not_registered_already(&self, token_id: &TokenIdentifier) -> SCResult<()> {
         require!(
-            self.collection_name(token_id).is_empty(),
+            self.collections(token_id).is_empty(),
             "Token id already registered"
         );
         Ok(())
@@ -88,6 +87,14 @@ pub trait ValidationModule:
         require!(
             collection_name.len() < MAX_COLLECTION_NAME_LEN,
             "Collection name too long"
+        );
+        Ok(())
+    }
+
+    fn require_valid_description(&self, description: &BoxedBytes) -> SCResult<()> {
+        require!(
+            description.len() < MAX_DESCRIPTION_LEN,
+            "Description name too long"
         );
         Ok(())
     }

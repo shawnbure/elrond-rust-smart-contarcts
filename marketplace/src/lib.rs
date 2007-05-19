@@ -11,7 +11,7 @@ pub mod utils;
 pub mod validation;
 pub mod views;
 
-use storage::{NftId, NftSaleInfo};
+use storage::{Collection, NftId, NftSaleInfo};
 
 const NFT_AMOUNT: u64 = 1;
 
@@ -169,22 +169,25 @@ pub trait MarketplaceContract:
         #[payment_amount] payment: Self::BigUint,
         token_id: TokenIdentifier,
         collection_name: BoxedBytes,
+        description: BoxedBytes,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
         self.require_valid_token_id(&token_id)?;
         self.require_valid_collection_name(&collection_name)?;
+        self.require_valid_description(&description)?;
 
         self.require_good_register_collection_payment(&payment)?;
         self.require_token_id_not_registered_already(&token_id)?;
         self.require_collection_name_unique(&collection_name)?;
 
-        self.collection_name(&token_id).set(&collection_name);
+        let collection = Collection::new(collection_name.clone(), description.clone());
+        self.collections(&token_id).set(&collection);
         self.all_collection_names().insert(collection_name.clone());
 
         let caller = self.blockchain().get_caller();
         let timestamp = self.blockchain().get_block_timestamp();
-        self.collection_register_event(caller, token_id, collection_name, timestamp);
+        self.collection_register_event(caller, token_id, collection_name, description, timestamp);
         Ok(())
     }
 }

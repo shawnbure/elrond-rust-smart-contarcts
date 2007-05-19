@@ -43,6 +43,18 @@ impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
     }
 }
 
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+pub struct Collection {
+    pub name: BoxedBytes,
+    pub description: BoxedBytes,
+}
+
+impl Collection {
+    pub fn new(name: BoxedBytes, description: BoxedBytes) -> Self {
+        Collection { name, description }
+    }
+}
+
 #[elrond_wasm::module]
 pub trait StorageModule {
     #[view(getPlatformFeePercent)]
@@ -54,11 +66,11 @@ pub trait StorageModule {
     fn collection_register_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
 
     #[view(getCollectionName)]
-    #[storage_mapper("collection_name")]
-    fn collection_name(
+    #[storage_mapper("collections")]
+    fn collections(
         &self,
         token_id: &TokenIdentifier,
-    ) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    ) -> SingleValueMapper<Self::Storage, Collection>;
 
     #[view(getAllCollectionNames)]
     #[storage_mapper("all_collection_names")]

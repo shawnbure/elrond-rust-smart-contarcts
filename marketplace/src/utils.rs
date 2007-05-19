@@ -53,8 +53,8 @@ pub trait UtilsModule: storage::StorageModule {
     }
 
     fn get_collection_name_or_default(&self, token_id: &TokenIdentifier) -> BoxedBytes {
-        if !self.collection_name(token_id).is_empty() {
-            self.collection_name(token_id).get()
+        if !self.collections(token_id).is_empty() {
+            self.collections(token_id).get().name
         } else {
             BoxedBytes::empty()
         }
