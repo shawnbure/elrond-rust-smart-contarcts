@@ -40,6 +40,8 @@ pub trait ValidationModule:
 
     fn require_valid_price(&self, price: &Self::BigUint) -> SCResult<()> {
         require!(self.get_platform_cut(&price) != 0, "Invalid price");
+        require!(price >= &self.asset_min_price().get(), "Price too low");
+        require!(price <= &self.asset_max_price().get(), "Price too high");
         Ok(())
     }
 

@@ -9,7 +9,6 @@ pub mod global_op;
 pub mod storage;
 pub mod utils;
 pub mod validation;
-pub mod views;
 
 use storage::{NftId, NftSaleInfo};
 
@@ -20,14 +19,19 @@ pub trait MarketplaceContract:
     events::EventsModule
     + storage::StorageModule
     + validation::ValidationModule
-    + views::ViewsModule
     + config::ConfigModule
     + utils::UtilsModule
     + global_op::GlobalOperationModule
 {
     #[init]
-    fn init(&self, platform_fee_percent: u64) -> SCResult<()> {
-        self.try_set_platform_fee_percent(platform_fee_percent)
+    fn init(
+        &self,
+        platform_fee_percent: u64,
+        asset_min_price: Self::BigUint,
+        asset_max_price: Self::BigUint,
+    ) -> SCResult<()> {
+        self.try_set_platform_fee_percent(platform_fee_percent)?;
+        self.try_set_asset_price_range(asset_min_price, asset_max_price)
     }
 
     #[payable("*")]

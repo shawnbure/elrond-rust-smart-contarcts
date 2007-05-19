@@ -45,6 +45,15 @@ pub trait StorageModule {
     #[storage_mapper("platform_fee_percent")]
     fn platform_fee_percent(&self) -> SingleValueMapper<Self::Storage, u64>;
 
+    #[view(getAssetMinPrice)]
+    #[storage_mapper("asset_min_price")]
+    fn asset_min_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+    #[view(getAssetMaxPrice)]
+    #[storage_mapper("asset_max_price")]
+    fn asset_max_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+
+    #[view(getNftSaleInfo)]
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(
         &self,
