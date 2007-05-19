@@ -1,11 +1,11 @@
-MY_WALLET_PEM="WalletKey.pem"
+MY_WALLET_PEM="~/Wallets/WalletKey.pem"
 MY_OTHER_WALLET_PEM="OtherWalletKey.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqj8vnqw76wq333qwx2wjf2nyn89dc8jhct9usvxzd7g"
-CONTRACT_ADDRESS_HEX="0x0000000000000000050091d9303bda70231881c653a4954c93395b83caf85979"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqm4dmwyxc5fsj49z3jcu9h08azjrcf60kt9uspxs483"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500dd5bb710d8a2612a945196385bbcfd148784e9f65979"
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
@@ -14,8 +14,8 @@ deploy() {
         --bytecode=${WASM} \
         --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
-        --gas-limit=100000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 \
+        --gas-limit=200000000 \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \
         --send || return
 }
 
