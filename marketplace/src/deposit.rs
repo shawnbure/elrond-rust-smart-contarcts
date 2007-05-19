@@ -64,6 +64,7 @@ pub trait DepositModule:
         deposit -= to_decrease;
 
         self.egld_deposit(address).set(&deposit);
+        self.deposit_update_event(address.clone(), deposit.clone());
         Ok(deposit)
     }
 }
