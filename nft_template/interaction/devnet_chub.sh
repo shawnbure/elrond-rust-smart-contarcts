@@ -1,9 +1,13 @@
 #Fill this with the good values
-MY_WALLET_PEM="../../dev-wallet-owner.pem"
+MY_WALLET_PEM="/pems/WalletKey.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
-MY_ADDRESS="erd1hh7gte28hahk9htwlhzf3gretusckhrqf4y6xv5p9qwznhn7y4wswnzua3"
-MY_ADDRESS_HEX="0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d"
+MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"         //wallet address that you deploy 
+MY_ADDRESS_HEX="0xf414111c036c35db662075f39120953b849f34749dda1e7157a8c75dae835979"
+
+
+#  erdpy wallet bech32 --decode erd12ngznv48rnlvgjtuc4h7ev5e2dyy0thzgewd95edne2urhyxrwtq09ara3
+# 0x54d029b2a71cfec4497cc56fecb299534847aee2465cd2d32d9e55c1dc861b96
 
 MY_TOKEN_NAME="0x43485542"
 MY_TOKEN_TICKER="0x43485542"
