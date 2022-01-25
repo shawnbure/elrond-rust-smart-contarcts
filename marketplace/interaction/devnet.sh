@@ -1,4 +1,4 @@
-MY_WALLET_PEM="/pems/WalletKey.pem"
+MY_WALLET_PEM="../../dev-wallet-owner.pem"
 MY_OTHER_WALLET_PEM="/pems/OtherWalletKey.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
@@ -164,3 +164,5 @@ getCreatorLastWithdrawalEpoch() {
         --function getCreatorLastWithdrawalEpoch \
         --arguments $1
 }
+
+deploy
