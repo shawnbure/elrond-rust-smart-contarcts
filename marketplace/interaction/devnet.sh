@@ -1,13 +1,20 @@
-MY_WALLET_PEM="../../dev-wallet-owner.pem"
-MY_OTHER_WALLET_PEM="/pems/OtherWalletKey.pem"
+MY_WALLET_PEM="../../dev-wallet-owner.pem"                  
+MY_OTHER_WALLET_PEM="../../dev-extra-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqm4dmwyxc5fsj49z3jcu9h08azjrcf60kt9uspxs483"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500dd5bb710d8a2612a945196385bbcfd148784e9f65979"
+#SETUP THIS AFTER DEPLOYMENT
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"           #after deploying, the the contract address
+CONTRACT_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+
+
+
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
+
+
+
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -165,4 +172,11 @@ getCreatorLastWithdrawalEpoch() {
         --arguments $1
 }
 
+
+
+
+#-------- SHELL EXECUTED FUNCTIONS --------------
+
 deploy
+
+#------------------------------------------------

@@ -1,18 +1,24 @@
-MY_WALLET_PEM="/pems/WalletKey.pem"
-MY_OTHER_WALLET_PEM="/pems/OtherWalletKey.pem"
+MY_WALLET_PEM="../../dev-wallet-owner.pem"
+MY_OTHER_WALLET_PEM="../../dev-extra-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/deployer.wasm"
 
-MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqupgxrdhphusx5crgvg454u9k4zqsp5mst9usqlrfyy"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500e05061b6e1bf206a6068622b4af0b6a88100d3705979"
+#MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq59hz4j3f4dc6mvd7zpa6j2f4py4qe4ywt9us5la775"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500a16e2aca29ab71adb1be107ba92935092a0cd48e5979"
+#deployer contract address
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqcnkcsuw4qjshzeldwgxcek4y76gxq2zxy4wssluyh9"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500c4ed8871d504a17167ed720d8cdaa4f690602846255d"
 
-MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgqg5fsxjxhvqj4naqp0msld0g4slfctc39t9us6ksjjx"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x0000000000000000050045130348d7602559f4017ee1f6bd1587d385e2255979"
+
+#NFT TEMPLATE ADDRESS (devnet_chub.sh)
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqd9tv8f3k7ea5y9wsnalhs9df5u3k7300y4wsd89yta"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x000000000000000005006956c3a636f67b4215d09f7f7815a9a7236f45ef255d"
+
+#address of the MARKETPLACE SC
+MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"
+
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -25,8 +31,12 @@ deploy() {
         --send || return
 }
 
-MY_TOKEN_NAME="0x4d4f4e4b"
-MY_TOKEN_TICKER="0x4d4f4e4b"
+MY_TOKEN_NAME="0x43485542"
+MY_TOKEN_TICKER="0x43485542"
+
+# 434855422d306637626631
+# CHUB-0f7bf1
+
 
 # This is how you get your token ID
 issueNft() {
@@ -40,8 +50,8 @@ issueNft() {
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --send || return
 }
-
-MY_TOKEN_ID="0x4d4f4e4b2d623032643339"
+            
+MY_TOKEN_ID="0x434855422d613166636239" #"0x4d4f4e4b2d623032643339"
 ROYALTIES=750
 TOKEN_NAME_BASE="0x4d6f6e6b"
 MY_TOKEN_IMAGE_BASE_URI="0x68747470733a2f2f676174657761792e70696e6174612e636c6f75642f697066732f516d664e635535374a67383858723338503678386a764c3767386e77694b323166667439697a6d6d766a52554d57"
@@ -126,3 +136,10 @@ withdraw() {
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --send || return
 }
+
+
+#-------- SHELL EXECUTED FUNCTIONS --------------
+
+deploy
+
+#------------------------------------------------
