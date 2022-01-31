@@ -6,7 +6,7 @@ Note: in VSCode, shift+cmd+p “elrond: setup workplace”
 
 1. MarketPlace
 
-Clean / Build the “youbei-sc/marketplace”  WASM file generated: youbei-sc/marketplace/output/marketplace.wasm
+Clean / Build the “youbei-sc/marketplace” WASM file generated: youbei-sc/marketplace/output/marketplace.wasm
 
 In youbei-sc/marketplace/interaction/devnet.sh,
 Set the following parameters:
@@ -32,7 +32,7 @@ Set that to the “CONTRACT_ADDRESS_HEX” value
  
 2. NFT_TEMPLATE
 
-Clean / Build the “youbei-sc/nft_template”  WASM file generated: youbei-sc/nft_template/output/nft_template.wasm
+Clean / Build the “youbei-sc/nft_template” WASM file generated: youbei-sc/nft_template/output/nft_template.wasm
 
 In youbei-sc/nft_template/interaction/devnet_chub.sh,
 Set the following parameters:
@@ -64,7 +64,7 @@ Set that to the “CONTRACT_ADDRESS_HEX” value
 
 2. DEPLOYER
 
-Clean / Build the “youbei-sc/deployer”  WASM file generated: youbei-sc/deployer/output/deployer.wasm
+Clean / Build the “youbei-sc/deployer” WASM file generated: youbei-sc/deployer/output/deployer.wasm
 
 In youbei-sc/nft_template/interaction/devnet_chub.sh,
 Set the following parameters:
