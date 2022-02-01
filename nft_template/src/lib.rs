@@ -8,11 +8,11 @@ mod random;
 use random::Random;
 
 const MAX_FEE_PERCENT: u64 = 10_000;
-const PLATFORM_MINT_DEFAULT_FEE_PERCENT: u64 = 150;
+const PLATFORM_MINT_DEFAULT_FEE_PERCENT: u64 = 250;
 
 const MIN_LOOP_ITERATION_GAS_LIMIT: u64 = 10_000_000;
-const ERDSEA_ERD721_STANDARD: &[u8] = b"Erdsea|ERD-721";
-const ERDSEA_WITHDRAW_MESSAGE: &[u8] = b"Erdsea website mint 1.5% fee";
+const ERDSEA_ERD721_STANDARD: &[u8] = b"Youbei | ERD-721";
+const ERDSEA_WITHDRAW_MESSAGE: &[u8] = b"Youbei website mint 2.5% fee";
 
 mod marketplace_proxy {
     elrond_wasm::imports!();
