@@ -163,7 +163,7 @@ pub trait NftTemplate {
 
         let tokens_to_sell = core::cmp::min(tokens_left_for_sale, number_of_tokens_desired);
         let price_for_tokens_to_sell = self.price().get() * (6 as u64).into();
-        require!(payment >= price_for_tokens_to_sell, "payment too low");
+        //require!(payment >= price_for_tokens_to_sell, "payment too low");
 
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
