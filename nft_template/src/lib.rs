@@ -8,11 +8,11 @@ mod random;
 use random::Random;
 
 const MAX_FEE_PERCENT: u64 = 10_000;
-const PLATFORM_MINT_DEFAULT_FEE_PERCENT: u64 = 250;
+const PLATFORM_MINT_DEFAULT_FEE_PERCENT: u64 = 150;
 
 const MIN_LOOP_ITERATION_GAS_LIMIT: u64 = 10_000_000;
-const YOUBEI_ERD721_STANDARD: &[u8] = b"Youbei | ERD-721";
-const YOUBEI_WITHDRAW_MESSAGE: &[u8] = b"Youbei website mint 2.5% fee";
+const ERDSEA_ERD721_STANDARD: &[u8] = b"Erdsea|ERD-721";
+const ERDSEA_WITHDRAW_MESSAGE: &[u8] = b"Erdsea website mint 1.5% fee";
 
 mod marketplace_proxy {
     elrond_wasm::imports!();
@@ -99,7 +99,7 @@ pub trait NftTemplate {
                     .direct(&address, &token_id, nonce, &big_one, &[]);
             }
             self.send()
-                .direct_egld(&address, &big_zero, &YOUBEI_ERD721_STANDARD);
+                .direct_egld(&address, &big_zero, &ERDSEA_ERD721_STANDARD);
 
             total_amount += amount;
         }
@@ -162,7 +162,7 @@ pub trait NftTemplate {
         require!(tokens_left_for_sale > 0, "no tokens left for sale");
 
         let tokens_to_sell = core::cmp::min(tokens_left_for_sale, number_of_tokens_desired);
-        let price_for_tokens_to_sell = self.price().get() * (6 as u64).into();
+        let price_for_tokens_to_sell = self.price().get() * (tokens_to_sell as u64).into();
         require!(payment >= price_for_tokens_to_sell, "payment too low");
 
         let token_name_base = self.token_name_base().get();
@@ -199,7 +199,7 @@ pub trait NftTemplate {
 
         let surplus = &payment - &price_for_tokens_to_sell;
         self.send()
-            .direct_egld(&caller, &surplus, &YOUBEI_ERD721_STANDARD);
+            .direct_egld(&caller, &surplus, &ERDSEA_ERD721_STANDARD);
 
         self.total_sold().update(|x| *x += tokens_to_sell);
         Ok(price_for_tokens_to_sell)
@@ -349,7 +349,7 @@ pub trait NftTemplate {
         self.marketplace_balance().update(|x| *x -= &amount);
 
         self.send()
-            .direct_egld(&caller, &amount, YOUBEI_WITHDRAW_MESSAGE);
+            .direct_egld(&caller, &amount, ERDSEA_WITHDRAW_MESSAGE);
         Ok(())
     }
 
