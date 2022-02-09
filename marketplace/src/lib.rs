@@ -34,10 +34,13 @@ pub trait MarketplaceContract:
         asset_min_price: Self::BigUint,
         asset_max_price: Self::BigUint,
         creator_withdrawal_waiting_epochs: u64,
+        admin_pub_key: BoxedBytes,
     ) -> SCResult<()> {
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
+        self.admin_pub().set(&admin_pub_key);
+        // self.try_set_admin_pub_key(admin_pub_key)?;
         self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)
     }
 
@@ -100,11 +103,23 @@ pub trait MarketplaceContract:
         #[payment_amount] payment: Self::BigUint,
         token_id: TokenIdentifier,
         nonce: u64,
+        signature: BoxedBytes,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
         self.require_valid_token_id(&token_id)?;
         self.require_valid_nonce(nonce)?;
+        
+        let data = [token_id.as_esdt_identifier(), &nonce.to_be_bytes()].concat();
+        let b_data = &data;
+        let u_data: &[u8] = &b_data;
+        require!(
+            self.crypto().verify_ed25519(
+                self.admin_pub().get().as_slice(),
+                u_data,
+                signature.as_slice(),
+            ) == true , "not verified"
+        );
 
         let nft_id = NftId::new(token_id.clone(), nonce);
         self.require_nft_for_sale(&nft_id)?;

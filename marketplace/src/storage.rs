@@ -156,4 +156,8 @@ pub trait StorageModule {
         &self,
         nft_id: &NftId,
     ) -> SingleValueMapper<Self::Storage, AuctionInfo<Self::BigUint>>;
+
+    #[view(getAdmin)]
+    #[storage_mapper("admin_pub")]
+    fn admin_pub(&self)  -> SingleValueMapper<Self::Storage, BoxedBytes>;
 }

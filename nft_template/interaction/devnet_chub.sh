@@ -3,8 +3,8 @@ MY_WALLET_PEM="../../dev-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgquxa3w45zcxrl69hdk9l4zvk8jj5mnsu0y4wsem7pnc"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x00000000000000000500e1bb175682c187fd16edb17f5132c794a9b9c38f255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 
 #SET THIS AFTER DEPLOYMENT
@@ -57,9 +57,6 @@ deploy() {
         --arguments ${MARKETPLACE_ADDRESS_HEX} ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
-
-
-
 
 
 upgrade() {
@@ -125,9 +122,9 @@ withdraw() {
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
 # RUN THIS INITIAL TO GET TOKEN ID 
-#issueNft
+issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-#deploy
+deploy
 
 #------------------------------------------------

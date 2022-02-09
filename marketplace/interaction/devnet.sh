@@ -13,9 +13,10 @@ CONTRACT_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8e
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
-
-
-
+ADMIN_PUB_KEY="0x302a300506032b6570032100032ddada91af480433dd79f8bbad2ef089547e5608b69328071b6cd5c79e6f9d"
+#"MCowBQYDK2VwAyEAAy3a2pGvSAQz3Xn4u60u8IlUflYItpMoBxts1ceeb50="
+DEPLOYED_WITH_ADMIN_PUB_KEY_MARKETPLACE="erd1qqqqqqqqqqqqqpgquxa3w45zcxrl69hdk9l4zvk8jj5mnsu0y4wsem7pnc"
+#"00000000000000000500ff294bd76e683484cf2d78e0d6d937627543a948255d"
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
         --bytecode=${WASM} \
@@ -23,7 +24,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e 0x302a300506032b6570032100032ddada91af480433dd79f8bbad2ef089547e5608b69328071b6cd5c79e6f9d \
         --send || return
 }
 

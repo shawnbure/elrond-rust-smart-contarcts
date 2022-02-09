@@ -81,4 +81,9 @@ pub trait ConfigModule: storage::StorageModule {
         self.creator_withdrawal_waiting_epochs().set(&epochs);
         Ok(())
     }
+
+    fn try_set_admin_pub_key(&self, pub_key: BoxedBytes) -> SCResult<()> {
+        self.admin_pub().set(&pub_key);
+        Ok(())
+    }
 }
