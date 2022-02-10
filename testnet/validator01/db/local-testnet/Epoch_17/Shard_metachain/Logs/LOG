@@ -1,6 +1,0 @@
-=============== Feb 10, 2022 (+0330) ===============
-16:36:13.544507 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
-16:36:13.583665 db@open opening
-16:36:13.586983 version@stat F·[] S·0B[] Sc·[]
-16:36:13.607441 db@janitor F·2 G·0
-16:36:13.607501 db@open done T·23.7975ms
