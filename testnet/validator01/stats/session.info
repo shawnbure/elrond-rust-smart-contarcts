@@ -1,0 +1,48 @@
+PkBlockSign:78689fd4b1e2e434d567fe01e61598a42717d83124308266bd09ccc15d2339dd318c019914b86ac29adbae5dd8a02d0307425e9bd85a296e94943708c72f8c670f0b7c50a890a5719088dbd9f1d062cad9acffa06df834106eebe1a4257ef00d
+ShardId:metachain
+TotalShards:1
+AppVersion:undefined/go1.15.2/darwin-amd64/c54b9423a5
+GenesisTimeStamp:1644488070
+
+Started with parameters:
+genesis-file = ./config/genesis.json
+smart-contracts-file = ./config/genesisSmartContracts.json
+nodes-setup-file = ./config/nodesSetup.json
+config = ./config/config.toml
+config-api = ./config/api.toml
+config-economics = ./config/economics.toml
+config-systemSmartContracts = ./config/systemSmartContractsConfig.toml
+config-ratings = ./config/ratings.toml
+config-preferences = ./config/prefs.toml
+config-external = ./config/external.toml
+p2p-config = ./config/p2p.toml
+epoch-config = ./config/enableEpochs.toml
+round-config = ./config/enableRounds.toml
+gas-costs-config = ./config/gasSchedules
+sk-index = 0
+validator-key-pem-file = ./config/validatorKey.pem
+port = 0
+profile-mode = false
+use-health-service = false
+storage-cleanup = false
+gops-enable = false
+rest-api-interface = localhost:10101
+rest-api-debug = false
+disable-ansi-color = false
+log-level = *:DEBUG,arwen:TRACE,process/smartcontract:TRACE,*:TRACE
+log-save = true
+log-correlation = true
+log-logger-name = true
+use-log-view = true
+bootstrap-round-index = 18446744073709551615
+num-epochs-to-keep = 2
+num-active-persisters = 2
+start-in-epoch = false
+import-db-no-sig-check = false
+import-db-save-epoch-root-hash = false
+import-db-start-epoch = 0
+redundancy-level = 0
+full-archive = false
+mem-ballast = 0
+help, h = <nil>
+version, v = <nil>

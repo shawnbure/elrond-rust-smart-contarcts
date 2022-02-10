@@ -3,8 +3,8 @@ MY_WALLET_PEM="../../dev-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgquxa3w45zcxrl69hdk9l4zvk8jj5mnsu0y4wsem7pnc"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x00000000000000000500e1bb175682c187fd16edb17f5132c794a9b9c38f255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqjcc0vrnhcmhdcs50axhtjsth6e3tj2qry4ws3m8nvz"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x000000000000000005009630f60e77c6eedc428fe9aeb94177d662b92803255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 
 #SET THIS AFTER DEPLOYMENT

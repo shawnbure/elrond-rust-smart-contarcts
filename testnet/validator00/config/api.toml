@@ -1,0 +1,202 @@
+[Logging]
+LoggingEnabled = false
+ThresholdInMicroSeconds = 1000
+
+[APIPackages.node]
+[[APIPackages.node.Routes]]
+Name = "/status"
+Open = true
+
+[[APIPackages.node.Routes]]
+Name = "/metrics"
+Open = true
+
+[[APIPackages.node.Routes]]
+Name = "/heartbeatstatus"
+Open = true
+
+[[APIPackages.node.Routes]]
+Name = "/p2pstatus"
+Open = true
+
+[[APIPackages.node.Routes]]
+Name = "/debug"
+Open = true
+
+[[APIPackages.node.Routes]]
+Name = "/peerinfo"
+Open = true
+
+[APIPackages.address]
+[[APIPackages.address.Routes]]
+Name = "/:address"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/balance"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/username"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/keys"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/key/:key"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdt"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdts/roles"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdt/:tokenIdentifier"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/nft/:tokenIdentifier/nonce/:nonce"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdts-with-role/:role"
+Open = true
+
+[[APIPackages.address.Routes]]
+Name = "/:address/registered-nfts"
+Open = true
+
+[APIPackages.hardfork]
+[[APIPackages.hardfork.Routes]]
+Name = "/trigger"
+Open = true
+
+[APIPackages.network]
+[[APIPackages.network.Routes]]
+Name = "/status"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/economics"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/config"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/enable-epochs"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/esdts"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/fungible-tokens"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/semi-fungible-tokens"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/non-fungible-tokens"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/supply/:token"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/direct-staked-info"
+Open = true
+
+[[APIPackages.network.Routes]]
+Name = "/delegated-info"
+Open = true
+
+[APIPackages.log]
+[[APIPackages.log.Routes]]
+Name = "/log"
+Open = true
+
+[APIPackages.validator]
+[[APIPackages.validator.Routes]]
+Name = "/statistics"
+Open = true
+
+[APIPackages.vm-values]
+[[APIPackages.vm-values.Routes]]
+Name = "/hex"
+Open = true
+
+[[APIPackages.vm-values.Routes]]
+Name = "/string"
+Open = true
+
+[[APIPackages.vm-values.Routes]]
+Name = "/int"
+Open = true
+
+[[APIPackages.vm-values.Routes]]
+Name = "/query"
+Open = true
+
+[APIPackages.transaction]
+[[APIPackages.transaction.Routes]]
+Name = "/send"
+Open = true
+
+[[APIPackages.transaction.Routes]]
+Name = "/simulate"
+Open = true
+
+[[APIPackages.transaction.Routes]]
+Name = "/send-multiple"
+Open = true
+
+[[APIPackages.transaction.Routes]]
+Name = "/cost"
+Open = true
+
+[[APIPackages.transaction.Routes]]
+Name = "/:txhash"
+Open = true
+
+[APIPackages.block]
+[[APIPackages.block.Routes]]
+Name = "/by-nonce/:nonce"
+Open = true
+
+[[APIPackages.block.Routes]]
+Name = "/by-hash/:hash"
+Open = true
+
+[[APIPackages.block.Routes]]
+Name = "/by-round/:round"
+Open = true
+
+[APIPackages.proof]
+[[APIPackages.proof.Routes]]
+Name = "/root-hash/:roothash/address/:address"
+Open = true
+
+[[APIPackages.proof.Routes]]
+Name = "/root-hash/:roothash/address/:address/key/:key"
+Open = true
+
+[[APIPackages.proof.Routes]]
+Name = "/address/:address"
+Open = true
+
+[[APIPackages.proof.Routes]]
+Name = "/verify"
+Open = true
+

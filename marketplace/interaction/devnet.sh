@@ -5,8 +5,8 @@ CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 
 #SETUP THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"           #after deploying, the the contract address
-CONTRACT_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqjcc0vrnhcmhdcs50axhtjsth6e3tj2qry4ws3m8nvz"           #after deploying, the the contract address
+CONTRACT_ADDRESS_HEX="0x000000000000000005009630f60e77c6eedc428fe9aeb94177d662b92803255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 
 
@@ -15,8 +15,8 @@ MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 ADMIN_PUB_KEY="0x302a300506032b6570032100032ddada91af480433dd79f8bbad2ef089547e5608b69328071b6cd5c79e6f9d"
 #"MCowBQYDK2VwAyEAAy3a2pGvSAQz3Xn4u60u8IlUflYItpMoBxts1ceeb50="
-DEPLOYED_WITH_ADMIN_PUB_KEY_MARKETPLACE="erd1qqqqqqqqqqqqqpgquxa3w45zcxrl69hdk9l4zvk8jj5mnsu0y4wsem7pnc"
-#"00000000000000000500ff294bd76e683484cf2d78e0d6d937627543a948255d"
+DEPLOYED_WITH_ADMIN_PUB_KEY_MARKETPLACE="erd1qqqqqqqqqqqqqpgqjcc0vrnhcmhdcs50axhtjsth6e3tj2qry4ws3m8nvz"
+#"0x000000000000000005009630f60e77c6eedc428fe9aeb94177d662b92803255d"
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
         --bytecode=${WASM} \
@@ -24,7 +24,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e 0x302a300506032b6570032100032ddada91af480433dd79f8bbad2ef089547e5608b69328071b6cd5c79e6f9d \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e 0x032ddada91af480433dd79f8bbad2ef089547e5608b69328071b6cd5c79e6f9d \
         --send || return
 }
 
@@ -63,6 +63,17 @@ buyNft() {
         --gas-limit=100000000 \
         --send || return
 }
+
+getAdmin() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_OTHER_WALLET_PEM} \
+        --value=1000000000000000000 \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function getAdmin \
+        --gas-limit=100000000 \
+        --send || return
+}
+
 
 # $1 token id in hex
 # $2 nonce

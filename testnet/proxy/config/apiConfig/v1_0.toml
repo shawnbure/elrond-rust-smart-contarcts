@@ -1,0 +1,319 @@
+[APIPackages.actions]
+[[APIPackages.actions.Routes]]
+Name = "/reload-observers"
+Open = true
+Secured = true
+RateLimit = 0
+
+[[APIPackages.actions.Routes]]
+Name = "/reload-full-history-observers"
+Open = true
+Secured = true
+RateLimit = 0
+
+[APIPackages.node]
+[[APIPackages.node.Routes]]
+Name = "/heartbeatstatus"
+Open = true
+Secured = false
+RateLimit = 0
+
+[APIPackages.address]
+[[APIPackages.address.Routes]]
+Name = "/:address"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/balance"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/nonce"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/username"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/keys"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/key/:key"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdt"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdts/roles"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdt/:tokenIdentifier"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/esdts-with-role/:role"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/registered-nfts"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/nft/:tokenIdentifier/nonce/:nonce"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/shard"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.address.Routes]]
+Name = "/:address/transactions"
+Open = true
+Secured = false
+RateLimit = 0
+
+[APIPackages.hyperblock]
+[[APIPackages.hyperblock.Routes]]
+Name = "/by-hash/:hash"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.hyperblock.Routes]]
+Name = "/by-nonce/:nonce"
+Open = true
+Secured = false
+RateLimit = 0
+
+[APIPackages.network]
+[[APIPackages.network.Routes]]
+Name = "/status/:shard"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/economics"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/config"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/esdts"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/fungible-tokens"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/semi-fungible-tokens"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/non-fungible-tokens"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/esdt/supply/:token"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/direct-staked-info"
+Open = true
+Secured = true
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/delegated-info"
+Open = true
+Secured = true
+RateLimit = 0
+
+[[APIPackages.network.Routes]]
+Name = "/enable-epochs"
+Open = false
+Secured = false
+RateLimit = 0
+
+[APIPackages.validator]
+[[APIPackages.validator.Routes]]
+Name = "/statistics"
+Open = true
+Secured = false
+RateLimit = 0
+
+[APIPackages.vm-values]
+[[APIPackages.vm-values.Routes]]
+Name = "/hex"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.vm-values.Routes]]
+Name = "/string"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.vm-values.Routes]]
+Name = "/int"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.vm-values.Routes]]
+Name = "/query"
+Open = true
+Secured = false
+RateLimit = 0
+
+[APIPackages.transaction]
+[[APIPackages.transaction.Routes]]
+Name = "/send"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.transaction.Routes]]
+Name = "/simulate"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.transaction.Routes]]
+Name = "/send-multiple"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.transaction.Routes]]
+Name = "/send-user-funds"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.transaction.Routes]]
+Name = "/cost"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.transaction.Routes]]
+Name = "/:txhash"
+Open = true
+Secured = false
+RateLimit = 0
+
+[[APIPackages.transaction.Routes]]
+Name = "/:txhash/status"
+Open = true
+Secured = false
+RateLimit = 0
+
+[APIPackages.block]
+[[APIPackages.block.Routes]]
+Name = "/:shard/by-nonce/:nonce"
+Secured = false
+Open = true
+RateLimit = 0
+
+[[APIPackages.block.Routes]]
+Name = "/:shard/by-hash/:hash"
+Secured = false
+Open = true
+RateLimit = 0
+
+[APIPackages.blocks]
+[[APIPackages.blocks.Routes]]
+Name = "/by-round/:round"
+Secured = false
+Open = true
+RateLimit = 0
+
+[APIPackages.block-atlas]
+[[APIPackages.block-atlas.Routes]]
+Name = "/:shard/:nonce"
+Secured = false
+Open = true
+RateLimit = 0
+
+[APIPackages.proof]
+[[APIPackages.proof.Routes]]
+Name = "/root-hash/:roothash/address/:address"
+Secured = false
+Open = false
+RateLimit = 0
+
+[[APIPackages.proof.Routes]]
+Name = "/address/:address"
+Secured = false
+Open = false
+RateLimit = 0
+
+[[APIPackages.proof.Routes]]
+Name = "/verify"
+Secured = false
+Open = false
+RateLimit = 0
+
+[APIPackages.status]
+[[APIPackages.status.Routes]]
+Name = "/metrics"
+Secured = false
+Open = true
+RateLimit = 0
+
+[[APIPackages.status.Routes]]
+Name = "/prometheus-metrics"
+Secured = false
+Open = true
+RateLimit = 0
+
