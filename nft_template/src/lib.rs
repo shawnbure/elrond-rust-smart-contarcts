@@ -39,6 +39,7 @@ pub trait NftTemplate {
         max_supply: u16,
         sale_start: u64,
         #[var_args] metadata_base_uri: OptionalArg<BoxedBytes>,
+        #[var_args] admin_pub_key: OptionalArg<BoxedBytes>,
     ) {
         self.marketplace_admin().set(&marketplace_admin);
         self.token_id().set_if_empty(&token_id);
@@ -54,6 +55,14 @@ pub trait NftTemplate {
         self.price().set_if_empty(&price);
         self.max_supply().set_if_empty(&max_supply);
         self.sale_start().set_if_empty(&sale_start);
+
+        //set the admin_pub_key if provided in parameter
+        self.admin_pub_key().set_if_empty(
+            &admin_pub_key
+                .into_option()
+                .unwrap_or(BoxedBytes::empty()),
+        );
+
     }
 
     #[only_owner]
@@ -147,6 +156,23 @@ pub trait NftTemplate {
         payment: Self::BigUint,
         number_of_tokens_desired_opt: OptionalArg<u16>,
     ) -> SCResult<Self::BigUint> {
+
+        //Verification of the signing 
+        /*
+        self.crypto().verify_ed25519
+        let data = [token_id.as_esdt_identifier(), &nonce.to_be_bytes()].concat();
+        let b_data = &data; 
+        let u_data: &[u8] = &b_data;
+        require!(
+            self.crypto().verify_ed25519(
+                self.admin_pub().get().as_slice(),
+                u_data,
+                signature.as_slice(),
+            ) == true , "not verified"
+        );
+        */
+
+
         let current_timestamp = self.blockchain().get_block_timestamp();
         let sale_start_timestamp = self.sale_start().get();
         require!(
@@ -454,4 +480,10 @@ pub trait NftTemplate {
 
     #[proxy]
     fn marketplace_proxy(&self, to: Address) -> marketplace_proxy::Proxy<Self::SendApi>;
+
+    
+    #[view(getAdminPubKey)]
+    #[storage_mapper("admin_pub_key")]
+    fn admin_pub_key(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;    
+
 }
