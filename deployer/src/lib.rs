@@ -6,9 +6,21 @@ elrond_wasm::derive_imports!();
 #[elrond_wasm::contract]
 pub trait Deployer {
     #[init]
-    fn init(&self, nft_template_address: ManagedAddress, marketplace_admin: ManagedAddress) {
+    fn init(&self, 
+            nft_template_address: ManagedAddress, 
+            marketplace_admin: ManagedAddress,
+            #[var_args] admin_pub_key: OptionalArg<BoxedBytes>, ) 
+    {
+
         self.nft_template_address().set(&nft_template_address);
         self.marketplace_admin().set(&marketplace_admin);
+
+        //set the admin_pub_key if provided in parameter
+        self.admin_pub_key().set_if_empty(
+            &admin_pub_key
+                .into_option()
+                .unwrap_or(BoxedBytes::empty()),
+        );
     }
 
     #[payable("EGLD")]
@@ -23,6 +35,7 @@ pub trait Deployer {
         price: BigUint,
         max_supply: u16,
         sale_start_timestamp: u64,
+        admin_pub_key: BoxedBytes,       
         #[var_args] metadata_base_uri_opt: OptionalArg<BoxedBytes>,
     ) -> SCResult<ManagedAddress> {
         let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
@@ -40,6 +53,12 @@ pub trait Deployer {
         if metadata_base_uri.is_some() {
             arg_buffer.push_arg(metadata_base_uri.unwrap());
         }
+
+        //add admin pub key if provided, add to arguments
+        if ! self.admin_pub_key.is_empty() {
+            arg_buffer.push_arg(self.admin_pub_key);    
+        }
+        
 
         let (new_address, _) = self.raw_vm_api().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
@@ -108,4 +127,9 @@ pub trait Deployer {
     #[view(getOwnerOfContract)]
     #[storage_mapper("owner_of_contract")]
     fn owner_of_contract(&self, sc_address: &ManagedAddress) -> SingleValueMapper<ManagedAddress>;
+
+    #[view(getAdminPubKey)]
+    #[storage_mapper("admin_pub_key")]
+    fn admin_pub_key(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;    
+
 }
