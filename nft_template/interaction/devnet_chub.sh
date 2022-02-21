@@ -118,8 +118,10 @@ withdraw() {
 }
 
 
+
+
 # Run first
-# issueNft  
+# deploy  
 
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
@@ -128,6 +130,6 @@ withdraw() {
 #issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-#deploy
+deploy
 
 #------------------------------------------------

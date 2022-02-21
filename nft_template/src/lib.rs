@@ -63,6 +63,7 @@ pub trait NftTemplate {
                 .unwrap_or(BoxedBytes::empty()),
         );
 
+        self.buyer_whitelist_check().set(&Self::BigInt::from(0));   //Default it to 0 which is OFF -> 1 is ON and 0 is OFF   
     }
 
     #[only_owner]
@@ -136,14 +137,38 @@ pub trait NftTemplate {
     fn mint_tokens_through_marketplace(
         &self,
         #[payment_amount] payment: Self::BigUint,
-        #[var_args] number_of_tokens_desired_opt: OptionalArg<u16>,
+        number_of_tokens_desired: u16,
     ) -> SCResult<()> {
+
+        //check if whitelist is enabled
+        if self.is_buyer_whitelist_check_enabled() 
+        {
+            //====== Check if address is registered   ======
+            if self.is_caller_address_not_part_of_whitelist() 
+            {                          
+                return sc_error!("Address is NOT part of WHITELIST");
+            }    
+            
+            //====== Check address count > limit   ======            
+            if self.check_buy_count_is_greater_than_buy_limit_by_adding_amount(self.buy_limit(&self.blockchain().get_caller()).get(),
+                                                                               number_of_tokens_desired) 
+            {
+                return sc_error!("Exceeded the Allowable Buy Limit for WhiteList"); 
+            }  
+            
+        }
+
+
+        
+
         require!(
             !self.minting_through_marketplace_denied().get(),
             "endpoint disabled"
         );
 
         
+
+
         //Verification of the signing 
         /*
         self.crypto().verify_ed25519
@@ -161,11 +186,17 @@ pub trait NftTemplate {
         
         //verify against admin_pub_key
         
-        let spent = self.mint_tokens(payment, number_of_tokens_desired_opt)?;
+        let spent = self.mint_tokens(payment, elrond_wasm::types::OptionalArg::Some(number_of_tokens_desired))?;
+
         let marketplace_cut =
             &spent * &PLATFORM_MINT_DEFAULT_FEE_PERCENT.into() / MAX_FEE_PERCENT.into();
         self.marketplace_balance()
             .update(|x| *x += &marketplace_cut);
+
+        
+        //successfully minted so now we can add to the address count
+        self.add_to_address_buy_count(number_of_tokens_desired);
+
         Ok(())
     }
 
@@ -490,5 +521,133 @@ pub trait NftTemplate {
     #[view(getAdminPubKey)]
     #[storage_mapper("admin_pub_key")]
     fn admin_pub_key(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;    
+
+
+
+
+
+   //===================================================================================================
+    // WHITELIST - BUY COUNT / LIMIT
+    //===================================================================================================
+
+    #[view(getBuyCount)]
+    #[storage_mapper("buy_count")]
+    fn buy_count(&self, address: &Address) -> SingleValueMapper<Self::Storage, u16>;
+
+
+    #[view(getBuyLimit)]
+    #[storage_mapper("buy_limit")]
+    fn buy_limit(&self, address: &Address) -> SingleValueMapper<Self::Storage, u16>;
+
+
+
+    
+    //CREATE MINTING COUNT & LIMIT (Used during population)
+    //----------------------------------------------------------------------
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(createBuyerAddress)]
+    fn create_buyer_address(&self,
+                            buy_count: u16,
+                            buy_limit: u16,
+                            address: Address) -> SCResult<()>
+    {          
+        //ONLY Create new address record if it doesn't exist    
+        if self.buy_limit(&address).is_empty() 
+        {
+            self.buy_count(&address).set(&buy_count);
+            self.buy_limit(&address).set(&buy_limit);
+        } 
+        
+        Ok(())
+    }
+    
+
+
+    // 
+    // [PRIVATE] - Check to see if caller is not part of  whitelist by checking buy_limit (empty)
+    //----------------------------------------------------------------------
+    fn is_caller_address_not_part_of_whitelist(&self) -> bool
+    {
+        //caller address (since minting_limit is based on address)
+        let caller_address = &self.blockchain().get_caller();  
+        
+        //check limit since it should be zero (at least 1 if created for address)
+        return self.buy_limit(&caller_address).is_empty() 
+    }
+
+
+
+
+
+    // [PRIVATE] - check if buy count < buy limit after adding to the buy count
+    //----------------------------------------------------------------------    
+    fn check_buy_count_is_greater_than_buy_limit_by_adding_amount(&self,
+                                                                  buy_limit: u16,
+                                                                  amount_to_add_to_buy_count: u16) -> bool
+    {
+        //get miting count for caller and add amount to it 
+        let mut buy_count_mut = self.buy_count(&self.blockchain().get_caller()).get();
+        buy_count_mut += amount_to_add_to_buy_count;
+
+        //check if the "new" (new by adding amount to it) buy count is greater than buy limit
+        return buy_count_mut > buy_limit;     
+    }    
+
+
+    // [PRIVATE] - ADD TO MINTING COUNT BY BIGINT PARAM
+    //----------------------------------------------------------------------
+    //#[endpoint(add_to_address_buy_count)] //TODO REMOVE: remove after testing
+    fn add_to_address_buy_count(&self,
+                                amount: u16) -> SCResult<()>
+    {
+        let address = self.blockchain().get_caller();
+
+        if self.buy_limit(&address).is_empty()  //check limit since limit is never 0 (empty)
+        {
+            return sc_error!("Address is NOT CREATED for Buying");
+        }
+        else
+        {
+            self.buy_count(&address).update(|buy_count| *buy_count += amount);
+
+            Ok(()) //SUCCESS        
+        }
+    }
+
+
+
+    //===================================================================================================
+    // WHITELIST - BUYER MINTING CHECKS FLAGS
+    //===================================================================================================
+
+    
+    //1: ON and 0: OFF 
+    #[view(getBuyerWhiteListCheck)]
+    #[storage_mapper("buyer_whitelist_check")]
+    fn buyer_whitelist_check(&self) -> SingleValueMapper<Self::Storage, Self::BigInt>;  
+
+
+
+    // PRIVATE : CHECK "BUYER" WHITELIST CHECK is Enabled (PRIVATE)
+    fn is_buyer_whitelist_check_enabled(&self) -> bool
+    {
+        return self.buyer_whitelist_check().get() == Self::BigInt::from(1);  //1 is ON and 0 is OFF
+    }
+
+ 
+    // [ENDPOINT] UPDATE "BUYER" WHITELIST CHECK 
+    //----------------------------------------------------------------------  
+    #[payable("EGLD")]  
+    #[only_owner]
+    #[endpoint(updateBuyerWhitelistCheck)]
+    fn update_buyer_whitelist_check(&self,
+                                    whitelist_check: Self::BigInt)
+    {  
+        //1: On and 0: Off
+        self.buyer_whitelist_check().set(&whitelist_check);
+    }
+
+
 
 }
