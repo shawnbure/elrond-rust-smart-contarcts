@@ -143,20 +143,7 @@ pub trait NftTemplate {
             "endpoint disabled"
         );
 
-        let spent = self.mint_tokens(payment, number_of_tokens_desired_opt)?;
-        let marketplace_cut =
-            &spent * &PLATFORM_MINT_DEFAULT_FEE_PERCENT.into() / MAX_FEE_PERCENT.into();
-        self.marketplace_balance()
-            .update(|x| *x += &marketplace_cut);
-        Ok(())
-    }
-
-    fn mint_tokens(
-        &self,
-        payment: Self::BigUint,
-        number_of_tokens_desired_opt: OptionalArg<u16>,
-    ) -> SCResult<Self::BigUint> {
-
+        
         //Verification of the signing 
         /*
         self.crypto().verify_ed25519
@@ -171,6 +158,24 @@ pub trait NftTemplate {
             ) == true , "not verified"
         );
         */
+        
+        //verify against admin_pub_key
+        
+        let spent = self.mint_tokens(payment, number_of_tokens_desired_opt)?;
+        let marketplace_cut =
+            &spent * &PLATFORM_MINT_DEFAULT_FEE_PERCENT.into() / MAX_FEE_PERCENT.into();
+        self.marketplace_balance()
+            .update(|x| *x += &marketplace_cut);
+        Ok(())
+    }
+
+    fn mint_tokens(
+        &self,
+        payment: Self::BigUint,
+        number_of_tokens_desired_opt: OptionalArg<u16>,
+    ) -> SCResult<Self::BigUint> {
+
+
 
 
         let current_timestamp = self.blockchain().get_block_timestamp();
