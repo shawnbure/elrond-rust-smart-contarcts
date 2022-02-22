@@ -8,12 +8,12 @@ MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7e
 
 
 #SET THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqd9tv8f3k7ea5y9wsnalhs9df5u3k7300y4wsd89yta"
-CONTRACT_ADDRESS_HEX="0x000000000000000005006956c3a636f67b4215d09f7f7815a9a7236f45ef255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500752f8b1c5a0321bd844966fcd7b0e48d2f3b4ccd255d"
 
 
-#  erdpy wallet bech32 --decode erd12ngznv48rnlvgjtuc4h7ev5e2dyy0thzgewd95edne2urhyxrwtq09ara3
-# 0x54d029b2a71cfec4497cc56fecb299534847aee2465cd2d32d9e55c1dc861b96
+#  erdpy wallet bech32 --decode erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92
+# 0x00000000000000000500752f8b1c5a0321bd844966fcd7b0e48d2f3b4ccd255d
 
 MY_TOKEN_NAME="0x43485542"          #'CHUB'
 MY_TOKEN_TICKER="0x43485542"        #'CHUB'
@@ -36,7 +36,7 @@ issueNft() {
 }
 
 WASM="../output/nft_template.wasm"   #
-MY_TOKEN_ID="0x434855422d613166636239" #Fill this after issue
+MY_TOKEN_ID="0x434855422d626165633062" #Fill this after issue
 ROYALTIES=0x02EE #7.5%
 MY_TOKEN_NAME_BASE="0x4368756262696672656e73"   #Chubbifrens
 MY_TOKEN_IMAGE_BASE_URI="0x68747470733a2f2f7777772e63687562626976657273652e636f6d2f6672656e"    #https://www.chubbiverse.com/fren
