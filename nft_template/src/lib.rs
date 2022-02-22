@@ -564,9 +564,9 @@ pub trait NftTemplate {
     
 
 
-    // 
     // [PRIVATE] - Check to see if caller is not part of  whitelist by checking buy_limit (empty)
     //----------------------------------------------------------------------
+    #[endpoint] 
     fn is_caller_address_not_part_of_whitelist(&self) -> bool
     {
         //caller address (since minting_limit is based on address)
@@ -581,7 +581,8 @@ pub trait NftTemplate {
 
 
     // [PRIVATE] - check if buy count < buy limit after adding to the buy count
-    //----------------------------------------------------------------------    
+    //----------------------------------------------------------------------   
+    #[endpoint] 
     fn check_buy_count_is_greater_than_buy_limit_by_adding_amount(&self,
                                                                   buy_limit: u16,
                                                                   amount_to_add_to_buy_count: u16) -> bool
@@ -597,7 +598,7 @@ pub trait NftTemplate {
 
     // [PRIVATE] - ADD TO MINTING COUNT BY BIGINT PARAM
     //----------------------------------------------------------------------
-    //#[endpoint(add_to_address_buy_count)] //TODO REMOVE: remove after testing
+    #[endpoint(add_to_address_buy_count)] //TODO REMOVE: remove after testing
     fn add_to_address_buy_count(&self,
                                 amount: u16) -> SCResult<()>
     {
@@ -634,7 +635,7 @@ pub trait NftTemplate {
     {
         return self.buyer_whitelist_check().get() == Self::BigInt::from(1);  //1 is ON and 0 is OFF
     }
-
+    
  
     // [ENDPOINT] UPDATE "BUYER" WHITELIST CHECK 
     //----------------------------------------------------------------------  
