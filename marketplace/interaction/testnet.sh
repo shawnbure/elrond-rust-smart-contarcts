@@ -1,12 +1,12 @@
-MY_WALLET_PEM="../../dev-wallet-owner.pem"                  
-MY_OTHER_WALLET_PEM="../../dev-extra-wallet-owner.pem"
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN_ID="D"
+MY_WALLET_PEM="../../test-net-wallet.pem"                  
+MY_OTHER_WALLET_PEM="../../test-net-other-wallet.pem"
+PROXY="https://testnet-gateway.elrond.com"
+CHAIN_ID="T"
 WASM="../output/marketplace.wasm"
 
 #SETUP THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"           #after deploying, the the contract address
-CONTRACT_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq98yt608sgy37432nt63esrv0qnx4fj4wxpwswqs6zc"           #after deploying, the the contract address
+CONTRACT_ADDRESS_HEX="0x0000000000000000050029c8bd3cf04123eac5535ea3980d8f04cd54caae305d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value (prefix it with 0x)
 
 
 

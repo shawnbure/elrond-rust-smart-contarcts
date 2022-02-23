@@ -13,3 +13,4 @@ Cargo.lock
 # VSCode specific files
 .vscode/*
 elrond.workspace.json
+.DS_Store

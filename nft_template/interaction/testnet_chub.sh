@@ -1,25 +1,26 @@
 #Fill this with the good values
-MY_WALLET_PEM="../../dev-wallet-owner.pem"
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN_ID="D"
+MY_WALLET_PEM="../../test-net-wallet.pem"   
+PROXY="https://testnet-gateway.elrond.com"
+CHAIN_ID="T"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq98yt608sgy37432nt63esrv0qnx4fj4wxpwswqs6zc"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x0000000000000000050029c8bd3cf04123eac5535ea3980d8f04cd54caae305d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 
 #SET THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500752f8b1c5a0321bd844966fcd7b0e48d2f3b4ccd255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqmx6mvas82g9ecwrahpn2w8pwpqvcrm6fxpwsurk280"               
+CONTRACT_ADDRESS_HEX="0x00000000000000000500d9b5b67607520b9c387db866a71c2e081981ef49305d"       #erdpy wallet bech32 --decode erd1qqqqqqqqqqqqqpgqmx6mvas82g9ecwrahpn2w8pwpqvcrm6fxpwsurk280 to get this value
 
 
-#  erdpy wallet bech32 --decode erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92
-# 0x00000000000000000500752f8b1c5a0321bd844966fcd7b0e48d2f3b4ccd255d
+#  erdpy wallet bech32 --decode erd12ngznv48rnlvgjtuc4h7ev5e2dyy0thzgewd95edne2urhyxrwtq09ara3
+# 0x54d029b2a71cfec4497cc56fecb299534847aee2465cd2d32d9e55c1dc861b96
 
 MY_TOKEN_NAME="0x43485542"          #'CHUB'
 MY_TOKEN_TICKER="0x43485542"        #'CHUB'
 
-# 434855422d613166636239
-# CHUB-a1fcb9
+#from running the IssueToken (look in testnet-explorer with transaction hash)
+# 434855422d343662393963
+# CHUB-46b99c
 
 
 # This is how you get your token ID
@@ -36,7 +37,7 @@ issueNft() {
 }
 
 WASM="../output/nft_template.wasm"   #
-MY_TOKEN_ID="0x434855422d626165633062" #Fill this after issue
+MY_TOKEN_ID="0x434855422d343662393963" #Fill this after issue  (IMPORTANT!!!!!)
 ROYALTIES=0x02EE #7.5%
 MY_TOKEN_NAME_BASE="0x4368756262696672656e73"   #Chubbifrens
 MY_TOKEN_IMAGE_BASE_URI="0x68747470733a2f2f7777772e63687562626976657273652e636f6d2f6672656e"    #https://www.chubbiverse.com/fren

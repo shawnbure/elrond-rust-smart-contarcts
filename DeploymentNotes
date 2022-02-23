@@ -1,0 +1,91 @@
+Deploy SC Process
+
+Note: in VSCode, shift+cmd+p “elrond: setup workplace”
+
+
+
+1. MarketPlace
+
+Clean / Build the “youbei-sc/marketplace” WASM file generated: youbei-sc/marketplace/output/marketplace.wasm
+
+In youbei-sc/marketplace/interaction/devnet.sh,
+Set the following parameters:
+- MY_WALLET_PEM
+- MY_OTHER_WALLET_PEM
+- WASM
+
+Add “deploy” function to the “Shell Executed functions”
+
+Go to directory youbei-sc/marketplace/interaction/
+chmod +x devnet.sh. 	//make the shell executable
+
+./devnet.sh.	 		//executes it
+
+//After the deployment, get the marketplace contract address and set it to the variable “CONTRACT_ADDRESS”
+
+//CLI, “erdpy wallet bech32 --decode <CONTRACT_ADDRESS>” and
+Set that to the “CONTRACT_ADDRESS_HEX” value
+
+
+// ———————————————————————————————————————
+
+ 
+2. NFT_TEMPLATE
+
+Clean / Build the “youbei-sc/nft_template” WASM file generated: youbei-sc/nft_template/output/nft_template.wasm
+
+In youbei-sc/nft_template/interaction/devnet_chub.sh,
+Set the following parameters:
+  - MY_WALLET_PEM 
+  - MARKETPLACE_ADDRESS
+  - MARKETPLACE_ADDRESS_HEX
+
+Add “issueNft” function to the “Shell Executed functions”
+
+Go to directory youbei-sc/nft_template/interaction/
+chmod +x devnet_chub.sh. 	//make the shell executable
+
+./devnet_chub.sh.	 		//executes it
+
+Set the MY_TOKEN_ID variable from the “return” value from the issueNft function
+
+Add “deploy” function to the “Shell Executed functions”
+
+
+//After the deployment, get the marketplace contract address and set it to the variable “CONTRACT_ADDRESS”
+
+//CLI, “erdpy wallet bech32 --decode <CONTRACT_ADDRESS>” and
+Set that to the “CONTRACT_ADDRESS_HEX” value
+
+
+
+// ———————————————————————————————————————
+
+
+2. DEPLOYER
+
+Clean / Build the “youbei-sc/deployer” WASM file generated: youbei-sc/deployer/output/deployer.wasm
+
+In youbei-sc/nft_template/interaction/devnet_chub.sh,
+Set the following parameters:
+  - MY_WALLET_PEM
+  - MY_OTHER_WALLET_PEM
+  - WASM
+
+Set the TEMPLATE_CONTRACT_ADDRESS from the NFT_TEMPLATE deploy contract address
+
+Set the MARKETPLACE_ADMIN_ADDRESS from the Marketplace SC 
+
+Set the MY_TOKEN_ID from devnet_chub.sh
+
+Add “deploy” function to the “Shell Executed functions”
+
+Go to directory youbei-sc/deployer/interaction/
+chmod +x devnet_chub.sh. 	//make the shell executable
+
+./devnet_chub.sh.	 		//executes it
+
+//After the deployment, get the marketplace contract address and set it to the variable “CONTRACT_ADDRESS”
+
+//CLI, “erdpy wallet bech32 --decode <CONTRACT_ADDRESS>” and
+Set that to the “CONTRACT_ADDRESS_HEX” value

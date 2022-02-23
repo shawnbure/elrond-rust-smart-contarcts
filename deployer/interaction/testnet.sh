@@ -1,23 +1,24 @@
-MY_WALLET_PEM="../../dev-wallet-owner.pem"
-MY_OTHER_WALLET_PEM="../../dev-extra-wallet-owner.pem"
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN_ID="D"
+MY_WALLET_PEM="../../test-net-wallet.pem"                  
+MY_OTHER_WALLET_PEM="../../test-net-other-wallet.pem"
+PROXY="https://testnet-gateway.elrond.com"
+CHAIN_ID="T"
 WASM="../output/deployer.wasm"
 
 #MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 #deployer contract address
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq0sc2v2zts6q89fca4dua0du3ea3trdrvy4wswv90pk"
-CONTRACT_ADDRESS_HEX="0x000000000000000005007c30a6284b868072a71dab79d7b791cf62b1b46c255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqwmpexc9n6zvll9kkhthwe47ww9x732h3xpws686kj4"
+CONTRACT_ADDRESS_HEX="0x0000000000000000050076c39360b3d099ff96d6baeeecd7ce714de8aaf1305d"
 
 
-#NFT TEMPLATE ADDRESS (devnet_chub.sh)
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500752f8b1c5a0321bd844966fcd7b0e48d2f3b4ccd255d"
+#NFT TEMPLATE ADDRESS (testnet_chub.sh)
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqmx6mvas82g9ecwrahpn2w8pwpqvcrm6fxpwsurk280"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500d9b5b67607520b9c387db866a71c2e081981ef49305d"
+
 
 #address of the MARKETPLACE SC
-MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"
+MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgq98yt608sgy37432nt63esrv0qnx4fj4wxpwswqs6zc"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0x0000000000000000050029c8bd3cf04123eac5535ea3980d8f04cd54caae305d"
 
 
 deploy() {
@@ -31,8 +32,9 @@ deploy() {
         --send || return
 }
 
-MY_TOKEN_NAME="0x43485542"
-MY_TOKEN_TICKER="0x43485542"
+# from testnet_chub.sh
+MY_TOKEN_NAME="0x43485542"          #'CHUB'
+MY_TOKEN_TICKER="0x43485542"        #'CHUB'
 
 # 434855422d306637626631
 # CHUB-0f7bf1
@@ -51,7 +53,7 @@ issueNft() {
         --send || return
 }
             
-MY_TOKEN_ID="0x434855422d626165633062" #"0x4d4f4e4b2d623032643339"
+MY_TOKEN_ID="0x434855422d613166636239" #"0x4d4f4e4b2d623032643339"
 ROYALTIES=750
 TOKEN_NAME_BASE="0x4d6f6e6b"
 MY_TOKEN_IMAGE_BASE_URI="0x68747470733a2f2f676174657761792e70696e6174612e636c6f75642f697066732f516d664e635535374a67383858723338503678386a764c3767386e77694b323166667439697a6d6d766a52554d57"
