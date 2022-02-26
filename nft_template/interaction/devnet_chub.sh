@@ -130,6 +130,6 @@ withdraw() {
 #issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-deploy
+upgrade
 
 #------------------------------------------------
