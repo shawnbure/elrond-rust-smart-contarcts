@@ -53,7 +53,7 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
-        --gas-limit=1563700 \
+        --gas-limit=600000000 \
         --arguments ${MARKETPLACE_ADDRESS_HEX} ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
