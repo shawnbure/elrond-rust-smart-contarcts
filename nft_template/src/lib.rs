@@ -619,7 +619,7 @@ pub trait NftTemplate {
     //----------------------------------------------------------------------
     //#[payable("EGLD")]   //remove
     //#[endpoint] //TODO REMOVE: remove after testing
-    fn add_to_address_buy_count(&self, amount: u16) {
+    fn add_to_address_buy_count(&self, amount: u16) -> SCResult<()> {
         let address = self.blockchain().get_caller();
 
         if self.buy_limit(&address).is_empty()
@@ -630,6 +630,7 @@ pub trait NftTemplate {
             self.buy_count(&address)
                 .update(|buy_count| *buy_count += amount);
         }
+        Ok(())
     }
 
     //===================================================================================================
