@@ -152,6 +152,8 @@ pub trait NftTemplate {
             ) {
                 return sc_error!("Exceeded the Allowable Buy Limit for WhiteList");
             }
+            //successfully minted so now we can add to the address count
+            self.add_to_address_buy_count(number_of_tokens_desired);
         }
 
         require!(
@@ -179,9 +181,6 @@ pub trait NftTemplate {
         let marketplace_cut = &spent * PLATFORM_MINT_DEFAULT_FEE_PERCENT / MAX_FEE_PERCENT;
         self.marketplace_balance()
             .update(|x| *x += &marketplace_cut);
-
-        //successfully minted so now we can add to the address count
-        self.add_to_address_buy_count(number_of_tokens_desired);
 
         Ok(())
     }
@@ -626,7 +625,7 @@ pub trait NftTemplate {
         if self.buy_limit(&address).is_empty()
         //check limit since limit is never 0 (empty)
         {
-            require!(false, "Address is NOT CREATED for Buying");
+            return sc_error!("Address is NOT CREATED for Buying");
         } else {
             self.buy_count(&address)
                 .update(|buy_count| *buy_count += amount);
