@@ -67,8 +67,8 @@ pub trait NftTemplate {
     #[endpoint(giveaway)]
     fn giveaway(
         &self,
-        #[var_args] addr_amount_args: MultiArgVec<MultiArg2<ManagedAddress, u16>>,
-    ) -> SCResult<u16> {
+        #[var_args] addr_amount_args: MultiValueVec<MultiValue2<ManagedAddress, u16>>,
+    ) -> u16 {
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
         let image_extension = self.image_extension().get();
@@ -118,7 +118,7 @@ pub trait NftTemplate {
         require!(tokens_left_for_sale >= total_amount, "no tokens left");
 
         self.total_sold().update(|x| *x += total_amount);
-        Ok(total_amount)
+        total_amount
     }
 
     #[payable("EGLD")]
@@ -126,7 +126,7 @@ pub trait NftTemplate {
     fn mint_tokens_endpoint(
         &self,
         #[payment_amount] payment: BigUint,
-        #[var_args] number_of_tokens_desired_opt: OptionalArg<u16>,
+        #[var_args] number_of_tokens_desired_opt: OptionalValue<u16>,
     ) -> SCResult<()> {
         self.mint_tokens(payment, number_of_tokens_desired_opt)?;
         Ok(())
@@ -175,10 +175,7 @@ pub trait NftTemplate {
         */
         //verify against admin_pub_key
 
-        let spent = self.mint_tokens(
-            payment,
-            elrond_wasm::types::OptionalArg::Some(number_of_tokens_desired),
-        )?;
+        let spent = self.mint_tokens(payment, OptionalValue::Some(number_of_tokens_desired))?;
         let marketplace_cut = &spent * PLATFORM_MINT_DEFAULT_FEE_PERCENT / MAX_FEE_PERCENT;
         self.marketplace_balance()
             .update(|x| *x += &marketplace_cut);
@@ -192,7 +189,7 @@ pub trait NftTemplate {
     fn mint_tokens(
         &self,
         payment: BigUint,
-        number_of_tokens_desired_opt: OptionalArg<u16>,
+        number_of_tokens_desired_opt: OptionalValue<u16>,
     ) -> SCResult<BigUint> {
         let current_timestamp = self.blockchain().get_block_timestamp();
         let sale_start_timestamp = self.sale_start().get();
@@ -378,18 +375,18 @@ pub trait NftTemplate {
         let rawVec = vec.into_vec();
         rawVec.as_slice().into()
     }
-
     #[only_owner]
     #[endpoint(requestWithdraw)]
-    fn request_withdraw(&self, marketplace: Address) -> AsyncCall<Self::SendApi> {
+    fn request_withdraw(&self, marketplace: ManagedAddress) {
         self.marketplace_proxy(marketplace)
             .withdraw_creator_royalties()
             .async_call()
+            .call_and_exit();
     }
 
     #[only_owner]
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] amount_opt: OptionalArg<BigUint>) {
+    fn withdraw(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let amount = amount_opt.into_option().unwrap_or(
             self.blockchain()
                 .get_sc_balance(&TokenIdentifier::egld(), 0)
@@ -401,7 +398,7 @@ pub trait NftTemplate {
     }
 
     #[endpoint(marketplaceWithdraw)]
-    fn marketplace_withdraw(&self, #[var_args] amount_opt: OptionalArg<BigUint>) -> SCResult<()> {
+    fn marketplace_withdraw(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let caller = self.blockchain().get_caller();
         require!(
             caller == self.marketplace_admin().get(),
@@ -415,7 +412,6 @@ pub trait NftTemplate {
 
         self.send()
             .direct_egld(&caller, &amount, ERDSEA_WITHDRAW_MESSAGE);
-        Ok(())
     }
 
     #[only_owner]
@@ -454,8 +450,8 @@ pub trait NftTemplate {
     }
 
     #[view(getMaxSupplyAndTotalSold)]
-    fn get_max_supply_and_total_sold(&self) -> MultiResult2<u16, u16> {
-        MultiResult2::from((self.max_supply().get(), self.total_sold().get()))
+    fn get_max_supply_and_total_sold(&self) -> MultiValue2<u16, u16> {
+        MultiValue2::from((self.max_supply().get(), self.total_sold().get()))
     }
 
     #[view(getMarketplaceBalance)]
@@ -544,18 +540,12 @@ pub trait NftTemplate {
     #[payable("EGLD")]
     #[only_owner]
     #[endpoint(createBuyerAddress)]
-    fn create_buyer_address(
-        &self,
-        buy_count: u16,
-        buy_limit: u16,
-        address: ManagedAddress,
-    ) -> SCResult<()> {
+    fn create_buyer_address(&self, buy_count: u16, buy_limit: u16, address: ManagedAddress) {
         //ONLY Create new address record if it doesn't exist
         if self.buy_limit(&address).is_empty() {
             self.buy_count(&address).set(&buy_count);
             self.buy_limit(&address).set(&buy_limit);
         }
-        Ok(())
     }
 
     //working 2/21
@@ -630,18 +620,16 @@ pub trait NftTemplate {
     //----------------------------------------------------------------------
     //#[payable("EGLD")]   //remove
     //#[endpoint] //TODO REMOVE: remove after testing
-    fn add_to_address_buy_count(&self, amount: u16) -> SCResult<()> {
+    fn add_to_address_buy_count(&self, amount: u16) {
         let address = self.blockchain().get_caller();
 
         if self.buy_limit(&address).is_empty()
         //check limit since limit is never 0 (empty)
         {
-            return sc_error!("Address is NOT CREATED for Buying");
+            require!(false, "Address is NOT CREATED for Buying");
         } else {
             self.buy_count(&address)
                 .update(|buy_count| *buy_count += amount);
-
-            Ok(()) //SUCCESS
         }
     }
 
