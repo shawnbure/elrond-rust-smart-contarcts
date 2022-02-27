@@ -7,8 +7,8 @@ WASM="../output/deployer.wasm"
 #MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 #deployer contract address
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqv0tr39kgc96a4vnu3adz68wvgkhz52dwy4wsctggtm"
-CONTRACT_ADDRESS_HEX="0x0000000000000000050063d63896c8c175dab27c8f5a2d1dcc45ae2a29ae255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqtlhtf95c0h63uvzutvdjkef7hsg5jgsqy4wsacpet6"
+CONTRACT_ADDRESS_HEX="0x000000000000000005005feeb496987df51e305c5b1b2b653ebc11492200255d"
 
 
 #NFT TEMPLATE ADDRESS (devnet_chub.sh)
