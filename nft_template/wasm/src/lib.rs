@@ -1,4 +1,41 @@
 #![no_std]
 
-pub use nft_template::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    nft_template
+    (
+        giveaway
+        mintTokens
+        mintTokensThroughMarketplace
+        shuffle
+        requestWithdraw
+        withdraw
+        marketplaceWithdraw
+        allowMintingThroughMarketplace
+        denyMintingThroughMarketplace
+        setPrice
+        pauseSale
+        resumeSale
+        getLeftForSale
+        getMaxSupplyAndTotalSold
+        getMarketplaceBalance
+        getMarketplaceAdmin
+        isMintingThroughMarketplaceDenied
+        getTotalSold
+        getMaxSupply
+        getPrice
+        getRoyalties
+        getImageBaseUri
+        getImageExtension
+        getMetadataBaseUri
+        getTokenNameBase
+        getTokenId
+        getSaleStart
+        isSalePaused
+        getAdminPubKey
+        getBuyCount
+        getBuyLimit
+        createBuyerAddress
+        getBuyerWhiteListCheck
+        updateBuyerWhitelistCheck
+    )
+}
