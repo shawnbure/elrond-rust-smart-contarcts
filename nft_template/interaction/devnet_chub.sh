@@ -8,8 +8,8 @@ MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7e
 
 
 #SET THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqws4wxzwswhpguz5wswctcptd2q43pjzsy4ws8kgnlg"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500742ae309d075c28e0a8e83b0bc056d502b10c850255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqhxqvt5fxrgj4awh955a0r8mlkpwhfm24y4ws7j90gc"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19f7fb05d74ed55255d"
 
 
 #  erdpy wallet bech32 --decode erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92
@@ -57,9 +57,6 @@ deploy() {
         --arguments ${MARKETPLACE_ADDRESS_HEX} ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
-
-
-
 
 
 upgrade() {

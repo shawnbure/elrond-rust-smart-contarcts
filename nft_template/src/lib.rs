@@ -47,6 +47,8 @@ pub trait NftTemplate {
         self.token_name_base().set_if_empty(&token_name_base);
         self.image_base_uri().set(&image_base_uri);
         self.image_extension().set(&image_extension);
+        let metadata_ext = ManagedBuffer::from(&b".json"[..]);
+        self.metadata_extension().set(&metadata_ext);
         self.metadata_base_uri().set_if_empty(
             &metadata_base_uri
                 .into_option()
@@ -73,6 +75,7 @@ pub trait NftTemplate {
         let image_base_uri = self.image_base_uri().get();
         let image_extension = self.image_extension().get();
         let metadata_base_uri = self.metadata_base_uri().get();
+        let metadata_extension = self.metadata_extension().get();
         let empty_box = ManagedBuffer::new();
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
@@ -96,6 +99,7 @@ pub trait NftTemplate {
                         &image_base_uri,
                         &image_extension,
                         &metadata_base_uri,
+                        &metadata_extension,
                         next_expected_nonce,
                     ),
                 );
@@ -211,6 +215,7 @@ pub trait NftTemplate {
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
         let image_extension = self.image_extension().get();
+        let metadata_extension = self.metadata_extension().get();
         let metadata_base_uri = self.metadata_base_uri().get();
         let empty_box = ManagedBuffer::new();
         let token_id = self.token_id().get();
@@ -231,6 +236,7 @@ pub trait NftTemplate {
                     &image_base_uri,
                     &image_extension,
                     &metadata_base_uri,
+                    &metadata_extension,
                     next_expected_nonce,
                 ),
             );
@@ -301,6 +307,7 @@ pub trait NftTemplate {
         image_base_uri: &ManagedBuffer,
         image_extension: &ManagedBuffer,
         metadata_base_uri: &ManagedBuffer,
+        metadata_extension: &ManagedBuffer,
         expected_nonce: u16,
     ) -> ManagedVec<ManagedBuffer> {
         let mut result = ManagedVec::<Self::Api, ManagedBuffer>::new();
@@ -330,6 +337,7 @@ pub trait NftTemplate {
                     metadata_base_uri.to_boxed_bytes().as_slice(),
                     delimiter.to_boxed_bytes().as_slice(),
                     index_string.to_boxed_bytes().as_slice(),
+                    metadata_extension.to_boxed_bytes().as_slice(),
                 ])
                 .as_slice(),
             );
@@ -488,6 +496,10 @@ pub trait NftTemplate {
     #[view(getImageExtension)]
     #[storage_mapper("image_extension")]
     fn image_extension(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
+
+    #[view(getMetadataExtension)]
+    #[storage_mapper("metadata_extension")]
+    fn metadata_extension(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
 
     #[view(getMetadataBaseUri)]
     #[storage_mapper("metadata_base_uri")]
@@ -659,5 +671,13 @@ pub trait NftTemplate {
     fn update_buyer_whitelist_check(&self, whitelist_check: BigInt) {
         //1: On and 0: Off
         self.buyer_whitelist_check().set(&whitelist_check);
+    }
+
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(updateMetadataExtension)]
+    fn update_metadata_extension(&self, metadata_extension: ManagedBuffer) {
+        //1: On and 0: Off
+        self.metadata_extension().set(&metadata_extension);
     }
 }
