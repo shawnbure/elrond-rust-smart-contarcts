@@ -314,12 +314,7 @@ pub trait NftTemplate {
         let delimiter = ManagedBuffer::from(&b"/"[..]);
         let index = self.get_token_index(expected_nonce);
         let index_string = self.u16_to_string(index);
-        let concated_bytes = BoxedBytes::from_concat(&[
-            image_base_uri.to_boxed_bytes().as_slice(),
-            delimiter.to_boxed_bytes().as_slice(),
-            index_string.to_boxed_bytes().as_slice(),
-            image_extension.to_boxed_bytes().as_slice(),
-        ]);
+
         let own_image_uri = ManagedBuffer::from(
             BoxedBytes::from_concat(&[
                 image_base_uri.to_boxed_bytes().as_slice(),
