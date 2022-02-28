@@ -3,12 +3,12 @@ MY_WALLET_PEM="../../../admin.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq0zanux4e7aw3w7glknhkrllx7ar2wemuydjs2q5u35"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x0000000000000000050078bb3e1ab9f75d17791fb4ef61ffe6f746a7677c2365"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 #SET THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq87zsp60sm2a0v2zzqqgqxvyf5c58e48wydjszcfzrx"
-CONTRACT_ADDRESS_HEX="0x000000000000000005003f8500e9f0dabaf628420010033089a6287cd4ee2365"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqys7zm9lxwa0ccfgek37l8t56euqqtz02ydjsmj50ny"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500243c2d97e6775f8c2519b47df3ae9acf000589ea2365"
 
 MY_TOKEN_NAME="0x54454d50"
 MY_TOKEN_TICKER="0x54454d50"
@@ -24,7 +24,7 @@ PRICE=1000000000000000000 #1EGLD
 MAX_SUPPLY=10000
 SALE_START=0
 
-ISSUEDHASH ="af5e1544ae0145d54fc67b23d611bfc83430ba79193ada4e01477318b82edfd0"
+ISSUEDHASH="af5e1544ae0145d54fc67b23d611bfc83430ba79193ada4e01477318b82edfd0"
 
 # This is how you get your token ID
 issueNft() {
@@ -115,6 +115,6 @@ withdraw() {
 # issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-# deploy
+deploy
 
 #------------------------------------------------
