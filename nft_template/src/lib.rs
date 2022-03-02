@@ -339,6 +339,18 @@ pub trait NftTemplate {
             result.push(own_metadata_uri);
         }
 
+        if !metadata_base_uri.is_empty() {
+            let own_collection_uri = ManagedBuffer::from(
+                BoxedBytes::from_concat(&[
+                    metadata_base_uri.to_boxed_bytes().as_slice(),
+                    delimiter.to_boxed_bytes().as_slice(),
+                    b"collection.json",
+                ])
+                .as_slice(),
+            );
+            result.push(own_collection_uri);
+        }
+
         result
     }
 
