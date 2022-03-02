@@ -115,7 +115,18 @@ withdraw() {
 }
 
 
-
+enableWhiteList(){
+    erdpy --verbose contract call erd1qqqqqqqqqqqqqpgq9nw6kx7rrhadywahg0fpam85p998f6ycy4ws2y6g83 \
+        --pem=fq.pem \
+        --recall-nonce \
+        --value 50000000000000000 \
+        --gas-limit 60000000 \
+        --function "updateBuyerWhitelistCheck" \
+        --arguments 1 \
+        --proxy="https://devnet-gateway.elrond.com" \
+        --chain="D" \
+        --send
+}
 
 # Run first
 # deploy  
