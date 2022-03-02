@@ -116,7 +116,7 @@ withdraw() {
 
 
 enableWhiteList(){
-    erdpy --verbose contract call erd1qqqqqqqqqqqqqpgqq5lrz9dhru47y9jtren9l50x3sdryc2ty4wsfl9ra2 \
+    erdpy --verbose contract call erd1qqqqqqqqqqqqqpgqfudlc5h5t0ulcr9vg2yepwaz9nm3ngkgy4wsu38rtm \
         --pem=wufq.pem \
         --recall-nonce \
         --value 50000000000000000 \
@@ -138,6 +138,6 @@ enableWhiteList(){
 #issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-upgrade
+enableWhiteList
 
 #------------------------------------------------
