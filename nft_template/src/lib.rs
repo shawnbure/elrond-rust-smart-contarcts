@@ -29,17 +29,17 @@ pub trait NftTemplate {
     #[init]
     fn init(
         &self,
-        marketplace_admin: Address,
+        marketplace_admin: ManagedAddress,
         token_id: TokenIdentifier,
-        royalties: Self::BigUint,
-        token_name_base: BoxedBytes,
-        image_base_uri: BoxedBytes,
-        image_extension: BoxedBytes,
-        price: Self::BigUint,
+        royalties: BigUint,
+        token_name_base: ManagedBuffer,
+        image_base_uri: ManagedBuffer,
+        image_extension: ManagedBuffer,
+        price: BigUint,
         max_supply: u16,
         sale_start: u64,
-        #[var_args] metadata_base_uri: OptionalArg<BoxedBytes>,
-        #[var_args] admin_pub_key: OptionalArg<BoxedBytes>,
+        #[var_args] metadata_base_uri: OptionalValue<ManagedBuffer>,
+        #[var_args] admin_pub_key: OptionalValue<ManagedBuffer>,
     ) {
         self.marketplace_admin().set(&marketplace_admin);
         self.token_id().set_if_empty(&token_id);
@@ -47,40 +47,40 @@ pub trait NftTemplate {
         self.token_name_base().set_if_empty(&token_name_base);
         self.image_base_uri().set(&image_base_uri);
         self.image_extension().set(&image_extension);
+        let metadata_ext = ManagedBuffer::from(&b".json"[..]);
+        self.metadata_extension().set(&metadata_ext);
         self.metadata_base_uri().set_if_empty(
             &metadata_base_uri
                 .into_option()
-                .unwrap_or(BoxedBytes::empty()),
+                .unwrap_or(ManagedBuffer::new()),
         );
         self.price().set_if_empty(&price);
         self.max_supply().set_if_empty(&max_supply);
         self.sale_start().set_if_empty(&sale_start);
 
         //set the admin_pub_key if provided in parameter
-        self.admin_pub_key().set_if_empty(
-            &admin_pub_key
-                .into_option()
-                .unwrap_or(BoxedBytes::empty()),
-        );
+        self.admin_pub_key()
+            .set_if_empty(&admin_pub_key.into_option().unwrap_or(ManagedBuffer::new()));
 
-        self.buyer_whitelist_check().set(&Self::BigInt::from(0));   //Default it to 0 which is OFF -> 1 is ON and 0 is OFF   
+        self.buyer_whitelist_check().set(&BigInt::from(0)); //Default it to 0 which is OFF -> 1 is ON and 0 is OFF
     }
 
     #[only_owner]
     #[endpoint(giveaway)]
     fn giveaway(
         &self,
-        #[var_args] addr_amount_args: MultiArgVec<MultiArg2<Address, u16>>,
-    ) -> SCResult<u16> {
+        #[var_args] addr_amount_args: MultiValueVec<MultiValue2<ManagedAddress, u16>>,
+    ) -> u16 {
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
         let image_extension = self.image_extension().get();
         let metadata_base_uri = self.metadata_base_uri().get();
-        let empty_box = BoxedBytes::empty();
+        let metadata_extension = self.metadata_extension().get();
+        let empty_box = ManagedBuffer::new();
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
-        let big_one = Self::BigUint::from(1u64);
-        let big_zero = Self::BigUint::zero();
+        let big_one = BigUint::from(1u64);
+        let big_zero = BigUint::zero();
         let mut total_amount = 0u16;
         let mut next_expected_nonce = self.total_sold().get() + 1;
 
@@ -99,6 +99,7 @@ pub trait NftTemplate {
                         &image_base_uri,
                         &image_extension,
                         &metadata_base_uri,
+                        &metadata_extension,
                         next_expected_nonce,
                     ),
                 );
@@ -108,8 +109,11 @@ pub trait NftTemplate {
                 self.send()
                     .direct(&address, &token_id, nonce, &big_one, &[]);
             }
-            self.send()
-                .direct_egld(&address, &big_zero, &ERDSEA_ERD721_STANDARD);
+            self.send().direct_egld(
+                &address,
+                &big_zero,
+                ManagedBuffer::new_from_bytes(&ERDSEA_ERD721_STANDARD),
+            );
 
             total_amount += amount;
         }
@@ -118,15 +122,15 @@ pub trait NftTemplate {
         require!(tokens_left_for_sale >= total_amount, "no tokens left");
 
         self.total_sold().update(|x| *x += total_amount);
-        Ok(total_amount)
+        total_amount
     }
 
     #[payable("EGLD")]
     #[endpoint(mintTokens)]
     fn mint_tokens_endpoint(
         &self,
-        #[payment_amount] payment: Self::BigUint,
-        #[var_args] number_of_tokens_desired_opt: OptionalArg<u16>,
+        #[payment_amount] payment: BigUint,
+        #[var_args] number_of_tokens_desired_opt: OptionalValue<u16>,
     ) -> SCResult<()> {
         self.mint_tokens(payment, number_of_tokens_desired_opt)?;
         Ok(())
@@ -136,43 +140,36 @@ pub trait NftTemplate {
     #[endpoint(mintTokensThroughMarketplace)]
     fn mint_tokens_through_marketplace(
         &self,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         number_of_tokens_desired: u16,
     ) -> SCResult<()> {
-
         //check if whitelist is enabled
-        if self.is_buyer_whitelist_check_enabled() 
-        {
+        if self.is_buyer_whitelist_check_enabled() {
             //====== Check if address is registered   ======
-            if self.is_caller_address_not_part_of_whitelist() 
-            {                          
+            if self.is_caller_address_not_part_of_whitelist() {
                 return sc_error!("Address is NOT part of WHITELIST");
-            }    
-            
-            //====== Check address count > limit   ======            
-            if self.check_buy_count_is_greater_than_buy_limit_by_adding_amount(number_of_tokens_desired) 
-            {
-                return sc_error!("Exceeded the Allowable Buy Limit for WhiteList"); 
-            }  
-            
+            }
+
+            //====== Check address count > limit   ======
+            if self.check_buy_count_is_greater_than_buy_limit_by_adding_amount(
+                number_of_tokens_desired,
+            ) {
+                return sc_error!("Exceeded the Allowable Buy Limit for WhiteList");
+            }
+            //successfully minted so now we can add to the address count
+            self.add_to_address_buy_count(number_of_tokens_desired);
         }
-
-
-        
 
         require!(
             !self.minting_through_marketplace_denied().get(),
             "endpoint disabled"
         );
 
-        
-
-
-        //Verification of the signing 
+        //Verification of the signing
         /*
         self.crypto().verify_ed25519
         let data = [token_id.as_esdt_identifier(), &nonce.to_be_bytes()].concat();
-        let b_data = &data; 
+        let b_data = &data;
         let u_data: &[u8] = &b_data;
         require!(
             self.crypto().verify_ed25519(
@@ -182,32 +179,21 @@ pub trait NftTemplate {
             ) == true , "not verified"
         );
         */
-        
         //verify against admin_pub_key
-        
-        let spent = self.mint_tokens(payment, elrond_wasm::types::OptionalArg::Some(number_of_tokens_desired))?;
 
-        let marketplace_cut =
-            &spent * &PLATFORM_MINT_DEFAULT_FEE_PERCENT.into() / MAX_FEE_PERCENT.into();
+        let spent = self.mint_tokens(payment, OptionalValue::Some(number_of_tokens_desired))?;
+        let marketplace_cut = &spent * PLATFORM_MINT_DEFAULT_FEE_PERCENT / MAX_FEE_PERCENT;
         self.marketplace_balance()
             .update(|x| *x += &marketplace_cut);
-
-        
-        //successfully minted so now we can add to the address count
-        self.add_to_address_buy_count(number_of_tokens_desired);
 
         Ok(())
     }
 
     fn mint_tokens(
         &self,
-        payment: Self::BigUint,
-        number_of_tokens_desired_opt: OptionalArg<u16>,
-    ) -> SCResult<Self::BigUint> {
-
-
-
-
+        payment: BigUint,
+        number_of_tokens_desired_opt: OptionalValue<u16>,
+    ) -> SCResult<BigUint> {
         let current_timestamp = self.blockchain().get_block_timestamp();
         let sale_start_timestamp = self.sale_start().get();
         require!(
@@ -223,17 +209,18 @@ pub trait NftTemplate {
         require!(tokens_left_for_sale > 0, "no tokens left for sale");
 
         let tokens_to_sell = core::cmp::min(tokens_left_for_sale, number_of_tokens_desired);
-        let price_for_tokens_to_sell = self.price().get() * (tokens_to_sell as u64).into();
+        let price_for_tokens_to_sell = self.price().get() * (tokens_to_sell as u64);
         require!(payment >= price_for_tokens_to_sell, "payment too low");
 
         let token_name_base = self.token_name_base().get();
         let image_base_uri = self.image_base_uri().get();
         let image_extension = self.image_extension().get();
+        let metadata_extension = self.metadata_extension().get();
         let metadata_base_uri = self.metadata_base_uri().get();
-        let empty_box = BoxedBytes::empty();
+        let empty_box = ManagedBuffer::new();
         let token_id = self.token_id().get();
         let royalties = self.royalties().get();
-        let big_one = Self::BigUint::from(1u64);
+        let big_one = BigUint::from(1u64);
         let caller = self.blockchain().get_caller();
         let mut next_expected_nonce = self.total_sold().get() + 1;
 
@@ -249,6 +236,7 @@ pub trait NftTemplate {
                     &image_base_uri,
                     &image_extension,
                     &metadata_base_uri,
+                    &metadata_extension,
                     next_expected_nonce,
                 ),
             );
@@ -259,8 +247,11 @@ pub trait NftTemplate {
         }
 
         let surplus = &payment - &price_for_tokens_to_sell;
-        self.send()
-            .direct_egld(&caller, &surplus, &ERDSEA_ERD721_STANDARD);
+        self.send().direct_egld(
+            &caller,
+            &surplus,
+            ManagedBuffer::new_from_bytes(&ERDSEA_ERD721_STANDARD),
+        );
 
         self.total_sold().update(|x| *x += tokens_to_sell);
         Ok(price_for_tokens_to_sell)
@@ -274,8 +265,8 @@ pub trait NftTemplate {
         require!(current_timestamp < sale_start_timestamp, "sale started");
 
         let mut random = Random::new(
-            *self.blockchain().get_block_random_seed(),
-            self.blockchain().get_tx_hash().as_bytes(),
+            self.blockchain().get_block_random_seed().to_byte_array(),
+            self.blockchain().get_tx_hash().to_byte_array().as_slice(),
         );
         let max_supply = self.max_supply().get() as u16;
 
@@ -313,50 +304,77 @@ pub trait NftTemplate {
 
     fn compute_token_uris(
         &self,
-        image_base_uri: &BoxedBytes,
-        image_extension: &BoxedBytes,
-        metadata_base_uri: &BoxedBytes,
+        image_base_uri: &ManagedBuffer,
+        image_extension: &ManagedBuffer,
+        metadata_base_uri: &ManagedBuffer,
+        metadata_extension: &ManagedBuffer,
         expected_nonce: u16,
-    ) -> Vec<BoxedBytes> {
-        let mut result = Vec::new();
-        let delimiter = BoxedBytes::from(&b"/"[..]);
+    ) -> ManagedVec<ManagedBuffer> {
+        let mut result = ManagedVec::<Self::Api, ManagedBuffer>::new();
+        let delimiter = ManagedBuffer::from(&b"/"[..]);
         let index = self.get_token_index(expected_nonce);
         let index_string = self.u16_to_string(index);
 
-        let own_image_uri = BoxedBytes::from_concat(&[
-            image_base_uri.as_slice(),
-            delimiter.as_slice(),
-            index_string.as_slice(),
-            image_extension.as_slice(),
-        ]);
+        let own_image_uri = ManagedBuffer::from(
+            BoxedBytes::from_concat(&[
+                image_base_uri.to_boxed_bytes().as_slice(),
+                delimiter.to_boxed_bytes().as_slice(),
+                index_string.to_boxed_bytes().as_slice(),
+                image_extension.to_boxed_bytes().as_slice(),
+            ])
+            .as_slice(),
+        );
         result.push(own_image_uri);
 
         if !metadata_base_uri.is_empty() {
-            let own_metadata_uri = BoxedBytes::from_concat(&[
-                metadata_base_uri.as_slice(),
-                delimiter.as_slice(),
-                index_string.as_slice(),
-            ]);
+            let own_metadata_uri = ManagedBuffer::from(
+                BoxedBytes::from_concat(&[
+                    metadata_base_uri.to_boxed_bytes().as_slice(),
+                    delimiter.to_boxed_bytes().as_slice(),
+                    index_string.to_boxed_bytes().as_slice(),
+                    metadata_extension.to_boxed_bytes().as_slice(),
+                ])
+                .as_slice(),
+            );
             result.push(own_metadata_uri);
+        }
+
+        if !metadata_base_uri.is_empty() {
+            let own_collection_uri = ManagedBuffer::from(
+                BoxedBytes::from_concat(&[
+                    metadata_base_uri.to_boxed_bytes().as_slice(),
+                    delimiter.to_boxed_bytes().as_slice(),
+                    b"collection.json",
+                ])
+                .as_slice(),
+            );
+            result.push(own_collection_uri);
         }
 
         result
     }
 
-    fn compute_token_name(&self, token_name_base: &BoxedBytes, expected_nonce: u16) -> BoxedBytes {
-        let delimiter = BoxedBytes::from(&b" #"[..]);
+    fn compute_token_name(
+        &self,
+        token_name_base: &ManagedBuffer,
+        expected_nonce: u16,
+    ) -> ManagedBuffer {
+        let delimiter = ManagedBuffer::new_from_bytes(&b" #"[..]);
         let expected_nonce_string = self.u16_to_string(expected_nonce);
 
-        BoxedBytes::from_concat(&[
-            token_name_base.as_slice(),
-            delimiter.as_slice(),
-            expected_nonce_string.as_slice(),
-        ])
+        ManagedBuffer::from(
+            BoxedBytes::from_concat(&[
+                token_name_base.to_boxed_bytes().as_slice(),
+                delimiter.to_boxed_bytes().as_slice(),
+                expected_nonce_string.to_boxed_bytes().as_slice(),
+            ])
+            .as_slice(),
+        )
     }
 
-    fn u16_to_string(&self, a: u16) -> BoxedBytes {
+    fn u16_to_string(&self, a: u16) -> ManagedBuffer {
         let ascii_zero_char = 48;
-        let mut vec = Vec::new();
+        let mut vec = ManagedVec::<Self::Api, u8>::new();
         let mut num = a;
 
         loop {
@@ -368,21 +386,21 @@ pub trait NftTemplate {
             }
         }
 
-        vec.reverse();
-        vec.as_slice().into()
+        let rawVec = vec.into_vec();
+        rawVec.as_slice().into()
     }
-
     #[only_owner]
     #[endpoint(requestWithdraw)]
-    fn request_withdraw(&self, marketplace: Address) -> AsyncCall<Self::SendApi> {
+    fn request_withdraw(&self, marketplace: ManagedAddress) {
         self.marketplace_proxy(marketplace)
             .withdraw_creator_royalties()
             .async_call()
+            .call_and_exit();
     }
 
     #[only_owner]
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] amount_opt: OptionalArg<Self::BigUint>) {
+    fn withdraw(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let amount = amount_opt.into_option().unwrap_or(
             self.blockchain()
                 .get_sc_balance(&TokenIdentifier::egld(), 0)
@@ -394,10 +412,7 @@ pub trait NftTemplate {
     }
 
     #[endpoint(marketplaceWithdraw)]
-    fn marketplace_withdraw(
-        &self,
-        #[var_args] amount_opt: OptionalArg<Self::BigUint>,
-    ) -> SCResult<()> {
+    fn marketplace_withdraw(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let caller = self.blockchain().get_caller();
         require!(
             caller == self.marketplace_admin().get(),
@@ -411,7 +426,6 @@ pub trait NftTemplate {
 
         self.send()
             .direct_egld(&caller, &amount, ERDSEA_WITHDRAW_MESSAGE);
-        Ok(())
     }
 
     #[only_owner]
@@ -428,7 +442,7 @@ pub trait NftTemplate {
 
     #[only_owner]
     #[endpoint(setPrice)]
-    fn set_price(&self, price: Self::BigUint) {
+    fn set_price(&self, price: BigUint) {
         self.price().set(&price);
     }
 
@@ -450,96 +464,93 @@ pub trait NftTemplate {
     }
 
     #[view(getMaxSupplyAndTotalSold)]
-    fn get_max_supply_and_total_sold(&self) -> MultiResult2<u16, u16> {
-        MultiResult2::from((self.max_supply().get(), self.total_sold().get()))
+    fn get_max_supply_and_total_sold(&self) -> MultiValue2<u16, u16> {
+        MultiValue2::from((self.max_supply().get(), self.total_sold().get()))
     }
 
     #[view(getMarketplaceBalance)]
     #[storage_mapper("marketplace_balance")]
-    fn marketplace_balance(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn marketplace_balance(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getMarketplaceAdmin)]
     #[storage_mapper("marketplace_admin")]
-    fn marketplace_admin(&self) -> SingleValueMapper<Self::Storage, Address>;
+    fn marketplace_admin(&self) -> SingleValueMapper<Self::Api, ManagedAddress>;
 
     #[view(isMintingThroughMarketplaceDenied)]
     #[storage_mapper("minting_through_marketplace_denied")]
-    fn minting_through_marketplace_denied(&self) -> SingleValueMapper<Self::Storage, bool>;
+    fn minting_through_marketplace_denied(&self) -> SingleValueMapper<Self::Api, bool>;
 
     #[view(getTotalSold)]
     #[storage_mapper("total_sold")]
-    fn total_sold(&self) -> SingleValueMapper<Self::Storage, u16>;
+    fn total_sold(&self) -> SingleValueMapper<Self::Api, u16>;
 
     #[view(getMaxSupply)]
     #[storage_mapper("max_supply")]
-    fn max_supply(&self) -> SingleValueMapper<Self::Storage, u16>;
+    fn max_supply(&self) -> SingleValueMapper<Self::Api, u16>;
 
     #[view(getPrice)]
     #[storage_mapper("price")]
-    fn price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn price(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getRoyalties)]
     #[storage_mapper("royalties")]
-    fn royalties(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn royalties(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getImageBaseUri)]
     #[storage_mapper("image_base_uri")]
-    fn image_base_uri(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn image_base_uri(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
 
     #[view(getImageExtension)]
     #[storage_mapper("image_extension")]
-    fn image_extension(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn image_extension(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
+
+    #[view(getMetadataExtension)]
+    #[storage_mapper("metadata_extension")]
+    fn metadata_extension(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
 
     #[view(getMetadataBaseUri)]
     #[storage_mapper("metadata_base_uri")]
-    fn metadata_base_uri(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn metadata_base_uri(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
 
     #[view(getTokenNameBase)]
     #[storage_mapper("token_name_base")]
-    fn token_name_base(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;
+    fn token_name_base(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
 
     #[view(getTokenId)]
     #[storage_mapper("token_id")]
-    fn token_id(&self) -> SingleValueMapper<Self::Storage, TokenIdentifier>;
+    fn token_id(&self) -> SingleValueMapper<Self::Api, TokenIdentifier>;
 
     #[view(getSaleStart)]
     #[storage_mapper("sale_start")]
-    fn sale_start(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn sale_start(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(isSalePaused)]
     #[storage_mapper("sale_paused")]
-    fn sale_paused(&self) -> SingleValueMapper<Self::Storage, bool>;
+    fn sale_paused(&self) -> SingleValueMapper<Self::Api, bool>;
 
     #[storage_mapper("nonce_to_index")]
-    fn nonce_to_index(&self, nonce_as_u16: u16) -> SingleValueMapper<Self::Storage, u16>;
+    fn nonce_to_index(&self, nonce_as_u16: u16) -> SingleValueMapper<Self::Api, u16>;
 
     #[proxy]
-    fn marketplace_proxy(&self, to: Address) -> marketplace_proxy::Proxy<Self::SendApi>;
+    fn marketplace_proxy(&self, to: ManagedAddress) -> marketplace_proxy::Proxy<Self::Api>;
 
-    
     #[view(getAdminPubKey)]
     #[storage_mapper("admin_pub_key")]
-    fn admin_pub_key(&self) -> SingleValueMapper<Self::Storage, BoxedBytes>;    
+    fn admin_pub_key(&self) -> SingleValueMapper<Self::Api, ManagedBuffer>;
 
-
-
-
-
-   //===================================================================================================
+    //===================================================================================================
     // WHITELIST - BUY COUNT / LIMIT
     //===================================================================================================
 
     //works 2/21
     #[view(getBuyCount)]
     #[storage_mapper("buy_count")]
-    fn buy_count(&self, address: &Address) -> SingleValueMapper<Self::Storage, u16>;
+    fn buy_count(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, u16>;
 
     //works 2/21
     #[view(getBuyLimit)]
     #[storage_mapper("buy_limit")]
-    fn buy_limit(&self, address: &Address) -> SingleValueMapper<Self::Storage, u16>;
-
-
+    fn buy_limit(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, u16>;
 
     //works 2/21
     //CREATE MINTING COUNT & LIMIT (Used during population)
@@ -547,34 +558,32 @@ pub trait NftTemplate {
     #[payable("EGLD")]
     #[only_owner]
     #[endpoint(createBuyerAddress)]
-    fn create_buyer_address(&self,
-                            buy_count: u16,
-                            buy_limit: u16,
-                            address: Address) -> SCResult<()>
-    {          
-        //ONLY Create new address record if it doesn't exist    
-        if self.buy_limit(&address).is_empty() 
-        {
+    fn create_buyer_address(&self, buy_count: u16, buy_limit: u16, address: ManagedAddress) {
+        //ONLY Create new address record if it doesn't exist
+        if self.buy_limit(&address).is_empty() {
             self.buy_count(&address).set(&buy_count);
             self.buy_limit(&address).set(&buy_limit);
-        } 
-        
-        Ok(())
+        }
     }
     
-
-    //working 2/21    
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(changeBuyerBuyLimit)]
+    fn change_buyer_buylimit(&self, buy_limit: u16, address: ManagedAddress) {
+        //ONLY Create new address record if it doesn't exist
+        if !self.buy_limit(&address).is_empty() {
+            self.buy_limit(&address).set(&buy_limit);
+        }
+    }
+    //working 2/21
     // [PRIVATE] - Check to see if caller is not part of  whitelist by checking buy_limit (empty)
     //----------------------------------------------------------------------
-    fn is_caller_address_not_part_of_whitelist(&self) -> bool
-    {
+    fn is_caller_address_not_part_of_whitelist(&self) -> bool {
         //caller address (since minting_limit is based on address)
-        let caller_address = &self.blockchain().get_caller();  
-        
+        let caller_address = &self.blockchain().get_caller();
         //check limit since it should be zero (at least 1 if created for address)
-        return self.buy_limit(&caller_address).is_empty() 
+        return self.buy_limit(&caller_address).is_empty();
     }
-
 
     /* FOR TESTING PURPOSE (LEAVE COMMENTED OUT)
     //TEST FUNC working 2/21
@@ -583,7 +592,7 @@ pub trait NftTemplate {
     fn is_caller_address_not_part_of_whitelist2(&self) -> SCResult<(u64)>
     {
         //caller address (since minting_limit is based on address)
-        let caller_address = &self.blockchain().get_caller();  
+        let caller_address = &self.blockchain().get_caller();
 
         if( self.buy_limit(&caller_address).is_empty() )
         {
@@ -596,35 +605,33 @@ pub trait NftTemplate {
     }
     */
 
-
-
     //working 2/21
     // [PRIVATE] - check if buy count < buy limit after adding to the buy count
-    //----------------------------------------------------------------------   
-    fn check_buy_count_is_greater_than_buy_limit_by_adding_amount(&self,
-                                                                  amount_to_add_to_buy_count: u16) -> bool
-    {
+    //----------------------------------------------------------------------
+    fn check_buy_count_is_greater_than_buy_limit_by_adding_amount(
+        &self,
+        amount_to_add_to_buy_count: u16,
+    ) -> bool {
         //get caller buy limit
         let buy_limit = self.buy_limit(&self.blockchain().get_caller()).get();
-        
-        //get miting count for caller and add amount to it 
+
+        //get miting count for caller and add amount to it
         let mut buy_count_mut = self.buy_count(&self.blockchain().get_caller()).get();
         buy_count_mut += amount_to_add_to_buy_count;
 
         //check if the "new" (new by adding amount to it) buy count is greater than buy limit
-        return buy_count_mut > buy_limit;     
-    }    
-
+        return buy_count_mut > buy_limit;
+    }
 
     /*
     //FOR TESTING PURPOSE (LEAVE COMMENTED OUT)
     #[payable("EGLD")]
-    #[endpoint] 
+    #[endpoint]
     fn check_buy_count_is_greater_than_buy_limit_by_adding_amount2(&self,
                                                                   amount_to_add_to_buy_count: u16) -> SCResult<(u64)>
     {
         //check if the "new" (new by adding amount to it) buy count is greater than buy limit
-        if self.check_buy_count_is_greater_than_buy_limit_by_adding_amount(amount_to_add_to_buy_count) 
+        if self.check_buy_count_is_greater_than_buy_limit_by_adding_amount(amount_to_add_to_buy_count)
         {
             Ok(1)
         }
@@ -632,66 +639,59 @@ pub trait NftTemplate {
         {
             Ok(2)
         }
-    }   
+    }
     */
 
     //working 2/21
     // [PRIVATE] - ADD TO MINTING COUNT BY BIGINT PARAM
     //----------------------------------------------------------------------
-    //#[payable("EGLD")]   //remove
-    //#[endpoint] //TODO REMOVE: remove after testing
-    fn add_to_address_buy_count(&self,
-                                amount: u16) -> SCResult<()>
-    {
+    fn add_to_address_buy_count(&self, amount: u16) -> SCResult<()> {
         let address = self.blockchain().get_caller();
 
-        if self.buy_limit(&address).is_empty()  //check limit since limit is never 0 (empty)
+        if self.buy_limit(&address).is_empty()
+        //check limit since limit is never 0 (empty)
         {
             return sc_error!("Address is NOT CREATED for Buying");
+        } else {
+            self.buy_count(&address)
+                .update(|buy_count| *buy_count += amount);
         }
-        else
-        {
-            self.buy_count(&address).update(|buy_count| *buy_count += amount);
-
-            Ok(()) //SUCCESS        
-        }
+        Ok(())
     }
-
-
 
     //===================================================================================================
     // WHITELIST - BUYER MINTING CHECKS FLAGS
     //===================================================================================================
 
     //works: 2/21
-    //1: ON and 0: OFF 
+    //1: ON and 0: OFF
     #[view(getBuyerWhiteListCheck)]
     #[storage_mapper("buyer_whitelist_check")]
-    fn buyer_whitelist_check(&self) -> SingleValueMapper<Self::Storage, Self::BigInt>;  
-
+    fn buyer_whitelist_check(&self) -> SingleValueMapper<Self::Api, BigInt>;
 
     //works 2/21
     // PRIVATE : CHECK "BUYER" WHITELIST CHECK is Enabled (PRIVATE)
-    fn is_buyer_whitelist_check_enabled(&self) -> bool
-    {
-        return self.buyer_whitelist_check().get() == Self::BigInt::from(1);  //1 is ON and 0 is OFF
+    fn is_buyer_whitelist_check_enabled(&self) -> bool {
+        let one = BigInt::from(1);
+        return self.buyer_whitelist_check().get() == one; //1 is ON and 0 is OFF
     }
-    
 
-    
     //works 2/21
-    // [ENDPOINT] UPDATE "BUYER" WHITELIST CHECK 
-    //----------------------------------------------------------------------  
-    #[payable("EGLD")]  
+    // [ENDPOINT] UPDATE "BUYER" WHITELIST CHECK
+    //----------------------------------------------------------------------
+    #[payable("EGLD")]
     #[only_owner]
     #[endpoint(updateBuyerWhitelistCheck)]
-    fn update_buyer_whitelist_check(&self,
-                                    whitelist_check: Self::BigInt)
-    {  
+    fn update_buyer_whitelist_check(&self, whitelist_check: BigInt) {
         //1: On and 0: Off
         self.buyer_whitelist_check().set(&whitelist_check);
     }
 
-
-
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(updateMetadataExtension)]
+    fn update_metadata_extension(&self, metadata_extension: ManagedBuffer) {
+        //1: On and 0: Off
+        self.metadata_extension().set(&metadata_extension);
+    }
 }

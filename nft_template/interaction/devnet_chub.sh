@@ -8,8 +8,8 @@ MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7e
 
 
 #SET THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500752f8b1c5a0321bd844966fcd7b0e48d2f3b4ccd255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqhxqvt5fxrgj4awh955a0r8mlkpwhfm24y4ws7j90gc"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19f7fb05d74ed55255d"
 
 
 #  erdpy wallet bech32 --decode erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92
@@ -53,13 +53,10 @@ deploy() {
         --pem=${MY_WALLET_PEM} \
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
-        --gas-limit=200000000 \
+        --gas-limit=600000000 \
         --arguments ${MARKETPLACE_ADDRESS_HEX} ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
-
-
-
 
 
 upgrade() {
@@ -118,7 +115,18 @@ withdraw() {
 }
 
 
-
+enableWhiteList(){
+    erdpy --verbose contract call erd1qqqqqqqqqqqqqpgqfudlc5h5t0ulcr9vg2yepwaz9nm3ngkgy4wsu38rtm \
+        --pem=wufq.pem \
+        --recall-nonce \
+        --value 50000000000000000 \
+        --gas-limit 60000000 \
+        --function "updateBuyerWhitelistCheck" \
+        --arguments 1 \
+        --proxy="https://devnet-gateway.elrond.com" \
+        --chain="D" \
+        --send
+}
 
 # Run first
 # deploy  
@@ -130,6 +138,6 @@ withdraw() {
 #issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-deploy
+enableWhiteList
 
 #------------------------------------------------

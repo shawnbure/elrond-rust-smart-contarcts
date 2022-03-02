@@ -17,14 +17,17 @@ members = [ ".",]
 codegen-units = 1
 opt-level = "z"
 lto = true
-debug = false
+debug = true
 panic = "abort"
 
 [dependencies.nft_template]
-features = [ "wasm-output-mode",]
-default-features = false
+# features = [ "wasm-output-mode",]
+# default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
-version = "0.18"
+version = "0.28.0"
 features = [ "wasm-output-mode",]
+
+[dependencies.elrond-wasm-node]
+version = "0.28.0"

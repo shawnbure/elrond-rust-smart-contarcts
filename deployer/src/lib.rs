@@ -6,32 +6,26 @@ elrond_wasm::derive_imports!();
 #[elrond_wasm::contract]
 pub trait Deployer {
     #[init]
-    fn init(&self, 
-            nft_template_address: ManagedAddress, 
-            marketplace_admin: ManagedAddress, ) 
-    {
-
+    fn init(&self, nft_template_address: ManagedAddress, marketplace_admin: ManagedAddress) {
         self.nft_template_address().set(&nft_template_address);
         self.marketplace_admin().set(&marketplace_admin);
-
-
     }
 
     #[payable("EGLD")]
     #[endpoint(deployNFTTemplateContract)]
     fn deploy_nft_template_contract(
         &self,
-        token_id: BoxedBytes,
+        token_id: ManagedBuffer,
         royalties: BigUint,
-        token_name_base: BoxedBytes,
-        image_base_uri: BoxedBytes,
-        image_extension: BoxedBytes,
+        token_name_base: ManagedBuffer,
+        image_base_uri: ManagedBuffer,
+        image_extension: ManagedBuffer,
         price: BigUint,
         max_supply: u16,
-        sale_start_timestamp: u64,   
-        #[var_args] metadata_base_uri_opt: OptionalArg<BoxedBytes>,
+        sale_start_timestamp: u64,
+        #[var_args] metadata_base_uri_opt: OptionalValue<ManagedBuffer>,
     ) -> SCResult<ManagedAddress> {
-        let mut arg_buffer = ManagedArgBuffer::new_empty(self.type_manager());
+        let mut arg_buffer = ManagedArgBuffer::new_empty();
         arg_buffer.push_arg(self.marketplace_admin().get());
         arg_buffer.push_arg(token_id);
         arg_buffer.push_arg(royalties);
@@ -47,8 +41,7 @@ pub trait Deployer {
             arg_buffer.push_arg(metadata_base_uri.unwrap());
         }
 
-
-        let (new_address, _) = self.raw_vm_api().deploy_from_source_contract(
+        let (new_address, _) = Self::Api::send_api_impl().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
             &self.nft_template_address().get(),
@@ -115,7 +108,4 @@ pub trait Deployer {
     #[view(getOwnerOfContract)]
     #[storage_mapper("owner_of_contract")]
     fn owner_of_contract(&self, sc_address: &ManagedAddress) -> SingleValueMapper<ManagedAddress>;
-
-   
-
 }

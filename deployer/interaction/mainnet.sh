@@ -1,17 +1,18 @@
-MY_WALLET_PEM="/pems/mainnet/mainnet_thingy.pem"
+MY_WALLET_PEM="../../../admin.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
 WASM="../output/deployer.wasm"
 
 MY_ADDRESS="erd126"
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqnrv58g83nfp3qpvh9sh6h5k7kamx3fqkcfqsuvg768"
-CONTRACT_ADDRESS_HEX="0x0000000000000000050098d943a0f19a431005972c2fabd2deb77668a416c241"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq9vpuwyf6q7d0qg2guq2zn0llumvtmuspydjsj5ul79"
+CONTRACT_ADDRESS_HEX="0x000000000000000005002b03c7113a079af02148e01429bfffe6d8bdf2012365"
 
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqz9ktexrk53p6v43rhc93723vhxxj95qxcfqsmngnk9"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500116cbc9876a443a65623be0b1f2a2cb98d22d006c241"
+#NFT TEMPLATE ADDRESS (devnet_chub.sh)
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqayduf3tr40pja8gwd9huendczgn287rnydjs7rr06j"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500e91bc4c563abc32e9d0e696fcccdb81226a3f8732365"
 
-MARKETPLACE_ADMIN_ADDRESS="erd126"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x56994"
+MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgq0zanux4e7aw3w7glknhkrllx7ar2wemuydjs2q5u35"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0x0000000000000000050078bb3e1ab9f75d17791fb4ef61ffe6f746a7677c2365"
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -125,3 +126,5 @@ withdraw() {
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --send || return
 }
+
+deploy
