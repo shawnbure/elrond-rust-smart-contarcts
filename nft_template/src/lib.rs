@@ -565,7 +565,16 @@ pub trait NftTemplate {
             self.buy_limit(&address).set(&buy_limit);
         }
     }
-
+    
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(changeBuyerBuyLimit)]
+    fn change_buyer_buylimit(&self, buy_limit: u16, address: ManagedAddress) {
+        //ONLY Create new address record if it doesn't exist
+        if !self.buy_limit(&address).is_empty() {
+            self.buy_limit(&address).set(&buy_limit);
+        }
+    }
     //working 2/21
     // [PRIVATE] - Check to see if caller is not part of  whitelist by checking buy_limit (empty)
     //----------------------------------------------------------------------
@@ -636,8 +645,6 @@ pub trait NftTemplate {
     //working 2/21
     // [PRIVATE] - ADD TO MINTING COUNT BY BIGINT PARAM
     //----------------------------------------------------------------------
-    //#[payable("EGLD")]   //remove
-    //#[endpoint] //TODO REMOVE: remove after testing
     fn add_to_address_buy_count(&self, amount: u16) -> SCResult<()> {
         let address = self.blockchain().get_caller();
 

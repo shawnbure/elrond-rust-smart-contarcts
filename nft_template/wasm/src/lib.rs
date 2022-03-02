@@ -37,5 +37,6 @@ elrond_wasm_node::wasm_endpoints! {
         createBuyerAddress
         getBuyerWhiteListCheck
         updateBuyerWhitelistCheck
+        changeBuyerBuyLimit
     )
 }
