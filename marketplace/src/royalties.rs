@@ -8,7 +8,7 @@ use super::utils;
 pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
     #[only_owner]
     #[endpoint(withdrawPlatformRoyalties)]
-    fn withdraw_platform_royalties(&self, #[var_args] amount_opt: OptionalArg<Self::BigUint>) {
+    fn withdraw_platform_royalties(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let amount = amount_opt
             .into_option()
             .unwrap_or(self.platform_royalties().get());
@@ -41,7 +41,7 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
     }
 
     #[view(getRemainingEpochsUntilClaim)]
-    fn get_remaining_epochs_until_claim(&self, caller: Address) -> SCResult<u64> {
+    fn get_remaining_epochs_until_claim(&self, caller: ManagedAddress) -> SCResult<u64> {
         let curr_epoch = self.blockchain().get_block_epoch();
         let last_epoch = self.creator_last_withdrawal_epoch(&caller).get();
         let withdrawal_epochs = self.creator_withdrawal_waiting_epochs().get();
@@ -56,19 +56,19 @@ pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
         Ok(remaining)
     }
 
-    fn increase_platform_royalties(&self, amount: &Self::BigUint) {
+    fn increase_platform_royalties(&self, amount: &BigUint) {
         self.platform_royalties().update(|x| *x += amount);
     }
 
-    fn increase_creator_royalties(&self, creator: &Address, amount: &Self::BigUint) {
+    fn increase_creator_royalties(&self, creator: &ManagedAddress, amount: &BigUint) {
         self.creator_royalties(creator).update(|x| *x += amount);
     }
 
-    fn creator_not_blacklisted(&self, address: &Address) -> bool {
+    fn creator_not_blacklisted(&self, address: &ManagedAddress) -> bool {
         !self.creator_blacklist(address).get()
     }
 
-    fn set_creator_last_withdrawal_epoch_if_empty(&self, creator: &Address) {
+    fn set_creator_last_withdrawal_epoch_if_empty(&self, creator: &ManagedAddress) {
         if self.creator_last_withdrawal_epoch(creator).is_empty() {
             let current = self.blockchain().get_block_epoch();
             self.creator_last_withdrawal_epoch(creator).set(&current);

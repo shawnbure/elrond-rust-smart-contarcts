@@ -11,13 +11,13 @@ pub trait DepositModule:
 {
     #[payable("EGLD")]
     #[endpoint(deposit)]
-    fn deposit(&self, #[payment_amount] amount: Self::BigUint) {
+    fn deposit(&self, #[payment_amount] amount: BigUint) {
         let caller = self.blockchain().get_caller();
         self.increase_deposit(&caller, &amount);
     }
 
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] opt_amount: OptionalArg<Self::BigUint>) -> SCResult<()> {
+    fn withdraw(&self, #[var_args] opt_amount: OptionalValue<BigUint>) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let amount = opt_amount
             .into_option()
@@ -27,7 +27,7 @@ pub trait DepositModule:
         Ok(())
     }
 
-    fn increase_deposit(&self, address: &Address, amount: &Self::BigUint) -> Self::BigUint {
+    fn increase_deposit(&self, address: &ManagedAddress, amount: &BigUint) -> BigUint {
         let mut deposit = self.egld_deposit(address).get();
         deposit += amount;
 
@@ -38,9 +38,9 @@ pub trait DepositModule:
 
     fn try_decrease_deposit(
         &self,
-        address: &Address,
-        amount: &Self::BigUint,
-    ) -> SCResult<Self::BigUint> {
+        address: &ManagedAddress,
+        amount: &BigUint,
+    ) -> SCResult<BigUint> {
         let mut deposit = self.egld_deposit(address).get();
 
         require!(&deposit >= amount, "insuficient funds in user deposit");
@@ -53,10 +53,10 @@ pub trait DepositModule:
 
     fn try_increase_decrease_deposit(
         &self,
-        address: &Address,
-        to_increase: &Self::BigUint,
-        to_decrease: &Self::BigUint,
-    ) -> SCResult<Self::BigUint> {
+        address: &ManagedAddress,
+        to_increase: &BigUint,
+        to_decrease: &BigUint,
+    ) -> SCResult<BigUint> {
         let mut deposit = self.egld_deposit(address).get();
         deposit += to_increase;
 
