@@ -119,8 +119,7 @@ enableWhiteList(){
     erdpy --verbose contract call erd1qqqqqqqqqqqqqpgqfudlc5h5t0ulcr9vg2yepwaz9nm3ngkgy4wsu38rtm \
         --pem=wufq.pem \
         --recall-nonce \
-        --value 50000000000000000 \
-        --gas-limit 60000000 \
+        --gas-limit 4341625 \
         --function "updateBuyerWhitelistCheck" \
         --arguments 1 \
         --proxy="https://devnet-gateway.elrond.com" \
