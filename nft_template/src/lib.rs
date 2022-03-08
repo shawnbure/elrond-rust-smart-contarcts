@@ -157,7 +157,7 @@ pub trait NftTemplate {
                 return sc_error!("Exceeded the Allowable Buy Limit for WhiteList");
             }
             //successfully minted so now we can add to the address count
-            self.add_to_address_buy_count(number_of_tokens_desired);
+            self.add_to_address_buy_count(number_of_tokens_desired)?;
         }
 
         require!(
@@ -386,8 +386,9 @@ pub trait NftTemplate {
             }
         }
 
-        let rawVec = vec.into_vec();
-        rawVec.as_slice().into()
+        let mut raw_vec = vec.into_vec();
+        raw_vec.reverse();
+        raw_vec.as_slice().into()
     }
     #[only_owner]
     #[endpoint(requestWithdraw)]
@@ -565,7 +566,6 @@ pub trait NftTemplate {
             self.buy_limit(&address).set(&buy_limit);
         }
     }
-    
     #[payable("EGLD")]
     #[only_owner]
     #[endpoint(changeBuyerBuyLimit)]
