@@ -386,7 +386,8 @@ pub trait NftTemplate {
             }
         }
 
-        let raw_vec = vec.into_vec();
+        let mut raw_vec = vec.into_vec();
+        raw_vec.reverse();
         raw_vec.as_slice().into()
     }
     #[only_owner]
