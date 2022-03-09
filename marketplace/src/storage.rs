@@ -121,56 +121,56 @@ pub trait StorageModule {
 
     #[view(getPlatformFeePercent)]
     #[storage_mapper("platform_fee_percent")]
-    fn platform_fee_percent(&self) -> SingleValueMapper<Storage, u64>;
+    fn platform_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getAssetMinPrice)]
     #[storage_mapper("asset_min_price")]
-    fn asset_min_price(&self) -> SingleValueMapper<Storage, BigUint>;
+    fn asset_min_price(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getAssetMaxPrice)]
     #[storage_mapper("asset_max_price")]
-    fn asset_max_price(&self) -> SingleValueMapper<Storage, BigUint>;
+    fn asset_max_price(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getRoyaltiesMaxFeePercent)]
     #[storage_mapper("royalties_max_fee_percent")]
-    fn royalties_max_fee_percent(&self) -> SingleValueMapper<Storage, u64>;
+    fn royalties_max_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getCreatorWithdrawalWaitingEpochs)]
     #[storage_mapper("creator_withdrawal_waiting_epochs")]
-    fn creator_withdrawal_waiting_epochs(&self) -> SingleValueMapper<Storage, u64>;
+    fn creator_withdrawal_waiting_epochs(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(isCreatorBlacklisted)]
     #[storage_mapper("creator_blacklist")]
-    fn creator_blacklist(&self, address: &Address) -> SingleValueMapper<Storage, bool>;
+    fn creator_blacklist(&self, address: &Address) -> SingleValueMapper<Self::Api, bool>;
 
     #[view(getEgldDeposit)]
     #[storage_mapper("egld_deposit")]
-    fn egld_deposit(&self, address: &Address) -> SingleValueMapper<Storage, BigUint>;
+    fn egld_deposit(&self, address: &Address) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorRoyalties)]
     #[storage_mapper("creator_royalties")]
     fn creator_royalties(
         &self,
         address: &Address,
-    ) -> SingleValueMapper<Storage, BigUint>;
+    ) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorLastWithdrawalEpoch)]
     #[storage_mapper("creator_last_withdrawal_epoch")]
     fn creator_last_withdrawal_epoch(
         &self,
         address: &Address,
-    ) -> SingleValueMapper<Storage, u64>;
+    ) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getPlatformRoyalties)]
     #[storage_mapper("platform_royalties")]
-    fn platform_royalties(&self) -> SingleValueMapper<Storage, BigUint>;
+    fn platform_royalties(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getNftSaleInfo)]
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(
         &self,
         nft_id: &NftId,
-    ) -> SingleValueMapper<Storage, NftSaleInfo<BigUint>>;
+    ) -> SingleValueMapper<Self::Api, NftSaleInfo<BigUint>>;
 
     #[view(getOffer)]
     #[storage_mapper("offers")]
@@ -179,12 +179,12 @@ pub trait StorageModule {
         caller: &Address,
         nft_id: &NftId,
         nft_list_timestamp: u64,
-    ) -> SingleValueMapper<Storage, Offer<BigUint>>;
+    ) -> SingleValueMapper<Self::Api, Offer<BigUint>>;
 
     #[view(getAuction)]
     #[storage_mapper("auction")]
     fn auction(
         &self,
         nft_id: &NftId,
-    ) -> SingleValueMapper<Storage, AuctionInfo<BigUint>>;
+    ) -> SingleValueMapper<Self::Api, AuctionInfo<BigUint>>;
 }
