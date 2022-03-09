@@ -4,7 +4,9 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct NftId<M: ManagedTypeApi> 
+pub struct NftId<M> 
+where
+    M: ManagedTypeApi,
 {
     pub token_id: TokenIdentifier<M>,
     pub nonce: u64,
@@ -15,10 +17,10 @@ impl<M: ManagedTypeApi> NftId<M>
 where
     M: ManagedTypeApi,
 {
-    fn new(token_id: TokenIdentifier, nonce: u64) -> Self {
+    fn new(token_id: TokenIdentifier<M>, nonce: u64) -> Self {
         NftId { 
             token_id, 
-            nonce 
+            nonce,
         }
     }
 }
@@ -37,7 +39,7 @@ impl<M: ManagedTypeApi> NftSaleInfo<M>
 where
     M: ManagedTypeApi,
 {
-    pub fn new(owner: ManagedAddress, price: BigUint, timestamp: u64) -> Self {
+    pub fn new(owner: ManagedAddress<M>, price: BigUint<M>, timestamp: u64) -> Self {
         NftSaleInfo {
             owner,
             price,
@@ -98,7 +100,7 @@ impl<M: ManagedTypeApi> Offer<M>
 where
     M: ManagedTypeApi,
 {
-    pub fn new(amount: BigUint, expire: u64) -> Self {
+    pub fn new(amount: BigUint<M>, expire: u64) -> Self {
         Offer { amount, expire }
     }
 }
@@ -139,24 +141,24 @@ pub trait StorageModule {
 
     #[view(isCreatorBlacklisted)]
     #[storage_mapper("creator_blacklist")]
-    fn creator_blacklist(&self, address: &Address) -> SingleValueMapper<Self::Api, bool>;
+    fn creator_blacklist(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, bool>;
 
     #[view(getEgldDeposit)]
     #[storage_mapper("egld_deposit")]
-    fn egld_deposit(&self, address: &Address) -> SingleValueMapper<Self::Api, BigUint>;
+    fn egld_deposit(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorRoyalties)]
     #[storage_mapper("creator_royalties")]
     fn creator_royalties(
         &self,
-        address: &Address,
+        address: &ManagedAddress,
     ) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorLastWithdrawalEpoch)]
     #[storage_mapper("creator_last_withdrawal_epoch")]
     fn creator_last_withdrawal_epoch(
         &self,
-        address: &Address,
+        address: &ManagedAddress,
     ) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getPlatformRoyalties)]
@@ -167,22 +169,22 @@ pub trait StorageModule {
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(
         &self,
-        nft_id: &NftId,
-    ) -> SingleValueMapper<Self::Api, NftSaleInfo<BigUint>>;
+        nft_id: &NftId<Self::Api>,
+    ) -> SingleValueMapper<NftSaleInfo<Self::Api>>;
 
     #[view(getOffer)]
     #[storage_mapper("offers")]
     fn offers(
         &self,
-        caller: &Address,
-        nft_id: &NftId,
+        caller: &ManagedAddress,
+        nft_id: &NftId<Self::Api>,
         nft_list_timestamp: u64,
-    ) -> SingleValueMapper<Self::Api, Offer<BigUint>>;
+    ) -> SingleValueMapper<Offer<Self::Api>>;
 
     #[view(getAuction)]
     #[storage_mapper("auction")]
     fn auction(
         &self,
-        nft_id: &NftId,
-    ) -> SingleValueMapper<Self::Api, AuctionInfo<BigUint>>;
+        nft_id: &NftId<Self::Api>,
+    ) -> SingleValueMapper<AuctionInfo<Self::Api>>;
 }
