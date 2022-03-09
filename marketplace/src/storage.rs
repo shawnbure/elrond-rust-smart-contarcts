@@ -17,7 +17,7 @@ impl<M: ManagedTypeApi> NftId<M>
 where
     M: ManagedTypeApi,
 {
-    fn new(token_id: TokenIdentifier<M>, nonce: u64) -> Self {
+    pub fn new(token_id: TokenIdentifier<M>, nonce: u64) -> Self {
         NftId { 
             token_id, 
             nonce,

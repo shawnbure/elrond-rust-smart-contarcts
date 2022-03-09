@@ -14,17 +14,17 @@ use super::utils;
 pub trait ValidationModule:
     storage::StorageModule + config::ConfigModule + utils::UtilsModule
 {
-    fn require_nft_for_sale(&self, nft_id: &NftId) -> SCResult<()> {
+    fn require_nft_for_sale(&self, nft_id: &NftId<Self::Api>) -> SCResult<()> {
         require!(!self.nft_sale_info(nft_id).is_empty(), "Nft not for sale");
         Ok(())
     }
 
-    fn require_nft_not_for_sale(&self, nft_id: &NftId) -> SCResult<()> {
+    fn require_nft_not_for_sale(&self, nft_id: &NftId<Self::Api>) -> SCResult<()> {
         require!(self.nft_sale_info(nft_id).is_empty(), "Nft is for sale");
         Ok(())
     }
 
-    fn require_valid_token_id(&self, token_id: &TokenIdentifier) -> SCResult<()> {
+    fn require_valid_token_id(&self, token_id: &TokenIdentifier<Self::Api>) -> SCResult<()> {
         require!(token_id.is_valid_esdt_identifier(), "Invalid token Id");
         Ok(())
     }
@@ -50,20 +50,21 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_valid_royalties(&self, token_data: &EsdtTokenData<BigUint>) -> SCResult<()> {
+    fn require_valid_royalties(&self, token_data: &EsdtTokenData<Self::Api>) -> SCResult<()> {
         let platform_fee = self.get_platform_fee_percent_or_default();
         require!(
             token_data.royalties <= self.get_royalties_max_fee_percent_or_default(),
             "Royalties too big"
         );
         require!(
-            &token_data.royalties + &platform_fee < BP,
+            //&token_data.royalties + &platform_fee < BP,
+            token_data.royalties + platform_fee < BP,
             "Royalties too big"
         );
         Ok(())
     }
 
-    fn require_uris_not_empty(&self, token_data: &EsdtTokenData<BigUint>) -> SCResult<()> {
+    fn require_uris_not_empty(&self, token_data: &EsdtTokenData<Self::Api>) -> SCResult<()> {
         require!(!token_data.uris.is_empty(), "Empty uris");
         Ok(())
     }
@@ -71,7 +72,7 @@ pub trait ValidationModule:
     fn require_owns_nft(
         &self,
         address: &ManagedAddress,
-        nft_sale_info: &NftSaleInfo<BigUint>,
+        nft_sale_info: &NftSaleInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(address == &nft_sale_info.owner, "Not owner");
         Ok(())
@@ -80,7 +81,7 @@ pub trait ValidationModule:
     fn require_not_owns_nft(
         &self,
         address: &ManagedAddress,
-        nft_sale_info: &NftSaleInfo<BigUint>,
+        nft_sale_info: &NftSaleInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(address != &nft_sale_info.owner, "Is owner");
         Ok(())
@@ -106,7 +107,7 @@ pub trait ValidationModule:
     fn require_offer_exists(
         &self,
         address: &ManagedAddress,
-        nft_id: &NftId,
+        nft_id: &NftId<Self::Api>,
         timestamp: u64,
     ) -> SCResult<()> {
         require!(
@@ -124,7 +125,7 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_not_expired(&self, offer: &Offer<BigUint>) -> SCResult<()> {
+    fn require_not_expired(&self, offer: &Offer<Self::Api>) -> SCResult<()> {
         require!(
             offer.expire >= self.blockchain().get_block_timestamp(),
             "offer expired"
@@ -138,12 +139,12 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_nft_not_on_auction(&self, nft_id: &NftId) -> SCResult<()> {
+    fn require_nft_not_on_auction(&self, nft_id: &NftId<Self::Api>) -> SCResult<()> {
         require!(self.auction(nft_id).is_empty(), "Nft is on auction");
         Ok(())
     }
 
-    fn require_nft_on_auction(&self, nft_id: &NftId) -> SCResult<()> {
+    fn require_nft_on_auction(&self, nft_id: &NftId<Self::Api>) -> SCResult<()> {
         require!(!self.auction(nft_id).is_empty(), "Nft is not on auction");
         Ok(())
     }
@@ -151,7 +152,7 @@ pub trait ValidationModule:
     fn require_not_auction_owner(
         &self,
         address: &ManagedAddress,
-        auction_info: &AuctionInfo<BigUint>,
+        auction_info: &AuctionInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(address != &auction_info.owner, "Is owner");
         Ok(())
@@ -160,7 +161,7 @@ pub trait ValidationModule:
     fn require_owner_or_winner(
         &self,
         address: &ManagedAddress,
-        auction_info: &AuctionInfo<BigUint>,
+        auction_info: &AuctionInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(
             address == &auction_info.owner || address == &auction_info.highest_bidder,
@@ -172,7 +173,7 @@ pub trait ValidationModule:
     fn require_auction_owner(
         &self,
         address: &ManagedAddress,
-        auction_info: &AuctionInfo<BigUint>,
+        auction_info: &AuctionInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(address == &auction_info.owner, "Not owner");
         Ok(())
@@ -180,7 +181,7 @@ pub trait ValidationModule:
 
     fn require_is_auction_ongoing(
         &self,
-        auction_info: &AuctionInfo<BigUint>,
+        auction_info: &AuctionInfo<Self::Api>,
     ) -> SCResult<()> {
         let current_time = self.blockchain().get_block_timestamp();
         require!(
@@ -194,14 +195,14 @@ pub trait ValidationModule:
     fn require_valid_new_bid(
         &self,
         new_bid: &BigUint,
-        auction_info: &AuctionInfo<BigUint>,
+        auction_info: &AuctionInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(new_bid >= &auction_info.min_bid, "Lower than min bid");
         require!(new_bid > &auction_info.bid, "Lower than highest bid");
         Ok(())
     }
 
-    fn require_deadline_passed(&self, auction_info: &AuctionInfo<BigUint>) -> SCResult<()> {
+    fn require_deadline_passed(&self, auction_info: &AuctionInfo<Self::Api>) -> SCResult<()> {
         let current_time = self.blockchain().get_block_timestamp();
         require!(
             current_time > auction_info.deadline,
@@ -212,7 +213,7 @@ pub trait ValidationModule:
 
     fn require_auction_has_winner(
         &self,
-        auction_info: &AuctionInfo<BigUint>,
+        auction_info: &AuctionInfo<Self::Api>,
     ) -> SCResult<()> {
         require!(
             auction_info.highest_bidder != ManagedAddress::zero(),
