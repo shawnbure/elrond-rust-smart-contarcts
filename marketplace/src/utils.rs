@@ -30,22 +30,24 @@ pub trait UtilsModule: storage::StorageModule {
 
     fn get_platform_cut(&self, price: &BigUint) -> BigUint {
         let fee = self.get_platform_fee_percent_or_default();
-        price * &fee.into() / BP.into()
+        //price * &fee.into() / BP.into()
+        price * fee / BP
     }
 
     fn get_creator_cut(
         &self,
         price: &BigUint,
-        token_data: &EsdtTokenData<BigUint>,
+        token_data: &EsdtTokenData<Self::Api>,
     ) -> BigUint {
-        price * &token_data.royalties / BP.into()
+        //price * &token_data.royalties / BP.into
+        price * &token_data.royalties / BP
     }
 
     fn get_token_data(
         &self,
         token_id: &TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenData<BigUint> {
+    ) -> EsdtTokenData<Self::Api> {
         let sc_address = &self.blockchain().get_sc_address();
         self.blockchain()
             .get_esdt_token_data(sc_address, token_id, nonce)
@@ -59,15 +61,15 @@ pub trait UtilsModule: storage::StorageModule {
         self.send().direct_egld(to, amount, &[]);
     }
 
-    fn auction_has_winner(&self, auction_info: &AuctionInfo<BigUint>) -> bool {
+    fn auction_has_winner(&self, auction_info: &AuctionInfo<Self::Api>) -> bool {
         auction_info.highest_bidder != ManagedAddress::zero()
     }
 
-    fn is_nft_for_sale(&self, nft_id: &NftId) -> bool {
+    fn is_nft_for_sale(&self, nft_id: &NftId<Self::Api>) -> bool {
         !self.nft_sale_info(nft_id).is_empty()
     }
 
-    fn is_nft_on_auction(&self, nft_id: &NftId) -> bool {
+    fn is_nft_on_auction(&self, nft_id: &NftId<Self::Api>) -> bool {
         !self.auction(nft_id).is_empty()
     }
 
