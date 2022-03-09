@@ -31,8 +31,8 @@ pub trait MarketplaceContract:
         &self,
         platform_fee_percent: u64,
         royalties_max_fee_percent: u64,
-        asset_min_price: Self::BigUint,
-        asset_max_price: Self::BigUint,
+        asset_min_price: BigUint,
+        asset_max_price: BigUint,
         creator_withdrawal_waiting_epochs: u64,
     ) -> SCResult<()> {
         self.try_set_platform_fee_percent(platform_fee_percent)?;
@@ -47,8 +47,8 @@ pub trait MarketplaceContract:
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[payment_amount] amount: Self::BigUint,
-        price: Self::BigUint,
+        #[payment_amount] amount: BigUint,
+        price: BigUint,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -475,7 +475,7 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let nft_id = NftId::new(token_id.clone(), nonce);
@@ -497,8 +497,8 @@ pub trait MarketplaceContract:
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[payment_amount] amount: Self::BigUint,
-        min_bid: Self::BigUint,
+        #[payment_amount] amount: BigUint,
+        min_bid: BigUint,
         deadline: u64,
         #[var_args] opt_start_time: OptionalValue<u64>,
     ) -> SCResult<()> {
@@ -560,10 +560,10 @@ pub trait MarketplaceContract:
     #[endpoint(placeBid)]
     fn place_bid(
         &self,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         token_id: TokenIdentifier,
         nonce: u64,
-        bid_amount: Self::BigUint,
+        bid_amount: BigUint,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 

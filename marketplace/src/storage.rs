@@ -4,9 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct NftId<M> 
-where
-    M: ManagedTypeApi,
+pub struct NftId<M: ManagedTypeApi> 
 {
     pub token_id: TokenIdentifier<M>,
     pub nonce: u64,
