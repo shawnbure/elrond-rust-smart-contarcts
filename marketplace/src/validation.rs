@@ -34,12 +34,12 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_valid_nft_amount(&self, amount: &Self::BigUint) -> SCResult<()> {
+    fn require_valid_nft_amount(&self, amount: &BigUint) -> SCResult<()> {
         require!(amount == &1, "Invalid amount");
         Ok(())
     }
 
-    fn require_valid_price(&self, price: &Self::BigUint) -> SCResult<()> {
+    fn require_valid_price(&self, price: &BigUint) -> SCResult<()> {
         require!(self.get_platform_cut(price) != 0, "Invalid price");
 
         let min_price = self.asset_min_price().get();
@@ -50,28 +50,28 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_valid_royalties(&self, token_data: &EsdtTokenData<Self::BigUint>) -> SCResult<()> {
+    fn require_valid_royalties(&self, token_data: &EsdtTokenData<BigUint>) -> SCResult<()> {
         let platform_fee = self.get_platform_fee_percent_or_default();
         require!(
             token_data.royalties <= self.get_royalties_max_fee_percent_or_default(),
             "Royalties too big"
         );
         require!(
-            &token_data.royalties + &platform_fee.into() < BP,
+            &token_data.royalties + &platform_fee < BP,
             "Royalties too big"
         );
         Ok(())
     }
 
-    fn require_uris_not_empty(&self, token_data: &EsdtTokenData<Self::BigUint>) -> SCResult<()> {
+    fn require_uris_not_empty(&self, token_data: &EsdtTokenData<BigUint>) -> SCResult<()> {
         require!(!token_data.uris.is_empty(), "Empty uris");
         Ok(())
     }
 
     fn require_owns_nft(
         &self,
-        address: &Address,
-        nft_sale_info: &NftSaleInfo<Self::BigUint>,
+        address: &ManagedAddress,
+        nft_sale_info: &NftSaleInfo<BigUint>,
     ) -> SCResult<()> {
         require!(address == &nft_sale_info.owner, "Not owner");
         Ok(())
@@ -79,22 +79,22 @@ pub trait ValidationModule:
 
     fn require_not_owns_nft(
         &self,
-        address: &Address,
-        nft_sale_info: &NftSaleInfo<Self::BigUint>,
+        address: &ManagedAddress,
+        nft_sale_info: &NftSaleInfo<BigUint>,
     ) -> SCResult<()> {
         require!(address != &nft_sale_info.owner, "Is owner");
         Ok(())
     }
 
-    fn require_same_amounts(&self, a: &Self::BigUint, b: &Self::BigUint) -> SCResult<()> {
+    fn require_same_amounts(&self, a: &BigUint, b: &BigUint) -> SCResult<()> {
         require!(a == b, "Amounts differ");
         Ok(())
     }
 
     fn require_has_amount_in_deposit(
         &self,
-        address: &Address,
-        amount: &Self::BigUint,
+        address: &ManagedAddress,
+        amount: &BigUint,
     ) -> SCResult<()> {
         require!(
             &self.egld_deposit(address).get() >= amount,
@@ -105,7 +105,7 @@ pub trait ValidationModule:
 
     fn require_offer_exists(
         &self,
-        address: &Address,
+        address: &ManagedAddress,
         nft_id: &NftId,
         timestamp: u64,
     ) -> SCResult<()> {
@@ -124,7 +124,7 @@ pub trait ValidationModule:
         Ok(())
     }
 
-    fn require_not_expired(&self, offer: &Offer<Self::BigUint>) -> SCResult<()> {
+    fn require_not_expired(&self, offer: &Offer<BigUint>) -> SCResult<()> {
         require!(
             offer.expire >= self.blockchain().get_block_timestamp(),
             "offer expired"
@@ -150,8 +150,8 @@ pub trait ValidationModule:
 
     fn require_not_auction_owner(
         &self,
-        address: &Address,
-        auction_info: &AuctionInfo<Self::BigUint>,
+        address: &ManagedAddress,
+        auction_info: &AuctionInfo<BigUint>,
     ) -> SCResult<()> {
         require!(address != &auction_info.owner, "Is owner");
         Ok(())
@@ -159,8 +159,8 @@ pub trait ValidationModule:
 
     fn require_owner_or_winner(
         &self,
-        address: &Address,
-        auction_info: &AuctionInfo<Self::BigUint>,
+        address: &ManagedAddress,
+        auction_info: &AuctionInfo<BigUint>,
     ) -> SCResult<()> {
         require!(
             address == &auction_info.owner || address == &auction_info.highest_bidder,
@@ -171,8 +171,8 @@ pub trait ValidationModule:
 
     fn require_auction_owner(
         &self,
-        address: &Address,
-        auction_info: &AuctionInfo<Self::BigUint>,
+        address: &ManagedAddress,
+        auction_info: &AuctionInfo<BigUint>,
     ) -> SCResult<()> {
         require!(address == &auction_info.owner, "Not owner");
         Ok(())
@@ -180,7 +180,7 @@ pub trait ValidationModule:
 
     fn require_is_auction_ongoing(
         &self,
-        auction_info: &AuctionInfo<Self::BigUint>,
+        auction_info: &AuctionInfo<BigUint>,
     ) -> SCResult<()> {
         let current_time = self.blockchain().get_block_timestamp();
         require!(
@@ -193,15 +193,15 @@ pub trait ValidationModule:
 
     fn require_valid_new_bid(
         &self,
-        new_bid: &Self::BigUint,
-        auction_info: &AuctionInfo<Self::BigUint>,
+        new_bid: &BigUint,
+        auction_info: &AuctionInfo<BigUint>,
     ) -> SCResult<()> {
         require!(new_bid >= &auction_info.min_bid, "Lower than min bid");
         require!(new_bid > &auction_info.bid, "Lower than highest bid");
         Ok(())
     }
 
-    fn require_deadline_passed(&self, auction_info: &AuctionInfo<Self::BigUint>) -> SCResult<()> {
+    fn require_deadline_passed(&self, auction_info: &AuctionInfo<BigUint>) -> SCResult<()> {
         let current_time = self.blockchain().get_block_timestamp();
         require!(
             current_time > auction_info.deadline,
@@ -212,10 +212,10 @@ pub trait ValidationModule:
 
     fn require_auction_has_winner(
         &self,
-        auction_info: &AuctionInfo<Self::BigUint>,
+        auction_info: &AuctionInfo<BigUint>,
     ) -> SCResult<()> {
         require!(
-            auction_info.highest_bidder != Address::zero(),
+            auction_info.highest_bidder != ManagedAddress::zero(),
             "Auction has no winner"
         );
         Ok(())

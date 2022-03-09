@@ -8,15 +8,15 @@ pub trait EventsModule {
     #[event("put_nft_for_sale")]
     fn put_nft_for_sale_event(
         self,
-        #[indexed] caller: Address,
+        #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] token_name: BoxedBytes,
-        #[indexed] first_uri: BoxedBytes,
-        #[indexed] second_uri: BoxedBytes,
-        #[indexed] hash: BoxedBytes,
-        #[indexed] attributes: BoxedBytes,
-        #[indexed] price: Self::BigUint,
+        #[indexed] token_name: ManagedBuffer,
+        #[indexed] first_uri: ManagedBuffer,
+        #[indexed] second_uri: ManagedBuffer,
+        #[indexed] hash: ManagedBuffer,
+        #[indexed] attributes: ManagedBuffer,
+        #[indexed] price: BigUint,
         #[indexed] royalties_percent: u64,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
@@ -25,11 +25,11 @@ pub trait EventsModule {
     #[event("buy_nft")]
     fn buy_nft_event(
         self,
-        #[indexed] owner: Address,
-        #[indexed] buyer: Address,
+        #[indexed] owner: ManagedAddress,
+        #[indexed] buyer: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] price: Self::BigUint,
+        #[indexed] price: BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
@@ -37,24 +37,24 @@ pub trait EventsModule {
     #[event("withdraw_nft")]
     fn withdraw_nft_event(
         self,
-        #[indexed] owner: Address,
+        #[indexed] owner: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] price: Self::BigUint,
+        #[indexed] price: BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
 
     #[event("deposit_update")]
-    fn deposit_update_event(&self, #[indexed] address: Address, #[indexed] amount: Self::BigUint);
+    fn deposit_update_event(&self, #[indexed] address: ManagedAddress, #[indexed] amount: BigUint);
 
     #[event("make_offer")]
     fn make_offer_event(
         &self,
-        #[indexed] offeror: Address,
+        #[indexed] offeror: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] amount: Self::BigUint,
+        #[indexed] amount: BigUint,
         #[indexed] expire: u64,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
@@ -63,10 +63,10 @@ pub trait EventsModule {
     #[event("cancel_offer")]
     fn cancel_offer_event(
         &self,
-        #[indexed] owner: Address,
+        #[indexed] owner: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] amount: Self::BigUint,
+        #[indexed] amount: BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
@@ -74,11 +74,11 @@ pub trait EventsModule {
     #[event("accept_offer")]
     fn accept_offer_event(
         &self,
-        #[indexed] owner: Address,
+        #[indexed] owner: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] offeror: Address,
-        #[indexed] amount: Self::BigUint,
+        #[indexed] offeror: ManagedAddress,
+        #[indexed] amount: BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
@@ -86,15 +86,15 @@ pub trait EventsModule {
     #[event("start_auction")]
     fn start_auction_event(
         &self,
-        #[indexed] caller: Address,
+        #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] token_name: BoxedBytes,
-        #[indexed] first_uri: BoxedBytes,
-        #[indexed] second_uri: BoxedBytes,
-        #[indexed] hash: BoxedBytes,
-        #[indexed] attributes: BoxedBytes,
-        #[indexed] min_bid: Self::BigUint,
+        #[indexed] token_name: ManagedBuffer,
+        #[indexed] first_uri: ManagedBuffer,
+        #[indexed] second_uri: ManagedBuffer,
+        #[indexed] hash: ManagedBuffer,
+        #[indexed] attributes: ManagedBuffer,
+        #[indexed] min_bid: BigUint,
         #[indexed] start_time: u64,
         #[indexed] deadline: u64,
         #[indexed] royalties_percent: u64,
@@ -105,10 +105,10 @@ pub trait EventsModule {
     #[event("place_bid")]
     fn place_bid_event(
         &self,
-        #[indexed] caller: Address,
+        #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] bid: Self::BigUint,
+        #[indexed] bid: BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );
@@ -116,11 +116,11 @@ pub trait EventsModule {
     #[event("end_auction")]
     fn end_auction_event(
         &self,
-        #[indexed] caller: Address,
+        #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] winner: Address,
-        #[indexed] bid: Self::BigUint,
+        #[indexed] winner: ManagedAddress,
+        #[indexed] bid: BigUint,
         #[indexed] timestamp: u64,
         #[indexed] tx_hash: H256,
     );

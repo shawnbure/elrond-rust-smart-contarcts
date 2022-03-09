@@ -25,8 +25,8 @@ pub trait ConfigModule: storage::StorageModule {
     #[endpoint(setAssetPriceRange)]
     fn set_asset_price_range(
         &self,
-        min_price: Self::BigUint,
-        max_price: Self::BigUint,
+        min_price: BigUint,
+        max_price: BigUint,
     ) -> SCResult<()> {
         self.try_set_asset_price_range(min_price, max_price)
     }
@@ -39,13 +39,13 @@ pub trait ConfigModule: storage::StorageModule {
 
     #[only_owner]
     #[endpoint(blacklistCreator)]
-    fn blacklist_creator(&self, address: Address) {
+    fn blacklist_creator(&self, address: ManagedAddress) {
         self.creator_blacklist(&address).set(&true);
     }
 
     #[only_owner]
     #[endpoint(removeCreatorFromBlacklist)]
-    fn remove_creator_from_blacklist(&self, address: Address) {
+    fn remove_creator_from_blacklist(&self, address: ManagedAddress) {
         self.creator_blacklist(&address).set(&false);
     }
 
@@ -58,8 +58,8 @@ pub trait ConfigModule: storage::StorageModule {
 
     fn try_set_asset_price_range(
         &self,
-        min_price: Self::BigUint,
-        max_price: Self::BigUint,
+        min_price: BigUint,
+        max_price: BigUint,
     ) -> SCResult<()> {
         require!(min_price != 0, "Min price cannot be zero");
         require!(max_price >= min_price, "Max cannot be lower than min");

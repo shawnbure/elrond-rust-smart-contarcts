@@ -28,16 +28,16 @@ pub trait UtilsModule: storage::StorageModule {
         }
     }
 
-    fn get_platform_cut(&self, price: &Self::BigUint) -> Self::BigUint {
+    fn get_platform_cut(&self, price: &BigUint) -> BigUint {
         let fee = self.get_platform_fee_percent_or_default();
         price * &fee.into() / BP.into()
     }
 
     fn get_creator_cut(
         &self,
-        price: &Self::BigUint,
-        token_data: &EsdtTokenData<Self::BigUint>,
-    ) -> Self::BigUint {
+        price: &BigUint,
+        token_data: &EsdtTokenData<BigUint>,
+    ) -> BigUint {
         price * &token_data.royalties / BP.into()
     }
 
@@ -45,22 +45,22 @@ pub trait UtilsModule: storage::StorageModule {
         &self,
         token_id: &TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenData<Self::BigUint> {
+    ) -> EsdtTokenData<BigUint> {
         let sc_address = &self.blockchain().get_sc_address();
         self.blockchain()
             .get_esdt_token_data(sc_address, token_id, nonce)
     }
 
-    fn send_nft(&self, to: &Address, token_id: &TokenIdentifier, nonce: u64) {
+    fn send_nft(&self, to: &ManagedAddress, token_id: &TokenIdentifier, nonce: u64) {
         self.send().direct(to, token_id, nonce, &1u64.into(), &[]);
     }
 
-    fn send_egld(&self, to: &Address, amount: &Self::BigUint) {
+    fn send_egld(&self, to: &ManagedAddress, amount: &BigUint) {
         self.send().direct_egld(to, amount, &[]);
     }
 
-    fn auction_has_winner(&self, auction_info: &AuctionInfo<Self::BigUint>) -> bool {
-        auction_info.highest_bidder != Address::zero()
+    fn auction_has_winner(&self, auction_info: &AuctionInfo<BigUint>) -> bool {
+        auction_info.highest_bidder != ManagedAddress::zero()
     }
 
     fn is_nft_for_sale(&self, nft_id: &NftId) -> bool {
