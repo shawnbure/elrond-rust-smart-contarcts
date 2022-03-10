@@ -11,8 +11,8 @@ const MAX_FEE_PERCENT: u64 = 10_000;
 const PLATFORM_MINT_DEFAULT_FEE_PERCENT: u64 = 150;
 
 const MIN_LOOP_ITERATION_GAS_LIMIT: u64 = 10_000_000;
-const ERDSEA_ERD721_STANDARD: &[u8] = b"Erdsea|ERD-721";
-const ERDSEA_WITHDRAW_MESSAGE: &[u8] = b"Erdsea website mint 1.5% fee";
+const YOUBEI_ERD721_STANDARD: &[u8] = b"Youbei|ERD-721";
+const YOUBEI_WITHDRAW_MESSAGE: &[u8] = b"Youbei website mint 1.5% fee";
 
 mod marketplace_proxy {
     elrond_wasm::imports!();
@@ -112,7 +112,7 @@ pub trait NftTemplate {
             self.send().direct_egld(
                 &address,
                 &big_zero,
-                ManagedBuffer::new_from_bytes(&ERDSEA_ERD721_STANDARD),
+                ManagedBuffer::new_from_bytes(&YOUBEI_ERD721_STANDARD),
             );
 
             total_amount += amount;
@@ -250,7 +250,7 @@ pub trait NftTemplate {
         self.send().direct_egld(
             &caller,
             &surplus,
-            ManagedBuffer::new_from_bytes(&ERDSEA_ERD721_STANDARD),
+            ManagedBuffer::new_from_bytes(&YOUBEI_ERD721_STANDARD),
         );
 
         self.total_sold().update(|x| *x += tokens_to_sell);
@@ -426,7 +426,7 @@ pub trait NftTemplate {
         self.marketplace_balance().update(|x| *x -= &amount);
 
         self.send()
-            .direct_egld(&caller, &amount, ERDSEA_WITHDRAW_MESSAGE);
+            .direct_egld(&caller, &amount, YOUBEI_WITHDRAW_MESSAGE);
     }
 
     #[only_owner]
