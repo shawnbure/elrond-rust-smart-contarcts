@@ -77,6 +77,7 @@ pub trait MarketplaceContract:
             nonce,
             token_data.name,
             token_data.uris.get(0).unwrap().clone(),
+            //token_data.uris.get(0),
             token_data
                 .uris
                 .get(1)
