@@ -34,24 +34,15 @@ pub trait UtilsModule: storage::StorageModule {
         price * fee / BP
     }
 
-    fn get_creator_cut(
-        &self,
-        price: &BigUint,
-        //TODO HAVE TO RESEARCH IF THIS IS LEGIT original: token_data: &EsdtTokenData,
-        token_data: &EsdtTokenData<Self::Api>,
-    ) -> BigUint {
+    //TODO HAVE TO RESEARCH IF THIS IS LEGIT original: token_data: &EsdtTokenData,
+    fn get_creator_cut(&self,price: &BigUint, token_data: &EsdtTokenData<Self::Api>,) -> BigUint {
         //price * &token_data.royalties / BP.into
         price * &token_data.royalties / BP
     }
 
-    fn get_token_data<M: ManagedTypeApi>(
-        &self,
-        token_id: &TokenIdentifier,
-        nonce: u64,    
-    ) -> EsdtTokenData <M>{
+    fn get_token_data<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier, nonce: u64,) -> EsdtTokenData<Self::Api> {
         let sc_address = &self.blockchain().get_sc_address();
-        self.blockchain()
-            .get_esdt_token_data(sc_address, token_id, nonce)
+        self.blockchain().get_esdt_token_data(sc_address, token_id, nonce)
     }
 
     fn send_nft(&self, to: &ManagedAddress, token_id: &TokenIdentifier, nonce: u64) {
