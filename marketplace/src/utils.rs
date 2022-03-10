@@ -46,7 +46,7 @@ pub trait UtilsModule: storage::StorageModule {
 
     fn get_token_data<M: ManagedTypeApi>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier,
         nonce: u64,    
     ) -> EsdtTokenData <M>{
         let sc_address = &self.blockchain().get_sc_address();
