@@ -3,6 +3,8 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use core::ops::Deref;
+
 pub mod config;
 pub mod deposit;
 pub mod events;
@@ -76,8 +78,7 @@ pub trait MarketplaceContract:
             token_id,
             nonce,
             token_data.name,
-            token_data.uris.get(0).unwrap().clone(),
-            //token_data.uris.get(0).clone(),
+            token_data.uris.get(0).deref().clone(),
             token_data
                 .uris
                 .get(1)
