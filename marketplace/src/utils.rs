@@ -40,7 +40,7 @@ pub trait UtilsModule: storage::StorageModule {
         price * &token_data.royalties / BP
     }
 
-    fn get_token_data<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier, nonce: u64,) -> EsdtTokenData<Self::Api> {
+    fn get_token_data(&self, token_id: &TokenIdentifier, nonce: u64,) -> EsdtTokenData<Self::Api> {
         let sc_address = &self.blockchain().get_sc_address();
         self.blockchain().get_esdt_token_data(sc_address, token_id, nonce)
     }

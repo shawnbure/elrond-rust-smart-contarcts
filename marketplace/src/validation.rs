@@ -58,7 +58,7 @@ pub trait ValidationModule:
         );
         require!(
             //&token_data.royalties + &platform_fee < BP,
-            token_data.royalties + platform_fee < BP,
+            &token_data.royalties + platform_fee < BP,
             "Royalties too big"
         );
         Ok(())

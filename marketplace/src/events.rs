@@ -46,7 +46,7 @@ pub trait EventsModule {
     );
 
     #[event("deposit_update")]
-    fn deposit_update_event<M: ManagedTypeApi>(
+    fn deposit_update_event(
         &self, 
         #[indexed] address: ManagedAddress, 
         #[indexed] amount: BigUint
