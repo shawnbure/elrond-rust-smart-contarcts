@@ -72,18 +72,23 @@ pub trait MarketplaceContract:
         let nft_sale_info = NftSaleInfo::new(caller.clone(), price.clone(), timestamp);
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
-        let tx_hash = self.blockchain().get_tx_hash();
+        let tx_hash = H256::from_slice(self.blockchain().get_tx_hash());
+
+        let valid_uri =  token_data.uris.get(1).deref().is_empty();
+        
+        let mut uri_1 = ManagedBuffer::new();
+        
+        if valid_uri {
+            uri_1 = token_data.uris.get(1).deref().clone();
+        }
+
         self.put_nft_for_sale_event(
             caller,
             token_id,
             nonce,
             token_data.name,
             token_data.uris.get(0).deref().clone(),
-            token_data
-                .uris
-                .get(1)
-                .unwrap_or(&ManagedBuffer::new())
-                .clone(),
+            uri_1,
             token_data.hash,
             token_data.attributes,
             price,
@@ -133,7 +138,7 @@ pub trait MarketplaceContract:
         self.nft_sale_info(&nft_id).clear();
 
         let timestamp = self.blockchain().get_block_timestamp();
-        let tx_hash = self.blockchain().get_tx_hash();
+        let tx_hash = H256::from(self.blockchain().get_tx_hash());
         self.buy_nft_event(
             nft_sale_info.owner,
             caller,

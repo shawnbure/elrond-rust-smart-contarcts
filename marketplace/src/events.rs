@@ -6,7 +6,7 @@ elrond_wasm::derive_imports!();
 #[elrond_wasm::module]
 pub trait EventsModule {
     #[event("put_nft_for_sale")]
-    fn put_nft_for_sale_event(
+    fn put_nft_for_sale_event<M: ManagedTypeApi>(
         self,
         #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
@@ -19,11 +19,11 @@ pub trait EventsModule {
         #[indexed] price: BigUint,
         #[indexed] royalties_percent: u64,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("buy_nft")]
-    fn buy_nft_event(
+    fn buy_nft_event<M: ManagedTypeApi>(
         self,
         #[indexed] owner: ManagedAddress,
         #[indexed] buyer: ManagedAddress,
@@ -31,25 +31,29 @@ pub trait EventsModule {
         #[indexed] nonce: u64,
         #[indexed] price: BigUint,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("withdraw_nft")]
-    fn withdraw_nft_event(
+    fn withdraw_nft_event<M: ManagedTypeApi>(
         self,
         #[indexed] owner: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] price: BigUint,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("deposit_update")]
-    fn deposit_update_event(&self, #[indexed] address: ManagedAddress, #[indexed] amount: BigUint);
+    fn deposit_update_event<M: ManagedTypeApi>(
+        &self, 
+        #[indexed] address: ManagedAddress, 
+        #[indexed] amount: BigUint
+    );
 
     #[event("make_offer")]
-    fn make_offer_event(
+    fn make_offer_event<M: ManagedTypeApi>(
         &self,
         #[indexed] offeror: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
@@ -57,22 +61,22 @@ pub trait EventsModule {
         #[indexed] amount: BigUint,
         #[indexed] expire: u64,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("cancel_offer")]
-    fn cancel_offer_event(
+    fn cancel_offer_event<M: ManagedTypeApi>(
         &self,
         #[indexed] owner: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: BigUint,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("accept_offer")]
-    fn accept_offer_event(
+    fn accept_offer_event<M: ManagedTypeApi>(
         &self,
         #[indexed] owner: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
@@ -80,11 +84,11 @@ pub trait EventsModule {
         #[indexed] offeror: ManagedAddress,
         #[indexed] amount: BigUint,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("start_auction")]
-    fn start_auction_event(
+    fn start_auction_event<M: ManagedTypeApi>(
         &self,
         #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
@@ -99,22 +103,22 @@ pub trait EventsModule {
         #[indexed] deadline: u64,
         #[indexed] royalties_percent: u64,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("place_bid")]
-    fn place_bid_event(
+    fn place_bid_event<M: ManagedTypeApi>(
         &self,
         #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] bid: BigUint,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 
     #[event("end_auction")]
-    fn end_auction_event(
+    fn end_auction_event<M: ManagedTypeApi>(
         &self,
         #[indexed] caller: ManagedAddress,
         #[indexed] token_id: TokenIdentifier,
@@ -122,6 +126,6 @@ pub trait EventsModule {
         #[indexed] winner: ManagedAddress,
         #[indexed] bid: BigUint,
         #[indexed] timestamp: u64,
-        #[indexed] tx_hash: H256,
+        #[indexed] tx_hash: ManagedByteArray<M, 32>,
     );
 }
