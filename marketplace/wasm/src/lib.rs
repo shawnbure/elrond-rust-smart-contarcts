@@ -1,4 +1,15 @@
 #![no_std]
 
-pub use marketplace::*;
-pub use elrond_wasm_output::*;
+elrond_wasm_node::wasm_endpoints! {
+    marketplace
+    (
+        putNftForSale
+        buyNft
+        withdrawNft
+        makeOffer
+        cancelOffer
+        startAuction
+        placeBid
+        endAuction
+    )
+}

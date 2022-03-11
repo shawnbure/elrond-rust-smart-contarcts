@@ -5,8 +5,8 @@ CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 
 #SETUP THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"           #after deploying, the the contract address
-CONTRACT_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq24kgq27esq064w3rqqxhlusld4hw9kmzy4wss4zf2s"           #after deploying, the the contract address
+CONTRACT_ADDRESS_HEX="0x00000000000000000500556c802bd9801faaba23000d7ff21f6d6ee2db62255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 
 
