@@ -3,7 +3,7 @@
 MY_WALLET_PEM="../cp-new-wallet.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqj5qg3p4uq3nup4mjrmz9c2w24k00fajty4wsh65lq7"
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq07yasnqy0qv6krp2ekpq3udngdcxr9zmy4wstruw47"
 DAO_WALLET_ADDRESS_BECH32="54d029b2a71cfec4497cc56fecb299534847aee2465cd2d32d9e55c1dc861b96"
 TOKEN_IDENTIFIER="SMBSMB-4b24c7"
 RECEIVER_ADDRESS="erd1q347usx9ajuhzxh9343a7s8py5e95n2urme5wpa0whjl5qhgu3ks8lujw9"
