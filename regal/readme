@@ -1,0 +1,38 @@
+THESE INSTRUCTIONS ARE RELEVANT FOR THE VULTR HOSTED SERVER
+
+
+
+Run these on the deployed nft_template
+
+
+Upload your pem file ::: scp wallet.pem elrond@66.42.105.19:~/chris
+
+Log in to the terminal ::: ssh elrond@66.42.105.19
+
+Navigate to directory ::: cd ~/chris
+
+Create Eagle Collection in Youbei
+
+Find the “ContractAddress” for the NFT Template
+
+Change variables at top of script ::: nano regal.sh
+
+Change the variables, when done ::: CTRL-S to save, CTRL-X to exit
+
+Turn on whitelist in Contact ::: ./regal.sh updateBuyerWhitelistCheckOn
+
+Set the price to 0 EGLD ::: ./regal.sh setZeroPrice
+
+Create Whitelist Address (and buy count & buy limit) for the Youbei Wallet ::: ./regal.sh createBuyerAddress
+
+Go to Youbei and mint the 1000
+
+Set the price to 0.85 EGLD::: ./regal.sh setInitalSalePrice
+
+Create the rest of the Whitelist Address (Youbei) using the Bulk Address Populator
+
+After WhiteList Period is over, turn off whitelist restriction and now it’s PUBLIC Mint ::: ./regal.sh updateBuyerWhitelistCheckOff
+
+Set the price to 1 EGLD ::: ./regal.sh setFinalSalePrice
+
+Remove your pen file  ::: rm  wallet.pem

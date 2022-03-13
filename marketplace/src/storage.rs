@@ -4,26 +4,42 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct NftId {
-    pub token_id: TokenIdentifier,
+pub struct NftId<M> 
+where
+    M: ManagedTypeApi,
+{
+    pub token_id: TokenIdentifier<M>,
     pub nonce: u64,
 }
 
-impl NftId {
-    pub fn new(token_id: TokenIdentifier, nonce: u64) -> Self {
-        NftId { token_id, nonce }
+//impl <M> ManagedType<M> for NftId<M>
+impl<M: ManagedTypeApi> NftId<M>
+where
+    M: ManagedTypeApi,
+{
+    pub fn new(token_id: TokenIdentifier<M>, nonce: u64) -> Self {
+        NftId { 
+            token_id, 
+            nonce,
+        }
     }
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct NftSaleInfo<BigUint: BigUintApi> {
-    pub owner: Address,
-    pub price: BigUint,
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+pub struct NftSaleInfo<M> 
+where
+    M: ManagedTypeApi,
+{
+    pub owner: ManagedAddress<M>,
+    pub price: BigUint<M>,
     pub timestamp: u64,
 }
 
-impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
-    pub fn new(owner: Address, price: BigUint, timestamp: u64) -> Self {
+impl<M: ManagedTypeApi> NftSaleInfo<M> 
+where
+    M: ManagedTypeApi,
+{
+    pub fn new(owner: ManagedAddress<M>, price: BigUint<M>, timestamp: u64) -> Self {
         NftSaleInfo {
             owner,
             price,
@@ -32,26 +48,32 @@ impl<BigUint: BigUintApi> NftSaleInfo<BigUint> {
     }
 }
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct AuctionInfo<BigUint: BigUintApi> {
-    pub owner: Address,
-    pub min_bid: BigUint,
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+pub struct AuctionInfo<M> 
+where
+    M: ManagedTypeApi,
+{
+    pub owner: ManagedAddress<M>,
+    pub min_bid: BigUint<M>,
     pub start_time: u64,
     pub deadline: u64,
     pub created_at: u64,
-    pub highest_bidder: Address,
-    pub bid: BigUint,
+    pub highest_bidder: ManagedAddress<M>,
+    pub bid: BigUint<M>,
 }
 
-impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
+impl<M: ManagedTypeApi> AuctionInfo<M> 
+where
+    M: ManagedTypeApi,
+{
     pub fn new(
-        owner: Address,
-        min_bid: BigUint,
+        owner: ManagedAddress<M>,
+        min_bid: BigUint<M>,
         start_time: u64,
         deadline: u64,
         created_at: u64,
-        highest_bidder: Address,
-        bid: BigUint,
+        highest_bidder: ManagedAddress<M>,
+        bid: BigUint<M>,
     ) -> Self {
         AuctionInfo {
             owner,
@@ -66,18 +88,24 @@ impl<BigUint: BigUintApi> AuctionInfo<BigUint> {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct Offer<BigUint: BigUintApi> {
-    pub amount: BigUint,
+pub struct Offer<M> 
+where
+    M: ManagedTypeApi,
+{
+    pub amount: BigUint<M>,
     pub expire: u64,
 }
 
-impl<BigUint: BigUintApi> Offer<BigUint> {
-    pub fn new(amount: BigUint, expire: u64) -> Self {
+impl<M: ManagedTypeApi> Offer<M> 
+where
+    M: ManagedTypeApi,
+{
+    pub fn new(amount: BigUint<M>, expire: u64) -> Self {
         Offer { amount, expire }
     }
 }
 
-impl<BigUint: BigUintApi> Default for Offer<BigUint> {
+impl<M: ManagedTypeApi> Default for Offer<M> {
     fn default() -> Self {
         Offer {
             amount: BigUint::zero(),
@@ -86,74 +114,77 @@ impl<BigUint: BigUintApi> Default for Offer<BigUint> {
     }
 }
 
-#[elrond_wasm::module]
+
+#[elrond_wasm_derive::module]
+//#[elrond_wasm::module]
 pub trait StorageModule {
+
     #[view(getPlatformFeePercent)]
     #[storage_mapper("platform_fee_percent")]
-    fn platform_fee_percent(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn platform_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getAssetMinPrice)]
     #[storage_mapper("asset_min_price")]
-    fn asset_min_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn asset_min_price(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getAssetMaxPrice)]
     #[storage_mapper("asset_max_price")]
-    fn asset_max_price(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn asset_max_price(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getRoyaltiesMaxFeePercent)]
     #[storage_mapper("royalties_max_fee_percent")]
-    fn royalties_max_fee_percent(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn royalties_max_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getCreatorWithdrawalWaitingEpochs)]
     #[storage_mapper("creator_withdrawal_waiting_epochs")]
-    fn creator_withdrawal_waiting_epochs(&self) -> SingleValueMapper<Self::Storage, u64>;
+    fn creator_withdrawal_waiting_epochs(&self) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(isCreatorBlacklisted)]
     #[storage_mapper("creator_blacklist")]
-    fn creator_blacklist(&self, address: &Address) -> SingleValueMapper<Self::Storage, bool>;
+    fn creator_blacklist(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, bool>;
 
     #[view(getEgldDeposit)]
     #[storage_mapper("egld_deposit")]
-    fn egld_deposit(&self, address: &Address) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn egld_deposit(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorRoyalties)]
     #[storage_mapper("creator_royalties")]
     fn creator_royalties(
         &self,
-        address: &Address,
-    ) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+        address: &ManagedAddress,
+    ) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorLastWithdrawalEpoch)]
     #[storage_mapper("creator_last_withdrawal_epoch")]
     fn creator_last_withdrawal_epoch(
         &self,
-        address: &Address,
-    ) -> SingleValueMapper<Self::Storage, u64>;
+        address: &ManagedAddress,
+    ) -> SingleValueMapper<Self::Api, u64>;
 
     #[view(getPlatformRoyalties)]
     #[storage_mapper("platform_royalties")]
-    fn platform_royalties(&self) -> SingleValueMapper<Self::Storage, Self::BigUint>;
+    fn platform_royalties(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getNftSaleInfo)]
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(
         &self,
-        nft_id: &NftId,
-    ) -> SingleValueMapper<Self::Storage, NftSaleInfo<Self::BigUint>>;
+        nft_id: &NftId<Self::Api>,
+    ) -> SingleValueMapper<NftSaleInfo<Self::Api>>;
 
     #[view(getOffer)]
     #[storage_mapper("offers")]
     fn offers(
         &self,
-        caller: &Address,
-        nft_id: &NftId,
+        caller: &ManagedAddress,
+        nft_id: &NftId<Self::Api>,
         nft_list_timestamp: u64,
-    ) -> SingleValueMapper<Self::Storage, Offer<Self::BigUint>>;
+    ) -> SingleValueMapper<Offer<Self::Api>>;
 
     #[view(getAuction)]
     #[storage_mapper("auction")]
     fn auction(
         &self,
-        nft_id: &NftId,
-    ) -> SingleValueMapper<Self::Storage, AuctionInfo<Self::BigUint>>;
+        nft_id: &NftId<Self::Api>,
+    ) -> SingleValueMapper<AuctionInfo<Self::Api>>;
 }

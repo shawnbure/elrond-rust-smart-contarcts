@@ -3,8 +3,8 @@ MY_WALLET_PEM="../../dev-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq24kgq27esq064w3rqqxhlusld4hw9kmzy4wss4zf2s"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x00000000000000000500556c802bd9801faaba23000d7ff21f6d6ee2db62255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 
 #SET THIS AFTER DEPLOYMENT
@@ -137,6 +137,6 @@ enableWhiteList(){
 #issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-enableWhiteList
+upgrade
 
 #------------------------------------------------

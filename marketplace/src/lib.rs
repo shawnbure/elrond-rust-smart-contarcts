@@ -3,6 +3,8 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use core::ops::Deref;
+
 pub mod config;
 pub mod deposit;
 pub mod events;
@@ -31,8 +33,8 @@ pub trait MarketplaceContract:
         &self,
         platform_fee_percent: u64,
         royalties_max_fee_percent: u64,
-        asset_min_price: Self::BigUint,
-        asset_max_price: Self::BigUint,
+        asset_min_price: BigUint,
+        asset_max_price: BigUint,
         creator_withdrawal_waiting_epochs: u64,
     ) -> SCResult<()> {
         self.try_set_platform_fee_percent(platform_fee_percent)?;
@@ -47,8 +49,8 @@ pub trait MarketplaceContract:
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[payment_amount] amount: Self::BigUint,
-        price: Self::BigUint,
+        #[payment_amount] amount: BigUint,
+        price: BigUint,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -71,17 +73,20 @@ pub trait MarketplaceContract:
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
         let tx_hash = self.blockchain().get_tx_hash();
+
+        let valid_uri = token_data.uris.get(1).deref().is_empty();
+        let mut uri_1 = ManagedBuffer::new();
+        if valid_uri {
+            uri_1 = token_data.uris.get(1).deref().clone();
+        }
+
         self.put_nft_for_sale_event(
             caller,
             token_id,
             nonce,
             token_data.name,
-            token_data.uris.get(0).unwrap().clone(),
-            token_data
-                .uris
-                .get(1)
-                .unwrap_or(&BoxedBytes::empty())
-                .clone(),
+            token_data.uris.get(0).deref().clone(),
+            uri_1,
             token_data.hash,
             token_data.attributes,
             price,
@@ -97,7 +102,7 @@ pub trait MarketplaceContract:
     #[endpoint(buyNft)]
     fn buy_nft(
         &self,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         token_id: TokenIdentifier,
         nonce: u64,
     ) -> SCResult<()> {
@@ -192,7 +197,7 @@ pub trait MarketplaceContract:
 
         let timestamp = self.blockchain().get_block_timestamp();
         let deadline_passed = timestamp > auction_info.deadline;
-        let auction_has_winner = auction_info.highest_bidder != Address::zero();
+        let auction_has_winner = auction_info.highest_bidder != ManagedAddress::zero();
         require!(
             !(deadline_passed && auction_has_winner),
             "auction has a winner"
@@ -222,8 +227,8 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
-        #[var_args] expire_opt: OptionalArg<u64>,
+        amount: BigUint,
+        #[var_args] expire_opt: OptionalValue<u64>,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -253,7 +258,7 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
         expire: u64,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
@@ -275,7 +280,7 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
         expire: u64,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
@@ -298,8 +303,8 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        offeror: Address,
-        amount: Self::BigUint,
+        offeror: ManagedAddress,
+        amount: BigUint,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -321,8 +326,8 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        offeror: Address,
-        amount: Self::BigUint,
+        offeror: ManagedAddress,
+        amount: BigUint,
     ) -> SCResult<()> {
         let nft_id = NftId::new(token_id.clone(), nonce);
         let caller = self.blockchain().get_caller();
@@ -372,8 +377,8 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        offeror: Address,
-        amount: Self::BigUint,
+        offeror: ManagedAddress,
+        amount: BigUint,
     ) -> SCResult<()> {
         let nft_id = NftId::new(token_id.clone(), nonce);
         let caller = self.blockchain().get_caller();
@@ -384,7 +389,7 @@ pub trait MarketplaceContract:
         let timestamp = self.blockchain().get_block_timestamp();
         let auction_not_started = timestamp < auction_info.start_time;
         let deadline_passed = timestamp > auction_info.deadline;
-        let has_no_winner = auction_info.highest_bidder == Address::zero();
+        let has_no_winner = auction_info.highest_bidder == ManagedAddress::zero();
         let deadline_passed_and_has_no_winner = deadline_passed && has_no_winner;
         require!(
             auction_not_started || deadline_passed_and_has_no_winner,
@@ -433,7 +438,7 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -455,7 +460,7 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let nft_id = NftId::new(token_id.clone(), nonce);
@@ -475,7 +480,7 @@ pub trait MarketplaceContract:
         &self,
         token_id: TokenIdentifier,
         nonce: u64,
-        amount: Self::BigUint,
+        amount: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let nft_id = NftId::new(token_id.clone(), nonce);
@@ -497,10 +502,10 @@ pub trait MarketplaceContract:
         &self,
         #[payment_token] token_id: TokenIdentifier,
         #[payment_nonce] nonce: u64,
-        #[payment_amount] amount: Self::BigUint,
-        min_bid: Self::BigUint,
+        #[payment_amount] amount: BigUint,
+        min_bid: BigUint,
         deadline: u64,
-        #[var_args] opt_start_time: OptionalArg<u64>,
+        #[var_args] opt_start_time: OptionalValue<u64>,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -528,22 +533,24 @@ pub trait MarketplaceContract:
             start_time,
             deadline,
             timestamp,
-            Address::zero(),
-            0u64.into(),
+            ManagedAddress::zero(),
+            BigUint::zero(),
         );
         self.auction(&nft_id).set(&auction);
+
+        let valid_uri = token_data.uris.get(1).deref().is_empty();
+        let mut uri_1 = ManagedBuffer::new();
+        if valid_uri {
+            uri_1 = token_data.uris.get(1).deref().clone();
+        }
 
         self.start_auction_event(
             caller,
             token_id,
             nonce,
             token_data.name,
-            token_data.uris.get(0).unwrap().clone(),
-            token_data
-                .uris
-                .get(1)
-                .unwrap_or(&BoxedBytes::empty())
-                .clone(),
+            token_data.uris.get(0).deref().clone(),
+            uri_1,
             token_data.hash,
             token_data.attributes,
             min_bid,
@@ -560,10 +567,10 @@ pub trait MarketplaceContract:
     #[endpoint(placeBid)]
     fn place_bid(
         &self,
-        #[payment_amount] payment: Self::BigUint,
+        #[payment_amount] payment: BigUint,
         token_id: TokenIdentifier,
         nonce: u64,
-        bid_amount: Self::BigUint,
+        bid_amount: BigUint,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 

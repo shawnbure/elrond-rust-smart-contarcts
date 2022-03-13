@@ -7,8 +7,8 @@ WASM="../output/deployer.wasm"
 #MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 #deployer contract address
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqayjmy59h2nts6g8gzdyp6rgjusvay0gry4wsnyfeml"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500e925b250b754d70d20e813481d0d12e419d23d03255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqs80ft4tuv6w2ckhnvncsatga48qjf0zfy4wsky8qrn"
+CONTRACT_ADDRESS_HEX="0x0000000000000000050081de95d57c669cac5af364f10ead1da9c124bc49255d"
 
 
 #NFT TEMPLATE ADDRESS (devnet_chub.sh)
@@ -16,8 +16,8 @@ TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqhxqvt5fxrgj4awh955a0r8mlkpwhfm24y
 TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19f7fb05d74ed55255d"
 
 #address of the MARKETPLACE SC
-MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgqptcp7pv0z7dtd8gmkahsgxnsklhca2m2y4wsxj669r"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x000000000000000005000af01f058f179ab69d1bb76f041a70b7ef8eab6a255d"
+MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgq24kgq27esq064w3rqqxhlusld4hw9kmzy4wss4zf2s"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0x00000000000000000500556c802bd9801faaba23000d7ff21f6d6ee2db62255d"
 
 
 deploy() {
