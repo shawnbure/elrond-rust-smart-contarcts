@@ -76,7 +76,7 @@ pub trait Deployer {
 
     #[only_owner]
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] amount_opt: OptionalArg<BigUint>) {
+    fn withdraw(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let amount = amount_opt.into_option().unwrap_or(
             self.blockchain()
                 .get_balance(&self.blockchain().get_sc_address()),
