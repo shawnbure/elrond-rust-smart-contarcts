@@ -11,5 +11,7 @@ elrond_wasm_node::wasm_endpoints! {
         startAuction
         placeBid
         endAuction
+        withdraw
+        deposit
     )
 }
