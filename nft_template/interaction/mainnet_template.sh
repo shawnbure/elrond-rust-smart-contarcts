@@ -3,8 +3,8 @@ MY_WALLET_PEM="../../../admin.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq0zanux4e7aw3w7glknhkrllx7ar2wemuydjs2q5u35"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x0000000000000000050078bb3e1ab9f75d17791fb4ef61ffe6f746a7677c2365"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqgkpqfvzfnut2azmam4wxwd65qen8jemvydjsvvy5ch"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x00000000000000000500458204b0499f16ae8b7ddd5c673754066679676c2365"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 #SET THIS AFTER DEPLOYMENT
 CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqayduf3tr40pja8gwd9huendczgn287rnydjs7rr06j"
@@ -51,9 +51,6 @@ deploy() {
         --send || return
 }
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqz9ktexrk53p6v43rhc93723vhxxj95qxcfqsmngnk9"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500116cbc9876a443a65623be0b1f2a2cb98d22d006c241"
-
 upgrade() {
     erdpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
         --bytecode=${WASM} \
@@ -61,7 +58,7 @@ upgrade() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=100000000 \
-        --arguments ${MY_ADDRESS_HEX} ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
+        --arguments ${MARKETPLACE_ADDRESS_HEX} ${MY_TOKEN_ID} ${ROYALTIES} ${MY_TOKEN_NAME_BASE} ${MY_TOKEN_IMAGE_BASE_URI} ${MY_TOKEN_IMAGE_EXTENSION} ${PRICE} ${MAX_SUPPLY} ${SALE_START} ${MY_TOKEN_METADATA_BASE_URI} \
         --send || return
 }
 
@@ -115,6 +112,6 @@ withdraw() {
 # issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-deploy
+upgrade
 
 #------------------------------------------------
