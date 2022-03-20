@@ -2,9 +2,11 @@ MY_WALLET_PEM="../../../admin.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
 WASM="../output/marketplace.wasm"
+VERSION="0.0.1"
+VERSION_HEX=0x302E302E31
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq0zanux4e7aw3w7glknhkrllx7ar2wemuydjs2q5u35"
-CONTRACT_ADDRESS_HEX="0x0000000000000000050078bb3e1ab9f75d17791fb4ef61ffe6f746a7677c2365"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqgkpqfvzfnut2azmam4wxwd65qen8jemvydjsvvy5ch"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500458204b0499f16ae8b7ddd5c673754066679676c2365"
 MY_ADDRESS="erd126"
 
 deploy() {
@@ -14,7 +16,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${VERSION_HEX} \
         --send || return
 }
 
