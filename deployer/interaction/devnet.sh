@@ -3,12 +3,14 @@ MY_OTHER_WALLET_PEM="../../dev-extra-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/deployer.wasm"
+VERSION="0.0.1"
+VERSION_HEX=0x302E302E31
 
 #MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 #deployer contract address
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqs80ft4tuv6w2ckhnvncsatga48qjf0zfy4wsky8qrn"
-CONTRACT_ADDRESS_HEX="0x0000000000000000050081de95d57c669cac5af364f10ead1da9c124bc49255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq07x0mw47kwa2404f82j5lzdx77wktly3y4wsn0da87"
+CONTRACT_ADDRESS_HEX="0x000000000000000005007f8cfdbabeb3baaabea93aa54f89a6f79d65fc91255d"
 
 
 #NFT TEMPLATE ADDRESS (devnet_chub.sh)
@@ -16,8 +18,8 @@ TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqhxqvt5fxrgj4awh955a0r8mlkpwhfm24y
 TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19f7fb05d74ed55255d"
 
 #address of the MARKETPLACE SC
-MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgq24kgq27esq064w3rqqxhlusld4hw9kmzy4wss4zf2s"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x00000000000000000500556c802bd9801faaba23000d7ff21f6d6ee2db62255d"
+MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgq9dsuu03gndvucfsds3effym2mxffz45ty4wsu0llcm"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0x000000000000000005002b61ce3e289b59cc260d847294936ad99291568b255d"
 
 
 deploy() {
@@ -27,7 +29,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=50000000 \
-        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} \
+        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} ${VERSION_HEX} \
         --send || return
 }
 

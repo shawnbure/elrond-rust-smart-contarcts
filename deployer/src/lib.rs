@@ -6,7 +6,13 @@ elrond_wasm::derive_imports!();
 #[elrond_wasm::contract]
 pub trait Deployer {
     #[init]
-    fn init(&self, nft_template_address: ManagedAddress, marketplace_admin: ManagedAddress) {
+    fn init(
+        &self,
+        nft_template_address: ManagedAddress,
+        marketplace_admin: ManagedAddress,
+        version: ManagedBuffer,
+    ) {
+        self.version().set(&version);
         self.nft_template_address().set(&nft_template_address);
         self.marketplace_admin().set(&marketplace_admin);
     }
@@ -76,7 +82,7 @@ pub trait Deployer {
 
     #[only_owner]
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] amount_opt: OptionalArg<BigUint>) {
+    fn withdraw(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
         let amount = amount_opt.into_option().unwrap_or(
             self.blockchain()
                 .get_balance(&self.blockchain().get_sc_address()),
@@ -108,4 +114,8 @@ pub trait Deployer {
     #[view(getOwnerOfContract)]
     #[storage_mapper("owner_of_contract")]
     fn owner_of_contract(&self, sc_address: &ManagedAddress) -> SingleValueMapper<ManagedAddress>;
+
+    #[view(getversion)]
+    #[storage_mapper("version")]
+    fn version(&self) -> SingleValueMapper<ManagedBuffer>;
 }
