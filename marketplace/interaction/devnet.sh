@@ -3,10 +3,11 @@ MY_OTHER_WALLET_PEM="../../dev-extra-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
-
+VERSION="0.0.1"
+VERSION_HEX=0x302E302E31
 #SETUP THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq24kgq27esq064w3rqqxhlusld4hw9kmzy4wss4zf2s"           #after deploying, the the contract address
-CONTRACT_ADDRESS_HEX="0x00000000000000000500556c802bd9801faaba23000d7ff21f6d6ee2db62255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq9dsuu03gndvucfsds3effym2mxffz45ty4wsu0llcm"           #after deploying, the the contract address
+CONTRACT_ADDRESS_HEX="0x000000000000000005002b61ce3e289b59cc260d847294936ad99291568b255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 
 
@@ -23,7 +24,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${VERSION_HEX} \
         --send || return
 }
 

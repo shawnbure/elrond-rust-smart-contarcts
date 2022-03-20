@@ -36,7 +36,9 @@ pub trait MarketplaceContract:
         asset_min_price: BigUint,
         asset_max_price: BigUint,
         creator_withdrawal_waiting_epochs: u64,
+        version: ManagedBuffer,
     ) -> SCResult<()> {
+        self.version().set(&version);
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
@@ -645,4 +647,8 @@ pub trait MarketplaceContract:
         );
         Ok(())
     }
+
+    #[view(getversion)]
+    #[storage_mapper("version")]
+    fn version(&self) -> SingleValueMapper<ManagedBuffer>;
 }
