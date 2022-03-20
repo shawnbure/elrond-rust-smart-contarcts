@@ -45,7 +45,7 @@ pub trait Deployer {
             self.blockchain().get_gas_left(),
             &BigUint::zero(),
             &self.nft_template_address().get(),
-            CodeMetadata::PAYABLE,
+            CodeMetadata::PAYABLE | CodeMetadata::UPGRADEABLE,
             &arg_buffer,
         );
 
