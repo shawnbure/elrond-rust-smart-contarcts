@@ -2,6 +2,8 @@ MY_WALLET_PEM="../../../admin.pem"
 PROXY="https://gateway.elrond.com"
 CHAIN_ID="1"
 WASM="../output/deployer.wasm"
+VERSION="0.0.1"
+VERSION_HEX=0x302E302E31
 
 MY_ADDRESS="erd126"
 CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq9vpuwyf6q7d0qg2guq2zn0llumvtmuspydjsj5ul79"
@@ -11,8 +13,8 @@ CONTRACT_ADDRESS_HEX="0x000000000000000005002b03c7113a079af02148e01429bfffe6d8bd
 TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqayduf3tr40pja8gwd9huendczgn287rnydjs7rr06j"
 TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500e91bc4c563abc32e9d0e696fcccdb81226a3f8732365"
 
-MARKETPLACE_ADMIN_ADDRESS="erd1qqqqqqqqqqqqqpgqgkpqfvzfnut2azmam4wxwd65qen8jemvydjsvvy5ch"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x00000000000000000500458204b0499f16ae8b7ddd5c673754066679676c2365"
+MARKETPLACE_ADMIN_ADDRESS="erd1uww6wsvmxq9k88n00rpz3txyshuj2elvl0wk5y74yx3la359ydjscw6ew8"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0xe39da7419b300b639e6f78c228acc485f92567ecfbdd6a13d521a3fec6852365"
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -21,9 +23,21 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=50000000 \
-        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} \
+        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} ${VERSION_HEX} \
         --send || return
 }
+
+upgrade() {
+    erdpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
+        --bytecode=${WASM} \
+        --pem=${MY_WALLET_PEM} \
+        --metadata-payable \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --gas-limit=50000000 \
+        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} ${VERSION_HEX} \
+        --send || return
+}
+
 
 MY_TOKEN_NAME="0x4d4f4e4b"
 MY_TOKEN_TICKER="0x4d4f4e4b"
@@ -127,4 +141,4 @@ withdraw() {
         --send || return
 }
 
-deploy
+upgrade
