@@ -7,10 +7,12 @@ elrond_wasm_node::wasm_endpoints! {
         buyNft
         withdrawNft
         makeOffer
+        acceptOffer
         cancelOffer
         startAuction
         placeBid
         endAuction
+        getVersion
         withdraw
         deposit
     )

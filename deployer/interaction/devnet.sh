@@ -21,7 +21,6 @@ TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19
 MARKETPLACE_ADMIN_ADDRESS="erd1p39zv9xw5ftpfxy9s9afzkjaafadk9na44fput904luqgmpmh8rsrtwufq"
 MARKETPLACE_ADMIN_ADDRESS_HEX="0x0c4a2614cea256149885817a915a5dea7adb167dad521e2cafaff8046c3bb9c7"
 
-
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
         --bytecode=${WASM} \
@@ -32,6 +31,18 @@ deploy() {
         --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} ${VERSION_HEX} \
         --send || return
 }
+
+upgrade() {
+    erdpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
+        --bytecode=${WASM} \
+        --pem=${MY_WALLET_PEM} \
+        --metadata-payable \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --gas-limit=50000000 \
+        --arguments ${TEMPLATE_CONTRACT_ADDRESS_HEX} ${MARKETPLACE_ADMIN_ADDRESS_HEX} ${VERSION_HEX} \
+        --send || return
+}
+
 
 MY_TOKEN_NAME="0x43485542"
 MY_TOKEN_TICKER="0x43485542"
@@ -142,6 +153,6 @@ withdraw() {
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-deploy
+upgrade
 
 #------------------------------------------------

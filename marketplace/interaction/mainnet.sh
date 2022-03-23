@@ -165,4 +165,4 @@ getCreatorLastWithdrawalEpoch() {
         --arguments $1
 }
 
-deploy
+upgrade

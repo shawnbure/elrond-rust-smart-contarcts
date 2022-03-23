@@ -648,7 +648,7 @@ pub trait MarketplaceContract:
         Ok(())
     }
 
-    #[view(getversion)]
+    #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
 }
