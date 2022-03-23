@@ -51,7 +51,6 @@ where
     M: ManagedTypeApi,
 {
     pub owner: ManagedAddress<M>,
-    pub admin: ManagedAddress<M>,
     pub min_bid: BigUint<M>,
     pub start_time: u64,
     pub deadline: u64,
@@ -66,7 +65,6 @@ where
 {
     pub fn new(
         owner: ManagedAddress<M>,
-        admin: ManagedAddress<M>,
         min_bid: BigUint<M>,
         start_time: u64,
         deadline: u64,
@@ -76,7 +74,6 @@ where
     ) -> Self {
         AuctionInfo {
             owner,
-            admin,
             min_bid,
             start_time,
             deadline,

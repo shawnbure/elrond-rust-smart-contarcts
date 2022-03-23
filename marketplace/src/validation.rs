@@ -157,14 +157,6 @@ pub trait ValidationModule:
         require!(address != &auction_info.owner, "Is owner");
         Ok(())
     }
-    fn require_not_auction_admin(
-        &self,
-        address: &ManagedAddress,
-        auction_info: &AuctionInfo<Self::Api>,
-    ) -> SCResult<()> {
-        require!(address != &auction_info.admin, "Is admin");
-        Ok(())
-    }
     fn require_owner_or_winner(
         &self,
         address: &ManagedAddress,
@@ -172,17 +164,6 @@ pub trait ValidationModule:
     ) -> SCResult<()> {
         require!(
             address == &auction_info.owner || address == &auction_info.highest_bidder,
-            "Not owner or winner"
-        );
-        Ok(())
-    }
-    fn require_admin_or_winner(
-        &self,
-        address: &ManagedAddress,
-        auction_info: &AuctionInfo<Self::Api>,
-    ) -> SCResult<()> {
-        require!(
-            address == &auction_info.admin || address == &auction_info.highest_bidder,
             "Not owner or winner"
         );
         Ok(())
