@@ -4,7 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct NftId<M> 
+pub struct NftId<M>
 where
     M: ManagedTypeApi,
 {
@@ -18,15 +18,12 @@ where
     M: ManagedTypeApi,
 {
     pub fn new(token_id: TokenIdentifier<M>, nonce: u64) -> Self {
-        NftId { 
-            token_id, 
-            nonce,
-        }
+        NftId { token_id, nonce }
     }
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct NftSaleInfo<M> 
+pub struct NftSaleInfo<M>
 where
     M: ManagedTypeApi,
 {
@@ -35,7 +32,7 @@ where
     pub timestamp: u64,
 }
 
-impl<M: ManagedTypeApi> NftSaleInfo<M> 
+impl<M: ManagedTypeApi> NftSaleInfo<M>
 where
     M: ManagedTypeApi,
 {
@@ -49,11 +46,12 @@ where
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct AuctionInfo<M> 
+pub struct AuctionInfo<M>
 where
     M: ManagedTypeApi,
 {
     pub owner: ManagedAddress<M>,
+    pub admin: ManagedAddress<M>,
     pub min_bid: BigUint<M>,
     pub start_time: u64,
     pub deadline: u64,
@@ -62,12 +60,13 @@ where
     pub bid: BigUint<M>,
 }
 
-impl<M: ManagedTypeApi> AuctionInfo<M> 
+impl<M: ManagedTypeApi> AuctionInfo<M>
 where
     M: ManagedTypeApi,
 {
     pub fn new(
         owner: ManagedAddress<M>,
+        admin: ManagedAddress<M>,
         min_bid: BigUint<M>,
         start_time: u64,
         deadline: u64,
@@ -77,6 +76,7 @@ where
     ) -> Self {
         AuctionInfo {
             owner,
+            admin,
             min_bid,
             start_time,
             deadline,
@@ -88,7 +88,7 @@ where
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct Offer<M> 
+pub struct Offer<M>
 where
     M: ManagedTypeApi,
 {
@@ -96,7 +96,7 @@ where
     pub expire: u64,
 }
 
-impl<M: ManagedTypeApi> Offer<M> 
+impl<M: ManagedTypeApi> Offer<M>
 where
     M: ManagedTypeApi,
 {
@@ -114,11 +114,9 @@ impl<M: ManagedTypeApi> Default for Offer<M> {
     }
 }
 
-
 #[elrond_wasm_derive::module]
 //#[elrond_wasm::module]
 pub trait StorageModule {
-
     #[view(getPlatformFeePercent)]
     #[storage_mapper("platform_fee_percent")]
     fn platform_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
@@ -149,10 +147,7 @@ pub trait StorageModule {
 
     #[view(getCreatorRoyalties)]
     #[storage_mapper("creator_royalties")]
-    fn creator_royalties(
-        &self,
-        address: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Api, BigUint>;
+    fn creator_royalties(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getCreatorLastWithdrawalEpoch)]
     #[storage_mapper("creator_last_withdrawal_epoch")]
@@ -167,10 +162,8 @@ pub trait StorageModule {
 
     #[view(getNftSaleInfo)]
     #[storage_mapper("nft_sale_info")]
-    fn nft_sale_info(
-        &self,
-        nft_id: &NftId<Self::Api>,
-    ) -> SingleValueMapper<NftSaleInfo<Self::Api>>;
+    fn nft_sale_info(&self, nft_id: &NftId<Self::Api>)
+        -> SingleValueMapper<NftSaleInfo<Self::Api>>;
 
     #[view(getOffer)]
     #[storage_mapper("offers")]
@@ -183,8 +176,5 @@ pub trait StorageModule {
 
     #[view(getAuction)]
     #[storage_mapper("auction")]
-    fn auction(
-        &self,
-        nft_id: &NftId<Self::Api>,
-    ) -> SingleValueMapper<AuctionInfo<Self::Api>>;
+    fn auction(&self, nft_id: &NftId<Self::Api>) -> SingleValueMapper<AuctionInfo<Self::Api>>;
 }

@@ -37,11 +37,13 @@ pub trait MarketplaceContract:
         asset_max_price: BigUint,
         creator_withdrawal_waiting_epochs: u64,
         version: ManagedBuffer,
+        admin: ManagedAddress,
     ) -> SCResult<()> {
         self.version().set(&version);
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
+        self.admin().set(&admin);
         self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)
     }
 
@@ -531,6 +533,7 @@ pub trait MarketplaceContract:
         let caller = self.blockchain().get_caller();
         let auction = AuctionInfo::new(
             caller.clone(),
+            self.admin().get(),
             min_bid.clone(),
             start_time,
             deadline,
@@ -651,4 +654,7 @@ pub trait MarketplaceContract:
     #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
+
+    #[storage_mapper("admin")]
+    fn admin(&self) -> SingleValueMapper<ManagedAddress>;
 }
