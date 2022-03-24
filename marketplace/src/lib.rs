@@ -36,7 +36,7 @@ pub trait MarketplaceContract:
         asset_min_price: BigUint,
         asset_max_price: BigUint,
         creator_withdrawal_waiting_epochs: u64,
-        version: ManagedBuffer
+        version: ManagedBuffer,
     ) -> SCResult<()> {
         self.version().set(&version);
         self.try_set_platform_fee_percent(platform_fee_percent)?;
@@ -75,11 +75,12 @@ pub trait MarketplaceContract:
 
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
         let tx_hash = self.blockchain().get_tx_hash();
-
-        let valid_uri = token_data.uris.get(1).deref().is_empty();
         let mut uri_1 = ManagedBuffer::new();
-        if valid_uri {
-            uri_1 = token_data.uris.get(1).deref().clone();
+        if token_data.uris.len() > 0 {
+            let valid_uri = token_data.uris.get(1).deref().is_empty();
+            if valid_uri {
+                uri_1 = token_data.uris.get(1).deref().clone();
+            }
         }
 
         self.put_nft_for_sale_event(
@@ -651,5 +652,4 @@ pub trait MarketplaceContract:
     #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
-
 }
