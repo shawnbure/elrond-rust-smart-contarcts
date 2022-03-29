@@ -9,17 +9,20 @@ VERSION_HEX=0x302E302E31
 #MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 #deployer contract address
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq07x0mw47kwa2404f82j5lzdx77wktly3y4wsn0da87"
-CONTRACT_ADDRESS_HEX="0x000000000000000005007f8cfdbabeb3baaabea93aa54f89a6f79d65fc91255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq64up20w6qxn4ggpag7lqva9djnft5xk3y4wsph6j65"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500d578153dda01a754203d47be0674ad94d2ba1ad1255d"
 
 
 #NFT TEMPLATE ADDRESS (devnet_chub.sh)
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqhxqvt5fxrgj4awh955a0r8mlkpwhfm24y4ws7j90gc"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19f7fb05d74ed55255d"
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqk7urez32w4e6zp7rwplcd84czzk3cgajy4wstfraum"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500b7b83c8a2a7573a107c3707f869eb810ad1c23b2255d"
 
 #address of the MARKETPLACE SC
 MARKETPLACE_ADMIN_ADDRESS="erd1p39zv9xw5ftpfxy9s9afzkjaafadk9na44fput904luqgmpmh8rsrtwufq"
 MARKETPLACE_ADMIN_ADDRESS_HEX="0x0c4a2614cea256149885817a915a5dea7adb167dad521e2cafaff8046c3bb9c7"
+
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq9gkhgnlw460c2heqnf47xa57e22tnutqy4wsxknlpf"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x000000000000000005002a2d744feeae9f855f209a6be3769eca94b9f160255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
@@ -153,6 +156,6 @@ withdraw() {
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-upgrade
+deploy
 
 #------------------------------------------------

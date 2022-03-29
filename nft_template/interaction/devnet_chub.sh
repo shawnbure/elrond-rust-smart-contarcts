@@ -3,12 +3,12 @@ MY_WALLET_PEM="../../dev-wallet-owner.pem"
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN_ID="D"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq9dsuu03gndvucfsds3effym2mxffz45ty4wsu0llcm"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005002b61ce3e289b59cc260d847294936ad99291568b255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq9gkhgnlw460c2heqnf47xa57e22tnutqy4wsxknlpf"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x000000000000000005002a2d744feeae9f855f209a6be3769eca94b9f160255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 #SET THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqhxqvt5fxrgj4awh955a0r8mlkpwhfm24y4ws7j90gc"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500b980c5d1261a255ebae5a53af19f7fb05d74ed55255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqk7urez32w4e6zp7rwplcd84czzk3cgajy4wstfraum"
+CONTRACT_ADDRESS_HEX="0x00000000000000000500b7b83c8a2a7573a107c3707f869eb810ad1c23b2255d"
 
 
 #  erdpy wallet bech32 --decode erd1qqqqqqqqqqqqqpgqw5hck8z6qvsmmpzfvm7d0v8y35hnknxdy4ws5yth92
@@ -33,9 +33,9 @@ issueNft() {
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --send || return
 }
-
+# CHUB-d8c42e
 WASM="../output/nft_template.wasm"   #
-MY_TOKEN_ID="0x434855422d626165633062" #Fill this after issue
+MY_TOKEN_ID="0x434855422D643863343265" #Fill this after issue
 ROYALTIES=0x02EE #7.5%
 MY_TOKEN_NAME_BASE="0x4368756262696672656e73"   #Chubbifrens
 MY_TOKEN_IMAGE_BASE_URI="0x68747470733a2f2f7777772e63687562626976657273652e636f6d2f6672656e"    #https://www.chubbiverse.com/fren
@@ -133,9 +133,9 @@ enableWhiteList(){
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
 # RUN THIS INITIAL TO GET TOKEN ID 
-#issueNft
+# issueNft
 
 # DEPLOY AFTER YOU ISSUE_NFT
-upgrade
+ deploy
 
 #------------------------------------------------
