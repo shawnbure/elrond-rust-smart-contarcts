@@ -6,8 +6,8 @@ WASM="../output/marketplace.wasm"
 VERSION="0.0.1"
 VERSION_HEX=0x302E302E31
 #SETUP THIS AFTER DEPLOYMENT
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq9dsuu03gndvucfsds3effym2mxffz45ty4wsu0llcm"           #after deploying, the the contract address
-CONTRACT_ADDRESS_HEX="0x000000000000000005002b61ce3e289b59cc260d847294936ad99291568b255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq9gkhgnlw460c2heqnf47xa57e22tnutqy4wsxknlpf"           #after deploying, the the contract address
+CONTRACT_ADDRESS_HEX="0x000000000000000005002a2d744feeae9f855f209a6be3769eca94b9f160255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
@@ -173,6 +173,6 @@ getCreatorLastWithdrawalEpoch() {
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-upgrade
+deploy
 
 #------------------------------------------------
