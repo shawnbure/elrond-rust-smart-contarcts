@@ -76,7 +76,7 @@ pub trait MarketplaceContract:
         self.nft_sale_info(&nft_id).set(&nft_sale_info);
         let tx_hash = self.blockchain().get_tx_hash();
         let mut uri_1 = ManagedBuffer::new();
-        if token_data.uris.len() > 0 {
+        if token_data.uris.len() > 1 {
             let valid_uri = token_data.uris.get(1).deref().is_empty();
             if valid_uri {
                 uri_1 = token_data.uris.get(1).deref().clone();

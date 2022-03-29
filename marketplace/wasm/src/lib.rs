@@ -15,5 +15,18 @@ elrond_wasm_node::wasm_endpoints! {
         getVersion
         withdraw
         deposit
+        getPlatformFeePercent
+        getAssetMinPrice
+        getAssetMaxPrice
+        getRoyaltiesMaxFeePercent
+        getCreatorWithdrawalWaitingEpochs
+        isCreatorBlacklisted
+        getEgldDeposit
+        getCreatorRoyalties
+        getCreatorLastWithdrawalEpoch
+        getPlatformRoyalties
+        getNftSaleInfo
+        getOffer
+        getAuction
     )
 }

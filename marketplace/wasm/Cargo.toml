@@ -17,17 +17,16 @@ members = [ ".",]
 codegen-units = 1
 opt-level = "z"
 lto = true
-debug = false
+debug = true
 panic = "abort"
 
 [dependencies.marketplace]
 features = [ "wasm-output-mode",]
-default-features = false
 path = ".."
 
 [dependencies.elrond-wasm-output]
 version = "0.29.3"
-features = [ "wasm-output-mode",]
+features = [ "wasm-output-mode"]
 
 [dependencies.elrond-wasm-node]
 version = "0.29.3"
