@@ -9,20 +9,20 @@ VERSION_HEX=0x302E302E31
 #MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
 #deployer contract address
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgq64up20w6qxn4ggpag7lqva9djnft5xk3y4wsph6j65"
-CONTRACT_ADDRESS_HEX="0x00000000000000000500d578153dda01a754203d47be0674ad94d2ba1ad1255d"
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqstgev4w98pdgfd3ypazd6l23hfvdr8xwy4wsgpuhp9"
+CONTRACT_ADDRESS_HEX="0x0000000000000000050082d19655c5385a84b6240f44dd7d51ba58d19cce255d"
 
 
 #NFT TEMPLATE ADDRESS (devnet_chub.sh)
-TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqk7urez32w4e6zp7rwplcd84czzk3cgajy4wstfraum"
-TEMPLATE_CONTRACT_ADDRESS_HEX="0x00000000000000000500b7b83c8a2a7573a107c3707f869eb810ad1c23b2255d"
+TEMPLATE_CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqnuq2rks9t4quexc5gvwj97e493regre9y4wsw55lxl"
+TEMPLATE_CONTRACT_ADDRESS_HEX="0x000000000000000005009f00a1da055d41cc9b14431d22fb352c47940f25255d"
 
 #address of the MARKETPLACE SC
-MARKETPLACE_ADMIN_ADDRESS="erd1p39zv9xw5ftpfxy9s9afzkjaafadk9na44fput904luqgmpmh8rsrtwufq"
-MARKETPLACE_ADMIN_ADDRESS_HEX="0x0c4a2614cea256149885817a915a5dea7adb167dad521e2cafaff8046c3bb9c7"
+MARKETPLACE_ADMIN_ADDRESS="erd1hh7gte28hahk9htwlhzf3gretusckhrqf4y6xv5p9qwznhn7y4wswnzua3"
+MARKETPLACE_ADMIN_ADDRESS_HEX="0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d"
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgq9gkhgnlw460c2heqnf47xa57e22tnutqy4wsxknlpf"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005002a2d744feeae9f855f209a6be3769eca94b9f160255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqjq5wlj36spzvf9ppq2ae242wv9a78avcy4ws8ktslw"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+MARKETPLACE_ADDRESS_HEX="0x000000000000000005009028efca3a8044c4942102bb95554e617be3f598255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
