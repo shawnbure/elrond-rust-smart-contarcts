@@ -694,4 +694,13 @@ pub trait NftTemplate {
         //1: On and 0: Off
         self.metadata_extension().set(&metadata_extension);
     }
+
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(updateSaleStart)]
+    fn update_sale_start(&self, time: u64) {
+        //1: On and 0: Off
+        self.sale_start().set(&time);
+    }
+
 }

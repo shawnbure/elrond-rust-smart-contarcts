@@ -12,6 +12,7 @@ CONTRACT_ADDRESS_HEX="0x000000000000000005002a2d744feeae9f855f209a6be3769eca94b9
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
 
+DAO_ADDRESS="0x6b3d87c350a9fc286199e186de9e479dc9a2b58808083b7c419afbf358082319"
 deploy() {
     erdpy --verbose contract deploy --recall-nonce \
         --bytecode=${WASM} \
@@ -19,7 +20,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${VERSION_HEX} \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${VERSION_HEX} \
         --send || return
 }
 
@@ -30,7 +31,7 @@ upgrade() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${VERSION_HEX} \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${VERSION_HEX} \
         --send || return
 }
 

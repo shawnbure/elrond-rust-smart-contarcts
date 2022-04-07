@@ -36,9 +36,11 @@ pub trait MarketplaceContract:
         asset_min_price: BigUint,
         asset_max_price: BigUint,
         creator_withdrawal_waiting_epochs: u64,
+        dao_address: ManagedAddress,
         version: ManagedBuffer,
     ) -> SCResult<()> {
         self.version().set(&version);
+        self.dao().set(&dao_address);
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
@@ -109,6 +111,8 @@ pub trait MarketplaceContract:
         token_id: TokenIdentifier,
         nonce: u64,
     ) -> SCResult<()> {
+        let payment_token: EsdtTokenPayment<Self::Api> = self.call_value().payment();
+
         self.require_global_op_not_ongoing()?;
 
         self.require_valid_token_id(&token_id)?;
@@ -121,21 +125,39 @@ pub trait MarketplaceContract:
         let nft_sale_info = self.nft_sale_info(&nft_id).get();
         self.require_not_owns_nft(&caller, &nft_sale_info)?;
 
-        let price = &nft_sale_info.price;
-        self.try_increase_decrease_deposit(&caller, &payment, price)?;
+        let price = nft_sale_info.price;
+        // self.try_increase_decrease_deposit(&caller, &payment, price)?;
+        require!(payment == price, "not right amount of payment");
 
         let token_data = self.get_token_data(&token_id, nonce);
         let creator_cut = self.get_creator_cut(&payment, &token_data);
         self.set_creator_last_withdrawal_epoch_if_empty(&token_data.creator);
-        self.increase_creator_royalties(&token_data.creator, &creator_cut);
+        // self.increase_creator_royalties(&token_data.creator, &creator_cut);
 
+        let _amount_left = self.send().sell_nft(
+            &token_id,
+            nonce,
+            &1u64.into(),
+            &caller,
+            &payment_token.token_identifier,
+            payment_token.token_nonce,
+            &(&creator_cut * &10u64.into()),
+        );
+        
         let platform_cut = self.get_platform_cut(&payment);
-        self.increase_platform_royalties(&platform_cut);
+        // self.increase_platform_royalties(&platform_cut);
+        self.send()
+            .direct_egld(&self.dao().get(), &platform_cut, b"DAO's Cut");
 
-        let nft_owner_cut = &payment - &platform_cut - creator_cut;
-        self.increase_deposit(&nft_sale_info.owner, &nft_owner_cut);
+        let nft_owner_cut = &payment - &platform_cut - &creator_cut;
+        // self.increase_deposit(&nft_sale_info.owner, &nft_owner_cut);
+        self.send()
+            .direct_egld(&nft_sale_info.owner, &nft_owner_cut, b"Seller's Cut");
 
-        self.send_nft(&caller, &token_id, nonce);
+        // self.send()
+        //     .direct_egld(&token_data.creator, &creator_cut, b"Creator's Cut");
+
+        // self.send_nft(&caller, &token_id, nonce);
         self.nft_sale_info(&nft_id).clear();
 
         let timestamp = self.blockchain().get_block_timestamp();
@@ -652,4 +674,8 @@ pub trait MarketplaceContract:
     #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
+
+    #[view(getDao)]
+    #[storage_mapper("dao")]
+    fn dao(&self) -> SingleValueMapper<ManagedAddress>;
 }

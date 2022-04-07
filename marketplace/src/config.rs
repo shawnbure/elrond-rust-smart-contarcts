@@ -5,7 +5,7 @@ use super::storage;
 
 pub const BP: u64 = 10_000;
 pub const DEFAULT_FEE_PERCENT: u64 = 250;
-pub const ROYALTIES_MAX_FEE_PERCENT: u64 = 1_000;
+pub const ROYALTIES_MAX_FEE_PERCENT: u64 = 2_500;
 
 #[elrond_wasm::module]
 pub trait ConfigModule: storage::StorageModule {
@@ -23,11 +23,7 @@ pub trait ConfigModule: storage::StorageModule {
 
     #[only_owner]
     #[endpoint(setAssetPriceRange)]
-    fn set_asset_price_range(
-        &self,
-        min_price: BigUint,
-        max_price: BigUint,
-    ) -> SCResult<()> {
+    fn set_asset_price_range(&self, min_price: BigUint, max_price: BigUint) -> SCResult<()> {
         self.try_set_asset_price_range(min_price, max_price)
     }
 
@@ -56,11 +52,7 @@ pub trait ConfigModule: storage::StorageModule {
         Ok(())
     }
 
-    fn try_set_asset_price_range(
-        &self,
-        min_price: BigUint,
-        max_price: BigUint,
-    ) -> SCResult<()> {
+    fn try_set_asset_price_range(&self, min_price: BigUint, max_price: BigUint) -> SCResult<()> {
         require!(min_price != 0, "Min price cannot be zero");
         require!(max_price >= min_price, "Max cannot be lower than min");
         self.asset_min_price().set(&min_price);
