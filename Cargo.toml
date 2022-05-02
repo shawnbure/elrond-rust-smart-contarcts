@@ -6,4 +6,6 @@ members = [
   "nft_template/abi",
   "deployer",
   "deployer/abi",
+  "staking",
+  "staking/abi",  
 ]

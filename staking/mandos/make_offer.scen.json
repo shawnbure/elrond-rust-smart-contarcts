@@ -1,0 +1,86 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "sell.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "50,000",
+                "function": "deposit",
+                "arguments": [],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "makeOffer",
+                "arguments": [
+                    "str:NFT1-abcdef",
+                    "100",
+                    "50,000"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "50,000",
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "balance": "1",
+                            "nonce": "100"
+                        },
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT1-abcdef|u64:100": "address:owner|biguint:100,000|u64:0",
+                        "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|biguint:200,000|u64:0",
+                        "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
+                        "str:asset_min_price": "100",
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30",
+                        "str:egld_deposit|address:a_user": "50,000",
+                        "str:offers|address:a_user|nested:str:NFT1-abcdef|u64:100|u64:0": "biguint:50,000|u64:31,556,952"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

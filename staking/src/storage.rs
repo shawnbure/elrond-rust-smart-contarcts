@@ -202,68 +202,16 @@ impl<M: ManagedTypeApi> Default for Offer<M> {
 pub trait StorageModule {
 
 
+    #[view(getVersion)]
+    #[storage_mapper("version")]
+    fn version(&self) -> SingleValueMapper<ManagedBuffer>;
     
-    
-    #[view(getPlatformFeePercent)]
-    #[storage_mapper("platform_fee_percent")]
-    fn platform_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
 
-    #[view(getAssetMinPrice)]
-    #[storage_mapper("asset_min_price")]
-    fn asset_min_price(&self) -> SingleValueMapper<Self::Api, BigUint>;
-
-    #[view(getAssetMaxPrice)]
-    #[storage_mapper("asset_max_price")]
-    fn asset_max_price(&self) -> SingleValueMapper<Self::Api, BigUint>;
-
-    #[view(getRoyaltiesMaxFeePercent)]
-    #[storage_mapper("royalties_max_fee_percent")]
-    fn royalties_max_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
-
-    #[view(getCreatorWithdrawalWaitingEpochs)]
-    #[storage_mapper("creator_withdrawal_waiting_epochs")]
-    fn creator_withdrawal_waiting_epochs(&self) -> SingleValueMapper<Self::Api, u64>;
-
-    #[view(isCreatorBlacklisted)]
-    #[storage_mapper("creator_blacklist")]
-    fn creator_blacklist(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, bool>;
-
-    #[view(getEgldDeposit)]
-    #[storage_mapper("egld_deposit")]
-    fn egld_deposit(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, BigUint>;
-
-    #[view(getCreatorRoyalties)]
-    #[storage_mapper("creator_royalties")]
-    fn creator_royalties(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, BigUint>;
-
-    #[view(getCreatorLastWithdrawalEpoch)]
-    #[storage_mapper("creator_last_withdrawal_epoch")]
-    fn creator_last_withdrawal_epoch(
-        &self,
-        address: &ManagedAddress,
-    ) -> SingleValueMapper<Self::Api, u64>;
-
-    #[view(getPlatformRoyalties)]
-    #[storage_mapper("platform_royalties")]
-    fn platform_royalties(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[view(getNftSaleInfo)]
     #[storage_mapper("nft_sale_info")]
     fn nft_sale_info(&self, nft_id: &NftId<Self::Api>)
         -> SingleValueMapper<NftSaleInfo<Self::Api>>;
-
-    #[view(getOffer)]
-    #[storage_mapper("offers")]
-    fn offers(
-        &self,
-        caller: &ManagedAddress,
-        nft_id: &NftId<Self::Api>,
-        nft_list_timestamp: u64,
-    ) -> SingleValueMapper<Offer<Self::Api>>;
-
-    #[view(getAuction)]
-    #[storage_mapper("auction")]
-    fn auction(&self, nft_id: &NftId<Self::Api>) -> SingleValueMapper<AuctionInfo<Self::Api>>;
 
 
 
