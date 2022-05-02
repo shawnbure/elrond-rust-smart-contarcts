@@ -42,13 +42,13 @@ pub trait StakingContract:
         }  
                 
         self.version().set(&version);
-     
     }
 
 
 
 
  
+     
 
 
     #[payable("EGLD")]

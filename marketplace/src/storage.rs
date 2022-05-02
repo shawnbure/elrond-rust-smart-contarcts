@@ -6,89 +6,6 @@ elrond_wasm::derive_imports!();
 
 
 
-
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct StakedPool<M:ManagedTypeApi>
-{  
-    pub arrayStakedAddressNFTs: Vec<StakedAddressNFTs<M>>
-}
-
-
-impl<M: ManagedTypeApi> StakedPool<M>
-where
-    M: ManagedTypeApi,
-{
-    pub fn new(arrayStakedAddressNFTs: Vec<StakedAddressNFTs<M>>
-    ) -> Self {
-        StakedPool {
-            arrayStakedAddressNFTs
-        }
-    }
-}
-
-
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct StakedAddressNFTs<M>
-where
-    M: ManagedTypeApi,
-{
-    pub address: ManagedAddress<M>,   
-    pub arrayStakedNFTs: Vec<StakedNFT<M>>,
-    pub payout: BigUint<M>,                     //accumulated payout amount
-    pub last_withdraw_datetime: u64             //last datetime payout was withdraw
-}
-
-
-
-impl<M: ManagedTypeApi> StakedAddressNFTs<M>
-where
-    M: ManagedTypeApi,
-{
-    pub fn new(address: ManagedAddress<M>,
-               arrayStakedNFTs: Vec<StakedNFT<M>>,
-               payout: BigUint<M>,
-               last_withdraw_datetime: u64
-    ) -> Self {
-        StakedAddressNFTs {
-            address,
-            arrayStakedNFTs,
-            payout,
-            last_withdraw_datetime
-        }
-    }
-}
-
-
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
-pub struct StakedNFT<M>
-where
-    M: ManagedTypeApi,
-{
-    pub token_id: TokenIdentifier<M>,
-    pub nonce: u64,
-    pub staked_datetime: u64                //datetime it was added to staking
-}
-
-impl<M: ManagedTypeApi> StakedNFT<M>
-where
-    M: ManagedTypeApi,
-{
-    pub fn new(token_id: TokenIdentifier<M>, nonce: u64, staked_datetime: u64) -> Self {
-        StakedNFT { token_id, 
-                    nonce, 
-                    staked_datetime 
-        }
-    }
-}
-
-
-
-
-
-
-
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct NftId<M>
 where
@@ -266,10 +183,4 @@ pub trait StorageModule {
     fn auction(&self, nft_id: &NftId<Self::Api>) -> SingleValueMapper<AuctionInfo<Self::Api>>;
 
 
-
-    #[view(geStakedPool)]
-    #[storage_mapper("staked_pool")]
-    fn staked_pool(&self) -> SingleValueMapper<Self::Api, StakedPool<Self::Api>>;
-
-        
 }
