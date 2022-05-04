@@ -125,7 +125,8 @@ pub trait UtilsModule: storage::StorageModule {
             //check if stakedNFT datetime qualifies, if so, add to the totalNFTQualiedForReward
             if self.is_stake_datetime_qualified_for_rewards(stakedNFT.staked_datetime)
             {
-                totalNFTQualifiedForRewards += BigUint::from(1u64);
+                //use the weighted factor
+                totalNFTQualifiedForRewards += BigUint::from(stakedNFT.weighted_factor);
             }
         }   
         
@@ -140,11 +141,9 @@ pub trait UtilsModule: storage::StorageModule {
         //verify the staked datetime is greater than 24 hours
         let currentTimestamp = self.blockchain().get_block_timestamp();
 
-        //TODO:
-        //add a day to stake_datetime, then compare if it's less than or equal to the current datetime
-        //if so, the it qualifies for reward
+        let day24Hour = 24*60*60;
 
-        return true;
+        return (currentTimestamp - staked_datetime) > day24Hour;
     }
 
     
