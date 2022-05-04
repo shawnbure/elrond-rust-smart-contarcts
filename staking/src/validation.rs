@@ -1,14 +1,14 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-use crate::config::BP;
-use crate::storage::AuctionInfo;
-use crate::storage::NftSaleInfo;
+//use crate::config::BP;
+
 
 use super::config;
 use super::storage;
-use super::storage::{NftId, Offer};
+use super::storage::{StakedPool, StakedAddressNFTs, StakedNFT};
 use super::utils;
+
 
 #[elrond_wasm::module]
 pub trait ValidationModule:
@@ -24,6 +24,7 @@ pub trait ValidationModule:
         require!(nonce != 0, "Invalid nonce");
         Ok(())
     }
+
 
 
 }
