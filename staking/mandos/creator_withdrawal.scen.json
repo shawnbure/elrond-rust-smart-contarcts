@@ -1,0 +1,55 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy.scen.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:creator",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "withdrawCreatorRoyalties",
+                "arguments": [],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockEpoch": "130"
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:creator",
+                "to": "sc:contract",
+                "value": "0",
+                "function": "withdrawCreatorRoyalties",
+                "arguments": [],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

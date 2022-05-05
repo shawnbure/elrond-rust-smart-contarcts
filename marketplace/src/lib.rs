@@ -5,6 +5,7 @@ elrond_wasm::derive_imports!();
 
 use core::ops::Deref;
 
+
 pub mod config;
 pub mod deposit;
 pub mod events;
@@ -16,6 +17,8 @@ pub mod validation;
 
 use storage::{AuctionInfo, NftId, NftSaleInfo, Offer};
 const SECONDS_IN_YEARS: u64 = 31_556_952u64;
+
+//const LAST_WITHDRAW_DATETIME_INIT: u64 = 0;
 
 #[elrond_wasm::contract]
 pub trait MarketplaceContract:
@@ -38,14 +41,21 @@ pub trait MarketplaceContract:
         creator_withdrawal_waiting_epochs: u64,
         dao_address: ManagedAddress,
         version: ManagedBuffer,
-    ) -> SCResult<()> {
+    ) -> SCResult<()> {  
         self.version().set(&version);
         self.dao().set(&dao_address);
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
-        self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)
+        self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)        
     }
+
+
+
+
+
+
+
 
     #[payable("*")]
     #[endpoint(putNftForSale)]

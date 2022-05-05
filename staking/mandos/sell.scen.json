@@ -1,0 +1,178 @@
+{
+    "name": "init accounts",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init.steps.json"
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:NFT1-abcdef",
+                    "value": "1",
+                    "nonce": "100"
+                },
+                "function": "putNftForSale",
+                "arguments": [
+                    "100,000"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "balance": "1",
+                            "nonce": "100"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT1-abcdef|u64:100": "address:owner|biguint:100,000|u64:0",
+                        "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
+                        "str:asset_min_price": "100",
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:NFT2-abcdef",
+                    "value": "1",
+                    "nonce": "200"
+                },
+                "function": "putNftForSale",
+                "arguments": [
+                    "200,000"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "balance": "1",
+                            "nonce": "100"
+                        },
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT1-abcdef|u64:100": "address:owner|biguint:100,000|u64:0",
+                        "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|biguint:200,000|u64:0",
+                        "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
+                        "str:asset_min_price": "100",
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "value": "0",
+                "esdt": {
+                    "tokenIdentifier": "str:NFT2-abcdef",
+                    "value": "1",
+                    "nonce": "200"
+                },
+                "function": "putNftForSale",
+                "arguments": [
+                    "200,000"
+                ],
+                "gasLimit": "1,400,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT1-abcdef": {
+                            "balance": "1",
+                            "nonce": "100"
+                        },
+                        "str:NFT2-abcdef": {
+                            "balance": "1",
+                            "nonce": "200"
+                        }
+                    },
+                    "storage": {
+                        "str:nft_sale_info|nested:str:NFT1-abcdef|u64:100": "address:owner|biguint:100,000|u64:0",
+                        "str:nft_sale_info|nested:str:NFT2-abcdef|u64:200": "address:owner|biguint:200,000|u64:0",
+                        "str:platform_fee_percent": "250",
+                        "str:royalties_max_fee_percent": "1,000",
+                        "str:asset_min_price": "100",
+                        "str:asset_max_price": "1,000,000",
+                        "str:creator_withdrawal_waiting_epochs": "30"
+                    },
+                    "code": "file:../output/marketplace.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        }
+    ]
+}
