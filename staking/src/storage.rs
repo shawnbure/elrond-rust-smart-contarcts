@@ -8,7 +8,7 @@ elrond_wasm::derive_imports!();
 
 
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct StakedPool<M:ManagedTypeApi>
 {  
     pub arrayStakedAddresses: Vec<ManagedAddress<M>>
@@ -29,15 +29,14 @@ where
 
 
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct StakedAddressNFTs<M>
 where
     M: ManagedTypeApi,
 { 
     pub arrayStakedNFTIds: Vec<NftId<M>>,
     pub reward_balance: BigUint<M>,             //accumulated reward amount
-    pub last_withdraw_datetime: u64,            //last datetime reward was withdraw
-    pub payout_block_factor_tally: u64          //holds the payout block factors tally during the disbursement of rewards logic
+    pub last_withdraw_datetime: u64             //last datetime reward was withdraw
 }
 
 
@@ -48,20 +47,18 @@ where
 {
     pub fn new(arrayStakedNFTIds: Vec<NftId<M>>,
                reward_balance: BigUint<M>,
-               last_withdraw_datetime: u64,
-               payout_block_factor_tally: u64
+               last_withdraw_datetime: u64
             ) -> Self {
         StakedAddressNFTs {
             arrayStakedNFTIds,
             reward_balance,
-            last_withdraw_datetime,
-            payout_block_factor_tally
+            last_withdraw_datetime
         }
     }
 }
 
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct StakedNFT<M>
 where
     M: ManagedTypeApi,
@@ -135,7 +132,7 @@ where
 
 
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct NftId<M>
 where
     M: ManagedTypeApi,
@@ -151,6 +148,34 @@ where
 {
     pub fn new(token_id: TokenIdentifier<M>, nonce: u64) -> Self {
         NftId { token_id, nonce }
+    }
+}
+
+
+
+
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
+pub struct StakedAddressPayoutTallyTracker<M>
+where
+    M: ManagedTypeApi,
+{ 
+    pub address:  ManagedAddress<M>,
+    pub payout_block_factor_tally: u64          //holds the payout block factors tally during the disbursement of rewards logic
+}
+
+
+
+impl<M: ManagedTypeApi> StakedAddressPayoutTallyTracker<M>
+where
+    M: ManagedTypeApi,
+{
+    pub fn new(address: ManagedAddress<M>,
+               payout_block_factor_tally: u64
+            ) -> Self {
+                StakedAddressPayoutTallyTracker {
+            address,
+            payout_block_factor_tally
+        }
     }
 }
 
@@ -200,6 +225,8 @@ pub trait StorageModule {
     #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
+
+
 
 
 }

@@ -16,7 +16,7 @@ pub mod storage;
 pub mod utils;
 pub mod validation;
 
-use storage::{StakedPool, StakedAddressNFTs, StakedNFT, NftId};
+use storage::{StakedPool, StakedAddressNFTs, StakedNFT, NftId, StakedAddressPayoutTallyTracker};
 
 
 #[elrond_wasm::contract]
@@ -116,11 +116,10 @@ pub trait StakingContract:
     
     #[view(isNFTStaked)]
     fn is_nft_staked(&self, 
-                     address: ManagedAddress,
                      token_id: TokenIdentifier,
                      nonce: u64) -> bool 
     {
-        return self.does_nft_exist_in_staked_addresss_nfts(address, token_id, nonce);
+        return self.does_nft_exist_in_staked_addresss_nfts(self.blockchain().get_caller(), token_id, nonce);
     }
 
     
@@ -128,10 +127,11 @@ pub trait StakingContract:
     #[payable("EGLD")]
     #[endpoint(stakeAddressNFT)]   
     fn stake_address_nft(&self,
-                         address: ManagedAddress,
                          token_id: TokenIdentifier,
                          nonce: u64) -> SCResult<()> 
     {
+        let address = self.blockchain().get_caller();
+
         //validation
         self.require_valid_token_id(&token_id)?;
         self.require_valid_nonce(nonce)?;
@@ -148,7 +148,6 @@ pub trait StakingContract:
             //fail case: last_payout_datetime never set is is 0 
             return sc_error!("Last_Payout_Datetime was NEVER setup - Must set prior to staking any NFT.");
         }
-
 
         //Step 1: Check if address is the stake pool already, if not, add it
         //------------------------------------------------------------------------
@@ -167,13 +166,11 @@ pub trait StakingContract:
             //since it's new address, create a stakedAddressNFT for that address
             let rewardBalanceInit = BigUint::zero();    // zero initial reward balance
             let lastWithdrawDatetimeInit = 0u64;        // set last withdraw datetime to 0  
-            let payoutBlockFactorTally = 0u64;          
-
+       
             //set the new StakedAddressNFTs
             self.staked_address_nfts(&address).set(StakedAddressNFTs::new(Vec::new(), 
                                                                           rewardBalanceInit, 
-                                                                          lastWithdrawDatetimeInit,
-                                                                          payoutBlockFactorTally));  
+                                                                          lastWithdrawDatetimeInit));  
         }
 
 
@@ -228,12 +225,13 @@ pub trait StakingContract:
 
 
     #[payable("EGLD")]
-    #[endpoint(UnstakeAddressNFT)]   
+    #[endpoint(unstakeAddressNFT)]   
     fn unstake_address_nft(&self,
-                            address: ManagedAddress,
                             token_id: TokenIdentifier,
                             nonce: u64) -> SCResult<()> 
     {
+        let address = self.blockchain().get_caller();
+
         //validation
         self.require_valid_token_id(&token_id)?;
         self.require_valid_nonce(nonce)?;
@@ -249,7 +247,6 @@ pub trait StakingContract:
         {
             return sc_error!("NFT was NEVER Staked before.");
         }
-
 
         //NFTId object for storage access
         let nftId = NftId::new(token_id.clone(), nonce);
@@ -287,9 +284,10 @@ pub trait StakingContract:
     // REWARD BALANCE FUNDS
     
     #[view(getStakingRewardBalance)]
-    fn get_staking_reward_balanace(&self, 
-                                   address: ManagedAddress) -> BigUint 
+    fn get_staking_reward_balanace(&self) -> BigUint 
     {
+        let address = self.blockchain().get_caller();
+        
         //get stakedAddressNFT by address to get rewards
         let stakedAddressNFT = self.staked_address_nfts(&address).get();
 
@@ -300,9 +298,10 @@ pub trait StakingContract:
 
     #[payable("EGLD")]
     #[endpoint(redeemStakingRewards)]   
-    fn redeem_staking_rewards(&self, 
-                               address: ManagedAddress) -> SCResult<()>  
+    fn redeem_staking_rewards(&self) -> SCResult<()>  
     {
+        let address = self.blockchain().get_caller();
+
         let mut stakedAddressNFT = self.staked_address_nfts(&address).get();
 
         if stakedAddressNFT.reward_balance == BigUint::from(0u64)
@@ -378,9 +377,9 @@ pub trait StakingContract:
         //get the staked pool
         let stakedPool = self.staked_pool().get();  
 
-        //keeps an in memory of arrayStakedAddressNFTs so we don't have to set it back to block and read again 
-        //later on when we divide the rewards based on Qualified NFTs
-        let arrayStakedAddressNFTs: Vec<StakedAddressNFTs<Self::Api>> = Vec::new();
+        //keeps an in memory of address / payoutTally in StakedAddressPayoutTallyTracker and so we don't have to set 
+        //it back to block and read again later on when we divide the rewards based on Qualified NFTs
+        let mut arrayStakedAddressPayoutTallyTracker: Vec<StakedAddressPayoutTallyTracker<Self::Api>> = Vec::new();
 
         // iterate over the array of stakedAddresses to get address to get the 
         // stakedAddressNFTs to tally up the payout_block_factor_tally (used to split the rewards)
@@ -389,8 +388,10 @@ pub trait StakingContract:
             let mut stakedAddressNFT = self.staked_address_nfts(&stakedAddress).get();
             
             //add it to memory
-            //arrayStakedAddressNFTs.push(stakedAddressNFT);
+            //arrayAddressPayoutTallyTracker.push(stakedAddressNFT.clone());
 
+           let mut stakedAddressPayoutTallyTracker = StakedAddressPayoutTallyTracker::new(stakedAddress.clone(), 0u64);
+           
             for nftId in stakedAddressNFT.arrayStakedNFTIds
             {
                 let mut stakedNFT = self.staked_address_nft_info(&stakedAddress, &nftId).get();
@@ -416,24 +417,42 @@ pub trait StakingContract:
                     self.staked_address_nft_info(&stakedAddress, &nftId).set(stakedNFT);
 
                     //add to the stakedAddressNFT payout rollover factor 
-                    stakedAddressNFT.payout_block_factor_tally += nftRolloverPayoutFactor;   
+                    //stakedAddressNFT.payout_block_factor_tally += nftRolloverPayoutFactor;   
+                    stakedAddressPayoutTallyTracker.payout_block_factor_tally += nftRolloverPayoutFactor;
                     
                     //add to overall tally
                     overallTotalPayoutQualifiedStakedNFT += nftRolloverPayoutFactor;
                 }
             }
+
+            arrayStakedAddressPayoutTallyTracker.push(stakedAddressPayoutTallyTracker);
         }
 
 
 
-        //for stakedAddress in stakedPool.arrayStakedAddresses 
-        //{  
-        //    let mut stakedAddressNFT = self.staked_address_nfts(&stakedAddress).get();
-       // }
+        for stakedAddressPayoutTallyTracker in arrayStakedAddressPayoutTallyTracker
+        {
+            //addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
 
-        //addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
+            if stakedAddressPayoutTallyTracker.payout_block_factor_tally > 0u64
+            {
+                //only reward if there is a block factor
+
+                //TODO: verify if needs to be convert to float???
+                let addressRewardPayoutAmount = reward_amount.clone() * (stakedAddressPayoutTallyTracker.payout_block_factor_tally / overallTotalPayoutQualifiedStakedNFT);
+
+                if addressRewardPayoutAmount > 0u64  
+                {
+                    //only update it to the BlockChain if there is 
+                    let mut stakedAddressNFT = self.staked_address_nfts(&stakedAddressPayoutTallyTracker.address).get();
+                    stakedAddressNFT.reward_balance += addressRewardPayoutAmount;
+        
+                    self.staked_address_nfts(&stakedAddressPayoutTallyTracker.address).set(stakedAddressNFT);
+                }
+            }
 
 
+        }
 
 
 
@@ -448,33 +467,6 @@ pub trait StakingContract:
         // stakedAddress "payout" field according to this formula:
         // addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
 
-
-        /*
-        //all staked nfts across all address
-        let overallTotalStakedNFTQualifiedForRewards = self.get_overall_total_staked_nfts_qualified_for_rewards();
-
-
-        //get the staked pool
-        let stakedPool = self.staked_pool().get();
-     
-        //get the array of stakedAddresses
-        let arrayStakedAddresses = stakedPool.arrayStakedAddresses;
-        
-        //iterate over the array of stakedAddresses to get address to get the stakedAddressNFTs to update payout amount
-        for stakedAddress in arrayStakedAddresses 
-        {                  
-            let totalNFTQualifiedForRewardsByAddress = self.get_total_staked_nfts_qualified_for_rewards_by_address(stakedAddress.clone()); 
-
-
-            let mut stakedAddressNFT = self.staked_address_nfts(&stakedAddress).get();
-
-            //addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
-            stakedAddressNFT.reward_balance += (daily_total_reward.clone() * (totalNFTQualifiedForRewardsByAddress.clone()/overallTotalStakedNFTQualifiedForRewards.clone())); //daily_total_reward * (overallTotalStakedNFTQualifiedForRewards/overallTotalStakedNFTQualifiedForRewards);
-            
-            //set the updated stakedAddressNFT
-            self.staked_address_nfts(&stakedAddress).set(&stakedAddressNFT);              
-        }
-        */
 
 
         Ok(())       
