@@ -18,6 +18,8 @@ pub mod validation;
 use storage::{AuctionInfo, NftId, NftSaleInfo, Offer};
 const SECONDS_IN_YEARS: u64 = 31_556_952u64;
 
+//365 days * 24 hours/day * 60 min/hr * 60 sec/min = 31,536,000 secs
+
 //const LAST_WITHDRAW_DATETIME_INIT: u64 = 0;
 
 #[elrond_wasm::contract]

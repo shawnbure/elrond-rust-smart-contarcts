@@ -4,16 +4,22 @@ elrond_wasm::derive_imports!();
 
 //use super::config::{BP};
 use super::storage;
-use super::storage::{StakedPool, StakedAddressNFTs, StakedNFT};
+//use super::storage::{StakedPool, StakedAddressNFTs, StakedNFT, NftId};
 
 #[elrond_wasm::module]
 pub trait UtilsModule: storage::StorageModule {
  
 
 
-    fn does_address_exist_in_staked_pool(&self, 
-                                         address: ManagedAddress) -> bool                                               
-    {
+
+ 
+    
+
+
+
+    /*
+    
+        /*
         //get the staked pool
         let stakedPool = self.staked_pool().get();
      
@@ -35,40 +41,29 @@ pub trait UtilsModule: storage::StorageModule {
         }
 
         return isStakedAddressFound;
-    }
+        */
 
 
 
-    
-    fn does_nft_exist_in_staked_addresss(&self, 
-                                        address: ManagedAddress,
-                                        token_id: TokenIdentifier,
-                                        nonce: u64) -> bool                                               
-    {
-        return self.get_index_of_nft_in_staked_address(address, token_id, nonce) >= 0;
-    }
-
-
-
-    fn get_index_of_nft_in_staked_address(&self, 
-                                          address: ManagedAddress,
-                                          token_id: TokenIdentifier,
-                                          nonce: u64) -> i32 
+    fn get_index_of_nft_in_staked_address_nfts(&self, 
+                                                address: ManagedAddress,
+                                                token_id: TokenIdentifier,
+                                                nonce: u64) -> i32 
     {
         //get the staked address NFTs
         let stakedAddressNFT = self.staked_address_nfts(&address).get();
 
-        //get the array of stakedAddressNFTs
-        let arrayStakedNFTs = stakedAddressNFT.arrayStakedNFTs;
+        //get the array of NFTId
+        let arrayStakedNFTIds = stakedAddressNFT.arrayStakedNFTIds;
 
         let mut stakedNFTIndex: i32 = -1;
         let mut currentIndex: i32 = 0;
 
         //iterate over the array of StakedAddressNFTs to see if address is in there already
-        for stakedNFT in arrayStakedNFTs 
+        for nftId in arrayStakedNFTIds 
         {            
             //check the token id and nonce 
-            if stakedNFT.token_id == token_id && stakedNFT.nonce == nonce
+            if nftId.token_id == token_id && nftId.nonce == nonce
             {
                 stakedNFTIndex = currentIndex;
                 break;
@@ -80,6 +75,7 @@ pub trait UtilsModule: storage::StorageModule {
 
         return stakedNFTIndex;
     }
+
 
 
 
@@ -117,10 +113,10 @@ pub trait UtilsModule: storage::StorageModule {
         let stakedAddressNFT = self.staked_address_nfts(&address).get();
 
         //get the array of stakedAddressNFTs
-        let arrayStakedNFTs = stakedAddressNFT.arrayStakedNFTs;
+        let arrayStakedNFTIds = stakedAddressNFT.arrayStakedNFTIds;
 
         //iterate over the array of StakedAddressNFTs to see if address is in there already
-        for stakedNFT in arrayStakedNFTs 
+        for stakedNFT in arrayStakedNFTIds 
         {
             //check if stakedNFT datetime qualifies, if so, add to the totalNFTQualiedForReward
             if self.is_stake_datetime_qualified_for_rewards(stakedNFT.staked_datetime)
@@ -147,7 +143,7 @@ pub trait UtilsModule: storage::StorageModule {
     }
 
     
-
+    */
 
 
 
