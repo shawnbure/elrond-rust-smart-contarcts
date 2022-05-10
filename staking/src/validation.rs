@@ -15,7 +15,7 @@ pub trait ValidationModule:
     storage::StorageModule + config::ConfigModule + utils::UtilsModule
 {
 
-    
+
     fn does_address_exist_in_staked_pool(&self, 
                                          address: ManagedAddress) -> bool                                               
     {
@@ -32,13 +32,13 @@ pub trait ValidationModule:
                                               token_id: TokenIdentifier,
                                               nonce: u64) -> bool                                               
     {
-        // since staked_address_nft_info gets created if an NFT is staked with 
+        // since staked_nft_info gets created if an NFT is staked with 
         // an NFTId that isn't staked (look in fn stake_address_nft logic)
 
         //create NFTId object
         let nftId = NftId::new(token_id.clone(), nonce);
 
-        return ! self.staked_address_nft_info(&address, &nftId).is_empty();
+        return ! self.staked_nft_info(&address, &nftId).is_empty();
     }
 
     

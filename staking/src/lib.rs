@@ -62,7 +62,47 @@ pub trait StakingContract:
     fn set_last_payout_datetime(&self,
                                 payout_datetime: u64) -> SCResult<()> 
     {
+        //DISCLAIMER: should be set once initially - if reset again, it 
+        //will mess with the disbursement logic
         self.last_payout_datetime().set(payout_datetime);
+
+        Ok(()) 
+    }
+
+
+    //TESTED: 5/10
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(setLastPayoutDatetimeToBlockTimestamp)]   
+    fn set_last_payout_datetime_to_block_timestamp(&self) -> SCResult<()> 
+    {
+        //DISCLAIMER: should be set once initially - if reset again, it 
+        //will mess with the disbursement logic        
+        self.last_payout_datetime().set(self.blockchain().get_block_timestamp());
+
+        Ok(()) 
+    }
+
+
+    // =========================================================================================
+    // Add Admin address
+
+    //TESTED: 5/10
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint(setAdminAddress)]   
+    fn set_admin_address(&self,
+                         address: ManagedAddress) -> SCResult<()> 
+    {
+        if self.admin_address(&address).is_empty() 
+        {            
+            //just set a value so it's not empty
+            self.admin_address(&address).set(1u16);
+        }
+        else
+        {
+            return sc_error!("Address already register as admin.");
+        }
 
         Ok(()) 
     }
@@ -74,14 +114,21 @@ pub trait StakingContract:
 
 
     // =========================================================================================
-    // Enabling a TOKEN IDENTIFIER to be STAKABLE
+    // Enabling a TOKEN IDENTIFIER to be STAKEABLE
 
-
+    //TESTED: 5/10
     #[payable("EGLD")]
     #[endpoint(addStakableTokenIdentifier)]   
     fn add_stakable_token_identifier(&self,
                                      token_id: TokenIdentifier) -> SCResult<()> 
     {
+        let address = self.blockchain().get_caller();
+
+        if self.admin_address(&address).is_empty() 
+        {            
+            return sc_error!("Must be an admin to modify a token identifier as Stakeable.");
+        }
+
         // This is enables a "collection" with that token identifer 
         // to be able to staked it's NFT 
         if self.stakable_token_identifier(&token_id).is_empty() 
@@ -91,20 +138,39 @@ pub trait StakingContract:
         }
         else
         {
-            return sc_error!("Token Identifier already register as Stakable.");
+            return sc_error!("Token Identifier already register as Stakeable.");
         }
 
         Ok(()) 
     }
 
 
-    #[view(isTokenIdentifierStakable)]   
-    fn is_token_identifier_stakable(&self,
-                                    token_id: TokenIdentifier) -> bool
-    {
-        return self.verify_token_identifier_is_stakable(token_id);
-    }
 
+    #[payable("EGLD")]
+    #[endpoint(removeStakableTokenIdentifier)]   
+    fn remove_stakable_token_identifier(&self,
+                                         token_id: TokenIdentifier) -> SCResult<()> 
+    {
+        let address = self.blockchain().get_caller();
+
+        if self.admin_address(&address).is_empty() 
+        {            
+            return sc_error!("Must be an admin to modify a token identifier as Stakeable.");
+        }
+
+        // Check to see if the token id was make stakeable before
+        if ! self.stakable_token_identifier(&token_id).is_empty() 
+        {            
+            //clear it
+            self.stakable_token_identifier(&token_id).clear();
+        }
+        else
+        {
+            return sc_error!("Token Identifier was NEVER register as Stakeable.");
+        }
+
+        Ok(()) 
+    }
 
 
 
@@ -113,15 +179,62 @@ pub trait StakingContract:
     // =========================================================================================
     // STAKING / UNSTAKING NFTS
     
-    
+    //TESTED: 5/10
     #[view(isNFTStaked)]
     fn is_nft_staked(&self, 
+                     address: ManagedAddress,
                      token_id: TokenIdentifier,
                      nonce: u64) -> bool 
     {
-        return self.does_nft_exist_in_staked_addresss_nfts(self.blockchain().get_caller(), token_id, nonce);
+        return self.does_nft_exist_in_staked_addresss_nfts(address, token_id, nonce);
     }
 
+    
+    //TESTED: 5/10
+    #[view(getStakedNFTStakedDatetime)]
+    fn get_staked_nft_staked_datetime(&self, 
+                                      address: ManagedAddress,
+                                      token_id: TokenIdentifier,
+                                      nonce: u64) -> u64 
+    {
+        let nftId = NftId::new(token_id.clone(), nonce);
+        
+        if self.staked_nft_info(&address, &nftId).is_empty() 
+        {
+            return 0u64;
+        }
+        else
+        {
+            let stakedNFT = self.staked_nft_info(&address, &nftId).get();
+
+            return stakedNFT.staked_datetime;
+        }
+      
+    }
+
+
+
+    #[view(getStakedNFTRolloverBalance)]
+    fn get_staked_nft_rollover_balance(&self, 
+                                       address: ManagedAddress,
+                                       token_id: TokenIdentifier,
+                                       nonce: u64) -> u64 
+    {
+        let nftId = NftId::new(token_id.clone(), nonce);
+        
+        if self.staked_nft_info(&address, &nftId).is_empty() 
+        {
+            return 0u64;
+        }
+        else
+        {
+            let stakedNFT = self.staked_nft_info(&address, &nftId).get();
+
+            return stakedNFT.rollover_balance;
+        }
+      
+    }
+    
     
 
     #[payable("EGLD")]
@@ -136,10 +249,10 @@ pub trait StakingContract:
         self.require_valid_token_id(&token_id)?;
         self.require_valid_nonce(nonce)?;
         
-        // verify that token id is stakable
+        // verify that token id is stakeable
         if ! self.verify_token_identifier_is_stakable(token_id.clone())
         {
-            return sc_error!("Token Identifer NOT Stakable.");
+            return sc_error!("Token Identifer NOT Stakeable.");
         }
 
         
@@ -178,7 +291,7 @@ pub trait StakingContract:
         // if it does exist, check to make sure the datetime is 0u64 (zero) and update it
         //      if it's not 0u64, then it's been staked and trying to restake (throw errow)        
         // if it doesn't, then create it in the "staked_address_nfts" array of NFTId and
-        //      create it in the "staked_address_nft_info" (by address and NFTId)
+        //      create it in the "staked_nft_info" (by address and NFTId)
         //------------------------------------------------------------------------
 
         //create NFTId object
@@ -188,7 +301,7 @@ pub trait StakingContract:
         {
             //NFT did exist before, so it's an update case
 
-            let mut stakedNFT = self.staked_address_nft_info(&address, &nftId).get();
+            let mut stakedNFT = self.staked_nft_info(&address, &nftId).get();
 
             if stakedNFT.staked_datetime != 0u64
             {
@@ -201,7 +314,7 @@ pub trait StakingContract:
                 stakedNFT.staked_datetime = self.blockchain().get_block_timestamp();
 
                 //set the updated stakedNFT
-                self.staked_address_nft_info(&address, &nftId).set(stakedNFT);                   
+                self.staked_nft_info(&address, &nftId).set(stakedNFT);                   
             }
         }
         else
@@ -214,7 +327,7 @@ pub trait StakingContract:
             let newStakedNFT = StakedNFT::new(weightedFactor, stakedDateTime, rollover_balance);               
 
             //set the new stakedNFT
-            self.staked_address_nft_info(&address, &nftId).set(newStakedNFT);                
+            self.staked_nft_info(&address, &nftId).set(newStakedNFT);                
         }
 
         Ok(())
@@ -235,10 +348,10 @@ pub trait StakingContract:
         self.require_valid_token_id(&token_id)?;
         self.require_valid_nonce(nonce)?;
         
-        // verify that token id is stakable
+        // verify that token id is stakeable
         if ! self.verify_token_identifier_is_stakable(token_id.clone())
         {
-            return sc_error!("Token Identifer NOT Stakable.");
+            return sc_error!("Token Identifer NOT Stakeable - So it is UNSTAKEABLE.");
         }
         
         //check to see if it was ever staked 
@@ -250,7 +363,7 @@ pub trait StakingContract:
         //NFTId object for storage access
         let nftId = NftId::new(token_id.clone(), nonce);
 
-        let mut stakedNFT = self.staked_address_nft_info(&address, &nftId).get();
+        let mut stakedNFT = self.staked_nft_info(&address, &nftId).get();
 
         if stakedNFT.staked_datetime == 0u64 
         {
@@ -265,9 +378,10 @@ pub trait StakingContract:
 
             //add new rollover to existing balance
             stakedNFT.rollover_balance += unstaking_accured_rollover;
+            stakedNFT.staked_datetime = 0u64;
 
             //set the updated stakedNFT
-            self.staked_address_nft_info(&address, &nftId).set(stakedNFT);    
+            self.staked_nft_info(&address, &nftId).set(stakedNFT);    
         }
 
 
@@ -282,15 +396,23 @@ pub trait StakingContract:
     // =========================================================================================
     // REWARD BALANCE FUNDS
     
+    //TESTED: 5/10
     #[view(getStakingRewardBalance)]
     fn get_staking_reward_balanace(&self) -> BigUint 
     {
         let address = self.blockchain().get_caller();
         
-        //get stakedAddressNFT by address to get rewards
-        let stakedAddressNFT = self.staked_address_nfts(&address).get();
+        if self.staked_address_nfts(&address).is_empty()
+        {
+            return BigUint::from(0u64);
+        }
+        else
+        {
+            //get stakedAddressNFT by address to get rewards
+            let stakedAddressNFT = self.staked_address_nfts(&address).get();
 
-        return stakedAddressNFT.reward_balance;
+            return stakedAddressNFT.reward_balance;
+        }
     }
 
 
@@ -300,6 +422,11 @@ pub trait StakingContract:
     fn redeem_staking_rewards(&self) -> SCResult<()>  
     {
         let address = self.blockchain().get_caller();
+
+        if self.staked_address_nfts(&address).is_empty()
+        {
+            return sc_error!("Address has NOT staked any NFTs.");
+        }
 
         let mut stakedAddressNFT = self.staked_address_nfts(&address).get();
 
@@ -392,7 +519,7 @@ pub trait StakingContract:
            
             for nftId in stakedAddressNFT.arrayStakedNFTIds
             {
-                let mut stakedNFT = self.staked_address_nft_info(&stakedAddress, &nftId).get();
+                let mut stakedNFT = self.staked_nft_info(&stakedAddress, &nftId).get();
                 
                 if stakedNFT.staked_datetime != 0u64  //STILL STAKED
                 {
@@ -412,7 +539,7 @@ pub trait StakingContract:
                     stakedNFT.rollover_balance -= (nftRolloverPayoutFactor * PAYOUT_TIME_BLOCK);
 
                     //update the stakedNFT
-                    self.staked_address_nft_info(&stakedAddress, &nftId).set(stakedNFT);
+                    self.staked_nft_info(&stakedAddress, &nftId).set(stakedNFT);
 
                     //add to the stakedAddressNFT payout rollover factor 
                     stakedAddressPayoutTallyTracker.payout_block_factor_tally += nftRolloverPayoutFactor;
@@ -455,6 +582,26 @@ pub trait StakingContract:
 
 
 
+
+
+    // =========================================================================================
+    // TEST FUNCTIONS
+
+    #[payable("EGLD")]
+    #[only_owner]
+    #[endpoint]   
+    fn test_set_address_reward(&self,
+                                address: ManagedAddress, 
+                                reward_amount: BigUint) -> SCResult<()> 
+    {
+        let mut stakedAddressNFT = self.staked_address_nfts(&address).get();
+
+        stakedAddressNFT.reward_balance += reward_amount;
+
+        self.staked_address_nfts(&address).set(stakedAddressNFT);
+
+        Ok(()) 
+    }
 
 
 

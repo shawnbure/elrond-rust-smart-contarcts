@@ -189,9 +189,9 @@ pub trait StorageModule {
     fn staked_address_nfts(&self, address: &ManagedAddress) -> SingleValueMapper<StakedAddressNFTs<Self::Api>>;
 
 
-    #[view(geStakedAddressNFTInfo)]
-    #[storage_mapper("staked_address_nft_info")]
-    fn staked_address_nft_info(&self, address: &ManagedAddress, nft_id: &NftId<Self::Api>) -> SingleValueMapper<StakedNFT<Self::Api>>;
+    #[view(geStakedNFTInfo)]
+    #[storage_mapper("staked_nft_info")]
+    fn staked_nft_info(&self, address: &ManagedAddress, nft_id: &NftId<Self::Api>) -> SingleValueMapper<StakedNFT<Self::Api>>;
 
 
 
@@ -204,14 +204,18 @@ pub trait StorageModule {
 
 
 
-    // set to a value of 1 if tokenIdentifier is stakable
+    // set to a value of 1 if tokenIdentifier is stakeable
     // this verify that a token is allowed to be staked
     #[view(geStakedTokenIndentifier)]
     #[storage_mapper("stakable_token_identifier")]
     fn stakable_token_identifier(&self, token_identifier: &TokenIdentifier) -> SingleValueMapper<Self::Api, u16>;
 
 
-    
+    #[view(getAdminAddress)]
+    #[storage_mapper("admin_address")]
+    fn admin_address(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, u16>;
+
+
     #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
