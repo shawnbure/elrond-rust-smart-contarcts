@@ -64,9 +64,7 @@ where
     M: ManagedTypeApi,
 {
     pub weighted_factor: BigUint<M>,            //if it's 1, count as 1, if 2, counts as 2x, and so forth
-    //pub staked_time_accumulated: BigUint<M>,    //this is for an NFT that stake then un
     pub staked_datetime: u64,                    //datetime it was added to staking
-    pub staked_start_rollover_checked: bool,
     pub rollover_balance: u64
     
 }
@@ -77,12 +75,10 @@ where
 {
     pub fn new(weighted_factor: BigUint<M>,
                staked_datetime: u64,
-               staked_start_rollover_checked: bool,
                rollover_balance: u64
                ) -> Self {
         StakedNFT { weighted_factor,
                     staked_datetime,
-                    staked_start_rollover_checked,
                     rollover_balance
         }
     }
@@ -98,15 +94,12 @@ where
     staked_datetime: u64
         - set when staked - if it's removed, set to zero (0).
           we have to do "soft" deletes for staking and unstalking to not lose accured staked time
-    staked_start_rollover_checked : 
-        - when staked, set it to false - once the payout happens, set this to true 
-          and account for any rollover if the staked time is before the payout time
     rollover_balance: 
         - holds the time accured that is paid for 
 
 
     rollover_balance RULES:
-         1) if ! staked_start_rollover_checked && staked_datetime < payoutDatetime, get the time prior
+         1) ????? if ! staked_start_rollover_checked && staked_datetime < payoutDatetime, get the time prior
          2) if unstaked, then take the time of last_payout_date and current time and add to rollover
 
 
@@ -186,11 +179,9 @@ where
 //#[elrond_wasm::module]
 pub trait StorageModule {
 
-
     #[view(geStakedPool)]
     #[storage_mapper("staked_pool")]
     fn staked_pool(&self) -> SingleValueMapper<StakedPool<Self::Api>>;
-
 
 
     #[view(geStakedAddressNFTs)]
@@ -198,11 +189,10 @@ pub trait StorageModule {
     fn staked_address_nfts(&self, address: &ManagedAddress) -> SingleValueMapper<StakedAddressNFTs<Self::Api>>;
 
 
-
-
     #[view(geStakedAddressNFTInfo)]
     #[storage_mapper("staked_address_nft_info")]
     fn staked_address_nft_info(&self, address: &ManagedAddress, nft_id: &NftId<Self::Api>) -> SingleValueMapper<StakedNFT<Self::Api>>;
+
 
 
 
@@ -225,8 +215,5 @@ pub trait StorageModule {
     #[view(getVersion)]
     #[storage_mapper("version")]
     fn version(&self) -> SingleValueMapper<ManagedBuffer>;
-
-
-
 
 }

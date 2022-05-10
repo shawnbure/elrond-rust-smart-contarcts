@@ -209,10 +209,9 @@ pub trait StakingContract:
             //create new stakeNFT Object - doesn't exist, so create it                
             let weightedFactor = BigUint::from(1u64);  //default as 1x
             let stakedDateTime = self.blockchain().get_block_timestamp();
-            let staked_start_rollover_checked = false;
             let rollover_balance = 0u64;
             
-            let newStakedNFT = StakedNFT::new(weightedFactor, stakedDateTime, staked_start_rollover_checked, rollover_balance);               
+            let newStakedNFT = StakedNFT::new(weightedFactor, stakedDateTime, rollover_balance);               
 
             //set the new stakedNFT
             self.staked_address_nft_info(&address, &nftId).set(newStakedNFT);                
@@ -340,7 +339,7 @@ pub trait StakingContract:
         // Step1: Check if the datetime is within the 24 hours payout block minimal since
         //        the last_payout_datetime 
         
-        //add a time buffer just in case 
+        //add a time buffer just in case process job runs every day at midnight - buffer will account for that case
         let currentDateTime_withTimeBuffer = self.blockchain().get_block_timestamp() + PAYOUT_TIME_BUFFER;
 
         let mut lastPayoutDatetime = self.last_payout_datetime().get();
@@ -371,7 +370,7 @@ pub trait StakingContract:
         }
 
 
-
+        //running total of all qualified NFT for all addresses
         let mut overallTotalPayoutQualifiedStakedNFT = 0u64;
 
         //get the staked pool
@@ -387,10 +386,9 @@ pub trait StakingContract:
         {  
             let mut stakedAddressNFT = self.staked_address_nfts(&stakedAddress).get();
             
-            //add it to memory
-            //arrayAddressPayoutTallyTracker.push(stakedAddressNFT.clone());
 
-           let mut stakedAddressPayoutTallyTracker = StakedAddressPayoutTallyTracker::new(stakedAddress.clone(), 0u64);
+            //store in-memory address and payout block factor tally
+            let mut stakedAddressPayoutTallyTracker = StakedAddressPayoutTallyTracker::new(stakedAddress.clone(), 0u64);
            
             for nftId in stakedAddressNFT.arrayStakedNFTIds
             {
@@ -417,7 +415,6 @@ pub trait StakingContract:
                     self.staked_address_nft_info(&stakedAddress, &nftId).set(stakedNFT);
 
                     //add to the stakedAddressNFT payout rollover factor 
-                    //stakedAddressNFT.payout_block_factor_tally += nftRolloverPayoutFactor;   
                     stakedAddressPayoutTallyTracker.payout_block_factor_tally += nftRolloverPayoutFactor;
                     
                     //add to overall tally
@@ -425,34 +422,39 @@ pub trait StakingContract:
                 }
             }
 
+            //add to in-memory array
             arrayStakedAddressPayoutTallyTracker.push(stakedAddressPayoutTallyTracker);
         }
 
 
 
+        //iterate over the in-memory vectory of address and payout tally 
         for stakedAddressPayoutTallyTracker in arrayStakedAddressPayoutTallyTracker
         {
-            //addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
-
+            //only reward if there is a block factor
             if stakedAddressPayoutTallyTracker.payout_block_factor_tally > 0u64
             {
-                //only reward if there is a block factor
-
                 //TODO: verify if needs to be convert to float???
                 let addressRewardPayoutAmount = reward_amount.clone() * (stakedAddressPayoutTallyTracker.payout_block_factor_tally / overallTotalPayoutQualifiedStakedNFT);
 
                 if addressRewardPayoutAmount > 0u64  
                 {
-                    //only update it to the BlockChain if there is 
+                    //only update it to the BlockChain if there is award amount
                     let mut stakedAddressNFT = self.staked_address_nfts(&stakedAddressPayoutTallyTracker.address).get();
                     stakedAddressNFT.reward_balance += addressRewardPayoutAmount;
         
                     self.staked_address_nfts(&stakedAddressPayoutTallyTracker.address).set(stakedAddressNFT);
                 }
             }
-
-
         }
+
+
+        Ok(())       
+    }
+
+
+
+
 
 
 
@@ -466,12 +468,6 @@ pub trait StakingContract:
         // The logic will tally up all the StakedNFT count then it will update the
         // stakedAddress "payout" field according to this formula:
         // addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
-
-
-
-        Ok(())       
-    }
-
 
 
 
