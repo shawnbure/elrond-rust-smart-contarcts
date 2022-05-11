@@ -1,0 +1,96 @@
+
+// DEPLOY Contract to the Blockchain - use return address to replace the contract hash in all calls below
+erdpy --verbose contract deploy --pem="../dev-wallet-owner.pem" --gas-limit=200000000 --recall-nonce --bytecode="output/staking.wasm" --arguments 0x312E30 --proxy="https://devnet-gateway.elrond.com" --chain=D --send
+
+
+
+// UPGRADE Contract
+erdpy --verbose contract upgrade  erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --gas-limit=200000000 --recall-nonce --bytecode="output/staking.wasm" --arguments 0x312E30 --proxy="https://devnet-gateway.elrond.com" --chain=D --send
+
+
+
+//==================================================================================
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --function="getVersion" 
+
+
+
+//==================================================================================
+
+// set last_payout_datetime by block chain get_block_timestamp
+erdpy --verbose contract call  erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --proxy="https://devnet-gateway.elrond.com" --chain=D --gas-limit=200000000 --function="setLastPayoutDatetimeToBlockTimestamp" --recall-nonce --send
+
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --function="getLastPayoutDatetime" 
+
+
+
+
+//==================================================================================
+
+erdpy --verbose contract call  erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --proxy="https://devnet-gateway.elrond.com" --chain=D --gas-limit=200000000 --function="addStakableTokenIdentifier" --arguments 0x4D4D4D582D383531363765 --recall-nonce --send
+
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --arguments 0x4D4D4D582D383531363765 --function="geStakedTokenIndentifier" 
+
+
+
+
+//==================================================================================
+erdpy --verbose contract call  erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --proxy="https://devnet-gateway.elrond.com" --chain=D --gas-limit=200000000 --function="setAdminAddress" --arguments 0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d --recall-nonce --send
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --arguments 0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d --function="getAdminAddress" 
+
+
+
+
+
+
+//==================================================================================
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --arguments 0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d 0x4D4D4D582D383531363765 0x0e --function="isNFTStaked" 
+
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --arguments 0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d 0x4D4D4D582D383531363765 0x0e --function="getStakedNFTStakedDatetime" 
+
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --arguments 0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d 0x4D4D4D582D383531363765 0x0e --function="getStakedNFTRolloverBalance" 
+
+
+erdpy --verbose contract call  erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --proxy="https://devnet-gateway.elrond.com" --chain=D --gas-limit=200000000 --function="stakeAddressNFT" --arguments 0x4D4D4D582D383531363765 0x0e --recall-nonce --send
+
+
+erdpy --verbose contract call  erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --proxy="https://devnet-gateway.elrond.com" --chain=D --gas-limit=200000000 --function="unstakeAddressNFT" --arguments 0x4D4D4D582D383531363765 0x0e --recall-nonce --send
+
+
+
+
+
+//==================================================================================
+
+erdpy contract query erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --proxy="https://devnet-gateway.elrond.com" --function="getStakingRewardBalance" 
+
+
+erdpy --verbose contract call erd1qqqqqqqqqqqqqpgqd7m2ppcp6gp6h2rs4s555a9nu2v4tq65y4ws4eylxf --pem="../dev-wallet-owner.pem" --proxy="https://devnet-gateway.elrond.com" --chain=D --gas-limit=200000000 --function="redeemStakingRewards" --recall-nonce --send
+
+
+
+
+
+
+
+
+
+//==================================================================================
+HELPER
+
+// bech32 address then PREFIX "0x" to hex it
+
+erdpy wallet bech32 --decode erd1ad4pvc2mdvfgjv7t0kr3axj0ry0wcsam2acedqj4vwgjj7runnysf84c9l
+
+StakingContractAddress(bech32 + hexed) : 0x000000000000000005006fb6a08701d203aba870ac294a74b3e299558354255d
+
+dev-wallet-owner (bech32 + hexed) : 0xbdfc85e547bf6f62dd6efdc498a0795f218b5c604d49a33281281c29de7e255d
+
+devnet-wallet (bech32 + hexed) :
+0xeb6a16615b6b128933cb7d871e9a4f191eec43bb5771968255639129787c9cc9
+
