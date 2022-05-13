@@ -5,7 +5,8 @@ elrond_wasm_node::wasm_endpoints! {
     (
         setLastPayoutDatetime
         setLastPayoutDatetimeToBlockTimestamp
-        setAdminAddress  
+
+        setAddressRole
 
         addStakableTokenIdentifier
         removeStakableTokenIdentifier
@@ -17,6 +18,8 @@ elrond_wasm_node::wasm_endpoints! {
         unstakeAddressNFT
         getStakingRewardBalance
         redeemStakingRewards
+
+        qualifiedStakedNFTsForRewards
         disburseRewards
 
         geStakedPool
@@ -24,11 +27,20 @@ elrond_wasm_node::wasm_endpoints! {
         geStakedNFTInfo
         getLastPayoutDatetime
         geStakedTokenIndentifier
-        getAdminAddress
+        getAddressRole
         getVersion      
 
 
 
+
+
         test_set_address_reward
+        test_reset_lastpayoutdatetime
+        test_get_currenttime
+        test_difference_lastpayoutdatetime_vs_currenttime   
+        test_time_block_calculations
+        test_get_new_lastpayoutdatetime
+        test_reward_split
+        test_marketplace_fee_splits
     )
 }

@@ -85,28 +85,35 @@ pub trait StakingContract:
 
 
     // =========================================================================================
-    // Add Admin address
+    // Add Address Role
 
-    //TESTED: 5/10
+
     #[payable("EGLD")]
     #[only_owner]
-    #[endpoint(setAdminAddress)]   
-    fn set_admin_address(&self,
-                         address: ManagedAddress) -> SCResult<()> 
+    #[endpoint(setAddressRole)]   
+    fn set_address_role(&self,
+                         address: ManagedAddress,
+                         role: u16) -> SCResult<()> 
     {
-        if self.admin_address(&address).is_empty() 
+        // Enum Address Role Values:
+        // 1. Deployer (1u16)
+        // 2. Owner (2u16)
+        // 3. Admin (3u16) 
+        
+        if role != 1u16 &&      // deployer role
+           role != 2u16 &&      // owner role
+           role != 3u16         // admin role
         {            
             //just set a value so it's not empty
-            self.admin_address(&address).set(1u16);
+            return sc_error!("Role is not valid.");
         }
         else
         {
-            return sc_error!("Address already register as admin.");
+            self.address_role(&address).set(role);
         }
 
         Ok(()) 
     }
-
 
 
 
@@ -123,11 +130,17 @@ pub trait StakingContract:
                                      token_id: TokenIdentifier) -> SCResult<()> 
     {
         let address = self.blockchain().get_caller();
-
-        if self.admin_address(&address).is_empty() 
+   
+        if ! self.address_role_exists(&address)
         {            
-            return sc_error!("Must be an admin to modify a token identifier as Stakeable.");
+            return sc_error!("Caller address does not have any role priviledges.");
         }
+
+        if ! self.address_role_can_edit_stakeable_token_id(&address)
+        {
+            return sc_error!("Caller address role cannot make token stakeable.");
+        }
+
 
         // This is enables a "collection" with that token identifer 
         // to be able to staked it's NFT 
@@ -153,9 +166,14 @@ pub trait StakingContract:
     {
         let address = self.blockchain().get_caller();
 
-        if self.admin_address(&address).is_empty() 
+        if ! self.address_role_exists(&address)
         {            
-            return sc_error!("Must be an admin to modify a token identifier as Stakeable.");
+            return sc_error!("Caller address does not have any role priviledges.");
+        }
+
+        if ! self.address_role_can_edit_stakeable_token_id(&address)
+        {
+            return sc_error!("Caller address role cannot make token stakeable.");
         }
 
         // Check to see if the token id was make stakeable before
@@ -213,7 +231,7 @@ pub trait StakingContract:
     }
 
 
-
+    //TESTED: 5/10
     #[view(getStakedNFTRolloverBalance)]
     fn get_staked_nft_rollover_balance(&self, 
                                        address: ManagedAddress,
@@ -236,7 +254,7 @@ pub trait StakingContract:
     }
     
     
-
+    //TESTED: 5/10
     #[payable("EGLD")]
     #[endpoint(stakeAddressNFT)]   
     fn stake_address_nft(&self,
@@ -335,7 +353,7 @@ pub trait StakingContract:
    
 
 
-
+    //TESTED: 5/10
     #[payable("EGLD")]
     #[endpoint(unstakeAddressNFT)]   
     fn unstake_address_nft(&self,
@@ -416,7 +434,7 @@ pub trait StakingContract:
     }
 
 
-
+    //TESTED: 5/10
     #[payable("EGLD")]
     #[endpoint(redeemStakingRewards)]   
     fn redeem_staking_rewards(&self) -> SCResult<()>  
@@ -458,23 +476,130 @@ pub trait StakingContract:
     // =========================================================================================
     // PAYOUT PROCESS   
 
+
+    #[view(qualifiedStakedNFTsForRewards)]
+    fn qualified_staked_nfts_for_rewards( &self) -> u16  
+    {
+
+
+        //check to see if there is any nfts (currently staked or rollover time qualified for reward)
+
+        //return 0 - No qualified NFTs found
+        //return 1 - true 
+        //return 2 - lastPayoutDateTime never setup
+        //return 3 - payout time block is less than required time block
+
+        // Step1: Check if the datetime is within the 24 hours payout block minimal since
+        //        the last_payout_datetime 
+        //add a time buffer just in case process job runs every day at midnight - buffer will account for that case
+        let currentDateTime_withTimeBuffer = self.blockchain().get_block_timestamp() + PAYOUT_TIME_BUFFER;
+
+        let lastPayoutDatetime = self.last_payout_datetime().get();
+        let mut accuredTimeFromLastPayoutDatetime = 0u64;
+        let mut newLastPayoutDateTime = 0u64;
+
+        if lastPayoutDatetime == 0u64 
+        {
+            //fail case: last_payout_datetime never set and is 0 
+            //Last_Payout_Datetime was NEVER setup - Must set prior to doing payout"
+            return 2u16;
+        }
+        else if (currentDateTime_withTimeBuffer - lastPayoutDatetime ) < PAYOUT_TIME_BLOCK  //check to see at least on payout time block (with added buffer)
+        {
+            //fail case: current datetime (with buffer) is less that the required timeframe
+            //Payout time period is less than required time block - Try at later time.
+            return 2u16;
+        }
+        else
+        {        
+            let timeDifference = currentDateTime_withTimeBuffer - lastPayoutDatetime;
+
+            let numOfPayoutTimeBlockFromTimeDifference = timeDifference / PAYOUT_TIME_BLOCK;
+
+            // NEW last_payout_datetime 
+            newLastPayoutDateTime = lastPayoutDatetime + (numOfPayoutTimeBlockFromTimeDifference * PAYOUT_TIME_BLOCK);
+
+            //get the difference between the new and old payout datetime
+            accuredTimeFromLastPayoutDatetime = newLastPayoutDateTime - lastPayoutDatetime;
+        }
+
+        let mut qualifiedNFTFound = 0u16;
+
+        //get the staked pool
+        let stakedPool = self.staked_pool().get();  
+        
+        // iterate over the array of stakedAddresses to get address to get the 
+        // stakedAddressNFTs to tally up the payout_block_factor_tally (used to split the rewards)
+        for stakedAddress in stakedPool.arrayStakedAddresses 
+        {
+            let stakedAddressNFT = self.staked_address_nfts(&stakedAddress).get();
+
+            for nftId in stakedAddressNFT.arrayStakedNFTIds
+            {
+                let mut stakedNFT = self.staked_nft_info(&stakedAddress, &nftId).get();
+                
+                if stakedNFT.staked_datetime != 0u64  //STILL STAKED
+                {
+                    //get the difference between the 
+                    let accuredTimeFromLastPayoutDatetime = accuredTimeFromLastPayoutDatetime - lastPayoutDatetime;
+                    
+                    //add it to the rollover balance
+                    stakedNFT.rollover_balance += accuredTimeFromLastPayoutDatetime;                    
+                }
+
+                //get the rolloverPayoutFactor by Int Division of balance with PAYOUT_TIME_BLOCK
+                let nftRolloverPayoutFactor = stakedNFT.rollover_balance / PAYOUT_TIME_BLOCK;
+
+                if nftRolloverPayoutFactor > 1  //factor must be greater than 1 to account for payout and updates
+                {
+                    qualifiedNFTFound = 1u16;
+                    break;
+                }                
+            }
+
+            if qualifiedNFTFound == 1u16
+            {
+                break;
+            }
+        }
+                
+        return qualifiedNFTFound;
+    }  
+    
+    
+
+
     #[payable("EGLD")]
     #[endpoint(disburseRewards)]
     fn disburse_rewards( &self, 
-                         reward_amount: BigUint ) -> SCResult<()>  
+                         reward_amount: u64 ) -> SCResult<()>  
     {       
+        let address = self.blockchain().get_caller();
+
+        if ! self.address_role_exists(&address)
+        {            
+            return sc_error!("Caller address does not have any role priviledges.");
+        }
+
+        if ! self.address_role_can_disburse_rewards(&address)
+        {
+            return sc_error!("Caller address role cannot disburse rewards.");
+        }
+        
+        
         // Step1: Check if the datetime is within the 24 hours payout block minimal since
         //        the last_payout_datetime 
         
         //add a time buffer just in case process job runs every day at midnight - buffer will account for that case
         let currentDateTime_withTimeBuffer = self.blockchain().get_block_timestamp() + PAYOUT_TIME_BUFFER;
 
-        let mut lastPayoutDatetime = self.last_payout_datetime().get();
+        let lastPayoutDatetime = self.last_payout_datetime().get();
         let mut accuredTimeFromLastPayoutDatetime = 0u64;
 
+        //VALIDATIONS
         if lastPayoutDatetime == 0u64 
         {
-            //fail case: last_payout_datetime never set is is 0 
+            //fail case: last_payout_datetime never set and is 0 
             return sc_error!("Last_Payout_Datetime was NEVER setup - Must set prior to doing payout");
         }
         else if (currentDateTime_withTimeBuffer - lastPayoutDatetime ) < PAYOUT_TIME_BLOCK  //check to see at least on payout time block (with added buffer)
@@ -490,7 +615,7 @@ pub trait StakingContract:
 
             //update NEW last_payout_datetime 
             let newLastPayoutDateTime = lastPayoutDatetime + (numOfPayoutTimeBlockFromTimeDifference * PAYOUT_TIME_BLOCK);
-            self.last_payout_datetime().set(newLastPayoutDateTime);
+            self.last_payout_datetime().set(newLastPayoutDateTime);  //verified
 
             //get the difference between the new and old payout datetime
             accuredTimeFromLastPayoutDatetime = newLastPayoutDateTime - lastPayoutDatetime;
@@ -587,8 +712,6 @@ pub trait StakingContract:
     // =========================================================================================
     // TEST FUNCTIONS
 
-    #[payable("EGLD")]
-    #[only_owner]
     #[endpoint]   
     fn test_set_address_reward(&self,
                                 address: ManagedAddress, 
@@ -604,18 +727,94 @@ pub trait StakingContract:
     }
 
 
+    #[endpoint]   
+    fn test_reset_lastpayoutdatetime(&self) -> SCResult<()> 
+    {
+        self.last_payout_datetime().set(0u64);
+
+        Ok(()) 
+    }
 
 
-        // a lump sum of daily reward is sent to the SC, then there is a function
-        // that disburse the funds to all staked accounts with qualified NFTS 
-        // (qualified NFTs are ones that have a stakedDateTime greater 24 hours).
-        // NFT is weighed equally.  However, to make it scale, added a weighted
-        // factor in the StakedNFT (if 1, it's counts for 1, 2, it counts as 2, 
-        // and so forth). 
-        // The logic will tally up all the StakedNFT count then it will update the
-        // stakedAddress "payout" field according to this formula:
-        // addressPayout = daily_total_reward * (numStakedNFTForAddress / overallTotalStakedNFTQualifiedForRewards)
+    #[view]   
+    fn test_get_currenttime(&self) -> u64
+    {
+        return self.blockchain().get_block_timestamp();
+    }
+    
+    
+    #[view]   
+    fn test_difference_lastpayoutdatetime_vs_currenttime(&self) -> u64
+    {
+        let currentDateTime = self.blockchain().get_block_timestamp();
+
+        let lastPayoutDatetime = self.last_payout_datetime().get();
+
+        return currentDateTime-lastPayoutDatetime;
+    }
 
 
+    #[view]   
+    fn test_time_block_calculations(&self) -> u64
+    {
+        /*
+        let currentDateTime_withTimeBuffer = self.blockchain().get_block_timestamp() + PAYOUT_TIME_BUFFER;
+        let lastPayoutDatetime = self.last_payout_datetime().get();
+        let timeDifference = currentDateTime_withTimeBuffer - lastPayoutDatetime;
+        */
+
+        let timeDifference = self.test_difference_lastpayoutdatetime_vs_currenttime();
+
+        let numOfPayoutTimeBlockFromTimeDifference = timeDifference / PAYOUT_TIME_BLOCK;    
+
+        return numOfPayoutTimeBlockFromTimeDifference;
+    }
+    
+    
+    #[view]   
+    fn test_get_new_lastpayoutdatetime(&self) -> u64
+    {
+        /*
+        let currentDateTime_withTimeBuffer = self.blockchain().get_block_timestamp() + PAYOUT_TIME_BUFFER;
+        let lastPayoutDatetime = self.last_payout_datetime().get();
+        let timeDifference = currentDateTime_withTimeBuffer - lastPayoutDatetime;
+        */
+
+        let numOfPayoutTimeBlockFromTimeDifference = self.test_time_block_calculations();
+
+        let lastPayoutDatetime = self.last_payout_datetime().get();
+
+        let newLastPayoutDateTime = lastPayoutDatetime + (numOfPayoutTimeBlockFromTimeDifference * PAYOUT_TIME_BLOCK);
+
+        return newLastPayoutDateTime;          
+    }
+
+
+
+    #[view]
+    fn test_reward_split(&self) -> BigUint
+    {
+        let rewardAmount: u64 = 80u64;
+
+        let overallTotalPayoutQualifiedStakedNFT: u64 = 3u64;
+        let payoutBlockFactorTally: u64 = 1u64;
+
+        let splitReturn = (rewardAmount as f64) * ((payoutBlockFactorTally as f64)/(overallTotalPayoutQualifiedStakedNFT as f64));
+
+        return BigUint::from(splitReturn as u64);    
+    }
+
+
+    #[view]
+    fn test_marketplace_fee_splits(&self) -> BigUint
+    {
+        let marketPlaceFees = BigUint::from(70u64);
+        let marketPlaceFeesConvertU64 = marketPlaceFees.to_u64().unwrap();
+
+        let daoPercentage: f64 = 0.20;
+        let stakePercentage: f64 = 0.80;
+
+        return BigUint::from(((marketPlaceFeesConvertU64 as f64) * stakePercentage) as u64);    
+    }
 
 }

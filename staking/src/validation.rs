@@ -54,7 +54,51 @@ pub trait ValidationModule:
 
 
 
+    fn address_role_exists(&self, address: &ManagedAddress) -> bool
+    {
+        return ! self.address_role(&address).is_empty();
+    }
 
+
+    fn address_role_is_deployer(&self, address: &ManagedAddress) -> bool
+    {
+        let addressRole = self.address_role(&address).get();
+
+        return addressRole == 1u16;
+    }
+    
+    fn address_role_is_owner(&self, address: &ManagedAddress) -> bool
+    {
+        let addressRole = self.address_role(&address).get();
+
+        return addressRole == 2u16;
+    }
+
+
+    fn address_role_is_admin(&self, address: &ManagedAddress) -> bool
+    {
+        let addressRole = self.address_role(&address).get();
+
+        return addressRole == 3u16;
+    }
+
+
+    fn address_role_can_edit_stakeable_token_id(&self, address: &ManagedAddress) -> bool
+    {
+        return self.address_role_is_deployer(&address) || 
+               self.address_role_is_owner(&address) ||
+               self.address_role_is_admin(&address);
+    }
+
+    fn address_role_can_disburse_rewards(&self, address: &ManagedAddress) -> bool
+    {
+        return self.address_role_is_deployer(&address) || 
+               self.address_role_is_owner(&address) ||
+               self.address_role_is_admin(&address);
+    }
+
+ 
+ 
 
     fn require_valid_token_id(&self, token_id: &TokenIdentifier<Self::Api>) -> SCResult<()> {
         require!(token_id.is_valid_esdt_identifier(), "Invalid token Id");

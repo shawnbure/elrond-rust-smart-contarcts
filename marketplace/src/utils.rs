@@ -63,7 +63,9 @@ pub trait UtilsModule: storage::StorageModule {
     }
 
 
-    
+    fn is_nft_on_auction(&self, nft_id: &NftId<Self::Api>) -> bool {
+        !self.auction(nft_id).is_empty()
+    }    
 
     fn error_nft_not_found(&self) -> SCResult<()> {
         sc_error!("Nft not found")

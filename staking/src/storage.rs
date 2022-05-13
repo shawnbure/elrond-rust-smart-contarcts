@@ -211,9 +211,14 @@ pub trait StorageModule {
     fn stakable_token_identifier(&self, token_identifier: &TokenIdentifier) -> SingleValueMapper<Self::Api, u16>;
 
 
-    #[view(getAdminAddress)]
-    #[storage_mapper("admin_address")]
-    fn admin_address(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, u16>;
+
+    // Enum Address Role Values:
+    // 1. Deployer (1u16)
+    // 2. Owner (2u16)
+    // 3. Admin (3u16) 
+    #[view(getAddressRole)]
+    #[storage_mapper("address_role")]
+    fn address_role(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, u16>;
 
 
     #[view(getVersion)]
