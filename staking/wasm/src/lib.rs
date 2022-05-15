@@ -40,7 +40,8 @@ elrond_wasm_node::wasm_endpoints! {
         test_difference_lastpayoutdatetime_vs_currenttime   
         test_time_block_calculations
         test_get_new_lastpayoutdatetime
-        test_reward_split
-        test_marketplace_fee_splits
+        
+        //test_reward_split
+        //test_marketplace_fee_splits
     )
 }

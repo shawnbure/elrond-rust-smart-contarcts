@@ -622,8 +622,10 @@ pub trait StakingContract:
         }
 
 
+        let reward_amount_f64: f64 = reward_amount as f64;
+
         //running total of all qualified NFT for all addresses
-        let mut overallTotalPayoutQualifiedStakedNFT = 0u64;
+        let mut overallTotalPayoutQualifiedStakedNFT : u64 = 0u64;
 
         //get the staked pool
         let stakedPool = self.staked_pool().get();  
@@ -686,8 +688,9 @@ pub trait StakingContract:
             //only reward if there is a block factor
             if stakedAddressPayoutTallyTracker.payout_block_factor_tally > 0u64
             {
-                //TODO: verify if needs to be convert to float???
-                let addressRewardPayoutAmount = reward_amount.clone() * (stakedAddressPayoutTallyTracker.payout_block_factor_tally / overallTotalPayoutQualifiedStakedNFT);
+                let addressRewardPayoutAmount_f64 = (reward_amount_f64) * ( (stakedAddressPayoutTallyTracker.payout_block_factor_tally as f64) / (overallTotalPayoutQualifiedStakedNFT as f64) );
+
+                let addressRewardPayoutAmount = addressRewardPayoutAmount_f64 as u64;
 
                 if addressRewardPayoutAmount > 0u64  
                 {
@@ -790,18 +793,20 @@ pub trait StakingContract:
     }
 
 
-
+    /*
     #[view]
     fn test_reward_split(&self) -> BigUint
     {
         let rewardAmount: u64 = 80u64;
+        let reward_amount_f64 = rewardAmount as f64;
 
         let overallTotalPayoutQualifiedStakedNFT: u64 = 3u64;
         let payoutBlockFactorTally: u64 = 1u64;
 
-        let splitReturn = (rewardAmount as f64) * ((payoutBlockFactorTally as f64)/(overallTotalPayoutQualifiedStakedNFT as f64));
+        let splitReturn_f64 : f64 = (reward_amount_f64) * ((payoutBlockFactorTally as f64)/(overallTotalPayoutQualifiedStakedNFT as f64));
+        let splitReturn = splitReturn_f64 as u64;
 
-        return BigUint::from(splitReturn as u64);    
+        return BigUint::from(splitReturn);    
     }
 
 
@@ -816,5 +821,6 @@ pub trait StakingContract:
 
         return BigUint::from(((marketPlaceFeesConvertU64 as f64) * stakePercentage) as u64);    
     }
+    */
 
 }
