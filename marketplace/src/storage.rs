@@ -3,6 +3,9 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+
+
+
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct NftId<M>
 where
@@ -114,6 +117,10 @@ impl<M: ManagedTypeApi> Default for Offer<M> {
 #[elrond_wasm_derive::module]
 //#[elrond_wasm::module]
 pub trait StorageModule {
+
+
+    
+    
     #[view(getPlatformFeePercent)]
     #[storage_mapper("platform_fee_percent")]
     fn platform_fee_percent(&self) -> SingleValueMapper<Self::Api, u64>;
@@ -174,4 +181,6 @@ pub trait StorageModule {
     #[view(getAuction)]
     #[storage_mapper("auction")]
     fn auction(&self, nft_id: &NftId<Self::Api>) -> SingleValueMapper<AuctionInfo<Self::Api>>;
+
+
 }

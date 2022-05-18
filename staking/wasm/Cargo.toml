@@ -1,0 +1,32 @@
+[package]
+name = "staking-wasm"
+version = "0.0.0"
+authors = [ "you",]
+edition = "2018"
+publish = false
+
+[lib]
+crate-type = [ "cdylib",]
+
+[workspace]
+members = [ ".",]
+
+[dev-dependencies]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = true
+panic = "abort"
+
+[dependencies.staking]
+features = [ "wasm-output-mode",]
+path = ".."
+
+[dependencies.elrond-wasm-output]
+version = "0.29.3"
+features = [ "wasm-output-mode"]
+
+[dependencies.elrond-wasm-node]
+version = "0.29.3"
