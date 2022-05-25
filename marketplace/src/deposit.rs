@@ -17,7 +17,7 @@ pub trait DepositModule:
     }
 
     #[endpoint(withdraw)]
-    fn withdraw(&self, #[var_args] opt_amount: OptionalValue<BigUint>) -> SCResult<()> {
+    fn withdraw(&self,  opt_amount: OptionalValue<BigUint>) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         let amount = opt_amount
             .into_option()

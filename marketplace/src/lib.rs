@@ -278,7 +278,7 @@ pub trait MarketplaceContract:
         token_id: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-        #[var_args] expire_opt: OptionalValue<u64>,
+         expire_opt: OptionalValue<u64>,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -555,7 +555,7 @@ pub trait MarketplaceContract:
         #[payment_amount] amount: BigUint,
         min_bid: BigUint,
         deadline: u64,
-        #[var_args] opt_start_time: OptionalValue<u64>,
+         opt_start_time: OptionalValue<u64>,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 

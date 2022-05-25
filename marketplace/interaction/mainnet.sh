@@ -166,4 +166,16 @@ getCreatorLastWithdrawalEpoch() {
         --arguments $1
 }
 
+
+
+setMarketplaceRoyalties20() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+        --pem=${MY_WALLET_PEM} \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --function setRoyaltiesMaxFeePercent \
+        --arguments 0x7D0 \
+        --gas-limit=100000000 \
+        --send || return
+}
+
 upgrade

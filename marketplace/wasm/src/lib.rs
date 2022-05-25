@@ -15,6 +15,7 @@ elrond_wasm_node::wasm_endpoints! {
         getVersion
         withdraw
         deposit
+        
         getPlatformFeePercent
         getAssetMinPrice
         getAssetMaxPrice

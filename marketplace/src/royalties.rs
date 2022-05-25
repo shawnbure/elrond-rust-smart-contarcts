@@ -8,7 +8,7 @@ use super::utils;
 pub trait RoyaltiesModule: storage::StorageModule + utils::UtilsModule {
     #[only_owner]
     #[endpoint(withdrawPlatformRoyalties)]
-    fn withdraw_platform_royalties(&self, #[var_args] amount_opt: OptionalValue<BigUint>) {
+    fn withdraw_platform_royalties(&self,  amount_opt: OptionalValue<BigUint>) {
         let amount = amount_opt
             .into_option()
             .unwrap_or(self.platform_royalties().get());

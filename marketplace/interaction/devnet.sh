@@ -174,6 +174,6 @@ getCreatorLastWithdrawalEpoch() {
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-deploy
+upgrade
 
 #------------------------------------------------
