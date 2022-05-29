@@ -3,11 +3,18 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy)]
-pub enum CheckoutStatus {
-    Pending,
-    Successful,
-    Failed,
+mod marketplace_proxy {
+    elrond_wasm::imports!();
+
+    #[elrond_wasm::proxy]
+    pub trait MarketPlace {
+        #[endpoint(tryDecreaseDeposit)]
+        fn try_decrease_deposit(
+            &self,
+            address: &ManagedAddress,
+            amount: &BigUint,
+        ) -> SCResult<BigUint>;
+    }
 }
 
 #[elrond_wasm::contract]
@@ -16,51 +23,50 @@ pub trait CheckoutDeposit {
     fn init(&self) {
     }
 
-    #[endpoint]
-    fn create_checkout(
-        &self,
-        checkout_id: BigUint,
-        checkout_amount: BigUint,
-    ) {
-        self.checkout_info(&checkout_id).set(&checkout_amount);
-        self.checkout_status(&checkout_id).set(CheckoutStatus::Pending);
-    }
-
-    #[payable("EGLD")]
-    #[endpoint]
+    #[endpoint(payCheckout)]
     fn pay_checkout(
         &self,
-        checkout_id: BigUint,
-        #[payment_amount] payment: BigUint,
+        marketplace: ManagedAddress,
+        amount: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
-        require!(self.checkout_info(&checkout_id).get() == payment, "You should pay enough!");
-        require!(self.checkout_status(&checkout_id).get() == CheckoutStatus::Pending, "Is not available at the moment");
-        self.checkout_status(&checkout_id).set(CheckoutStatus::Successful);
-        self.user_checkouts(&caller).push(&checkout_id);
-        Ok(())
+        self.marketplace_proxy(marketplace)
+            .try_decrease_deposit(caller, amount)
+            .async_call()
+            .call_and_exit();
     }
 
-    #[endpoint]
+    #[callback]
+    fn pay_checkout_callback(
+        &self,
+        #[call_result] result: ManagedAsyncCallResult<BigUint>,
+    ) {
+        match result {
+            ManagedAsyncCallResult::Ok(value) => {
+               self.deposit().update(|deposit| *deposit += value);
+            },
+            ManagedAsyncCallResult::Err(_) => {
+                todo!();
+                // self.err_storage().set(&err.err_msg);
+            },
+        }
+    }
+
+    #[endpoint(withdraw)]
     fn withdraw(&self) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         require!(caller == self.blockchain().get_owner_address(), "Only owner can withdraw!");
-        let sc_balance = self.blockchain().get_sc_balance(&TokenIdentifier::egld(), 0);
+        let sc_balance = self.deposit().get();
         self.send().direct(&caller, &TokenIdentifier::egld(), 0, &sc_balance, b"withdraw");
-
+        self.deposit().clear();
         Ok(())
     }
 
 
     // Storages
-    #[view(getCheckoutStatus)]
-    #[storage_mapper("checkoutStatus")]
-    fn checkout_status(&self, checkout_id: &BigUint) -> SingleValueMapper<CheckoutStatus>;
+    #[storage_mapper("deposit")]
+    fn deposit(&self) -> SingleValueMapper<BigUint>;
 
-    #[view(getCheckoutInfo)]
-    #[storage_mapper("checkoutInfo")]
-    fn checkout_info(&self, checkout_id: &BigUint) -> SingleValueMapper<BigUint>;
-
-    #[storage_mapper("userCheckouts")]
-    fn user_checkouts(&self, user: &ManagedAddress) -> VecMapper<BigUint>;
+    #[proxy]
+    fn marketplace_proxy(&self, sc_address: ManagedAddress) -> marketplace_proxy::Proxy<Self::Api>;
 }

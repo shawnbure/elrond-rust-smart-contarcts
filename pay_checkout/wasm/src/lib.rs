@@ -7,12 +7,8 @@
 elrond_wasm_node::wasm_endpoints! {
     pay_checkout
     (
-        create_checkout
-        getCheckoutInfo
-        getCheckoutStatus
-        pay_checkout
+        callBack
+        payCheckout
         withdraw
     )
 }
-
-elrond_wasm_node::wasm_empty_callback! {}
