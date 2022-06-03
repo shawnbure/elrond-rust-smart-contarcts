@@ -3,9 +3,9 @@ members = [
   "marketplace",
   "marketplace/meta",
   "nft_template",
-  "nft_template/abi",
+  "nft_template/meta",
   "deployer",
-  "deployer/abi",
+  "deployer/meta",
   "staking",
-  "staking/abi",  
+  "staking/meta",  
 ]
