@@ -161,9 +161,9 @@ pub trait MarketplaceContract:
         let platform_cut = self.get_platform_cut(&payment);
 
         let platform_cut_u64 = platform_cut.to_u64().unwrap();
-
-        let stakePercentage: f64 = 0.80;
-        let stakingCut: u64 = ((platform_cut_u64 as f64) * stakePercentage) as u64;
+        //DANGER
+        let stakePercentage: u64 = 80;
+        let stakingCut: u64 = ((platform_cut_u64) * stakePercentage) ;
         let daoCut: u64 = platform_cut_u64 - stakingCut;
 
         
