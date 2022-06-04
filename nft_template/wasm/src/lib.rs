@@ -1,43 +1,51 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     nft_template
     (
-        giveaway
-        mintTokens
-        mintTokensThroughMarketplace
-        shuffle
-        requestWithdraw
-        withdraw
-        marketplaceWithdraw
         allowMintingThroughMarketplace
+        changeBuyerBuyLimit
+        createBuyerAddress
         denyMintingThroughMarketplace
-        setPrice
-        pauseSale
-        resumeSale
-        getLeftForSale
-        getMaxSupplyAndTotalSold
-        getMarketplaceBalance
-        getMarketplaceAdmin
-        isMintingThroughMarketplaceDenied
-        getTotalSold
-        getMaxSupply
-        getPrice
-        getRoyalties
-        getImageBaseUri
-        getImageExtension
-        getMetadataBaseUri
-        getTokenNameBase
-        getTokenId
-        getSaleStart
-        isSalePaused
         getAdminPubKey
         getBuyCount
         getBuyLimit
-        createBuyerAddress
         getBuyerWhiteListCheck
+        getImageBaseUri
+        getImageExtension
+        getLeftForSale
+        getMarketplaceAdmin
+        getMarketplaceBalance
+        getMaxSupply
+        getMaxSupplyAndTotalSold
+        getMetadataBaseUri
+        getMetadataExtension
+        getPrice
+        getRoyalties
+        getSaleStart
+        getTokenId
+        getTokenNameBase
+        getTotalSold
+        giveaway
+        isMintingThroughMarketplaceDenied
+        isSalePaused
+        marketplaceWithdraw
+        mintTokens
+        mintTokensThroughMarketplace
+        pauseSale
+        requestWithdraw
+        resumeSale
+        setPrice
+        shuffle
         updateBuyerWhitelistCheck
-        changeBuyerBuyLimit
+        updateMetadataExtension
         updateSaleStart
+        withdraw
     )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

@@ -4,6 +4,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use core::ops::Deref;
+use elrond_wasm::types::heap::Vec;
 
 
 pub mod config;

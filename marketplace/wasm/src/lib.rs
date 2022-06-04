@@ -1,33 +1,52 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     marketplace
     (
-        putNftForSale
-        buyNft
-        withdrawNft
-        makeOffer
         acceptOffer
+        blacklistCreator
+        buyNft
         cancelOffer
-        startAuction
-        placeBid
-        endAuction
-        getVersion
-        withdraw
         deposit
-        getPlatformFeePercent
-        getStakingSCAddress
-        getAssetMinPrice
+        endAuction
         getAssetMaxPrice
-        getRoyaltiesMaxFeePercent
-        getCreatorWithdrawalWaitingEpochs
-        isCreatorBlacklisted
-        getEgldDeposit
-        getCreatorRoyalties
+        getAssetMinPrice
+        getAuction
         getCreatorLastWithdrawalEpoch
-        getPlatformRoyalties
+        getCreatorRoyalties
+        getCreatorWithdrawalWaitingEpochs
+        getDao
+        getEgldDeposit
+        getGlobalOpOngoing
         getNftSaleInfo
         getOffer
-        getAuction
+        getPlatformFeePercent
+        getPlatformRoyalties
+        getRemainingEpochsUntilClaim
+        getRoyaltiesMaxFeePercent
+        getStakingSCAddress
+        getVersion
+        isCreatorBlacklisted
+        makeOffer
+        placeBid
+        putNftForSale
+        removeCreatorFromBlacklist
+        setAssetPriceRange
+        setCreatorWithdrawalWaitingEpochs
+        setPlatformFeePercent
+        setRoyaltiesMaxFeePercent
+        startAuction
+        startGlobalOp
+        stopGlobalOp
+        withdraw
+        withdrawCreatorRoyalties
+        withdrawNft
+        withdrawPlatformRoyalties
     )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}
