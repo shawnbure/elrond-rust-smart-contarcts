@@ -31,7 +31,7 @@ upgrade() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${VERSION_HEX} \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${MY_PERSONAL_ADD} ${VERSION_HEX} \
         --send || return
 }
 
