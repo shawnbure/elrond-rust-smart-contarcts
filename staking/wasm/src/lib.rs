@@ -1,47 +1,43 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
     staking
     (
-        setLastPayoutDatetime
-        setLastPayoutDatetimeToBlockTimestamp
-
-        setAddressRole
-
         addStakableTokenIdentifier
-        removeStakableTokenIdentifier
-
-        isNFTStaked
-        getStakedNFTStakedDatetime
-        getStakedNFTRolloverBalance
-        stakeAddressNFT
-        unstakeAddressNFT
-        getStakingRewardBalance
-        redeemStakingRewards
-
-        qualifiedStakedNFTsForRewards
         disburseRewards
-
-        geStakedPool
         geStakedAddressNFTs
         geStakedNFTInfo
-        getLastPayoutDatetime
+        geStakedPool
         geStakedTokenIndentifier
         getAddressRole
-        getVersion      
-
-
-
-
-
-        test_set_address_reward
-        test_reset_lastpayoutdatetime
+        getGlobalOpOngoing
+        getLastPayoutDatetime
+        getStakedNFTRolloverBalance
+        getStakedNFTStakedDatetime
+        getStakingRewardBalance
+        getVersion
+        isNFTStaked
+        qualifiedStakedNFTsForRewards
+        redeemStakingRewards
+        removeStakableTokenIdentifier
+        setAddressRole
+        setLastPayoutDatetime
+        setLastPayoutDatetimeToBlockTimestamp
+        stakeAddressNFT
+        startGlobalOp
+        stopGlobalOp
+        test_difference_lastpayoutdatetime_vs_currenttime
         test_get_currenttime
-        test_difference_lastpayoutdatetime_vs_currenttime   
-        test_time_block_calculations
         test_get_new_lastpayoutdatetime
-        
-        //test_reward_split
-        //test_marketplace_fee_splits
+        test_reset_lastpayoutdatetime
+        test_set_address_reward
+        test_time_block_calculations
+        unstakeAddressNFT
     )
 }
+
+elrond_wasm_node::wasm_empty_callback! {}

@@ -3,6 +3,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+use elrond_wasm::types::heap::Vec;
 
 
 

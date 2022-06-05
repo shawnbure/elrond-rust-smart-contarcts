@@ -10,7 +10,7 @@ CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqjq5wlj36spzvf9ppq2ae242wv9a78avcy4ws8ktslw
 CONTRACT_ADDRESS_HEX="0x000000000000000005009028efca3a8044c4942102bb95554e617be3f598255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
-MY_ADDRESS="erd17s2pz8qrds6ake3qwheezgy48wzf7dr5nhdpuu2h4rr4mt5rt9ussj7xzh"
+MY_PERSONAL_ADD="0xbf3da1a0d2435dbe1637ec2be31dc9f6c01b76e3eb29646bf06de7d98eddb024"
 
 DAO_ADDRESS="0x6b3d87c350a9fc286199e186de9e479dc9a2b58808083b7c419afbf358082319"
 deploy() {
@@ -20,7 +20,7 @@ deploy() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${VERSION_HEX} \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${MY_PERSONAL_ADD} ${VERSION_HEX} \
         --send || return
 }
 
@@ -31,7 +31,7 @@ upgrade() {
         --metadata-payable \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --gas-limit=200000000 \
-        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${VERSION_HEX} \
+        --arguments 0xfa 0x03e8 0x038D7EA4C68000 0x52B7D2DCC80CD2E4000000 0x1e ${DAO_ADDRESS} ${MY_PERSONAL_ADD} ${VERSION_HEX} \
         --send || return
 }
 
