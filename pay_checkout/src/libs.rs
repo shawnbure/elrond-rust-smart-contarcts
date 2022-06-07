@@ -3,17 +3,21 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+mod status;
+use status::CheckoutStatus;
+
 mod marketplace_proxy {
     elrond_wasm::imports!();
 
     #[elrond_wasm::proxy]
     pub trait MarketPlace {
-        #[endpoint(tryDecreaseDeposit)]
-        fn try_decrease_deposit(
-            &self,
-            address: &ManagedAddress,
+        #[endpoint(checkoutPayment)]
+        fn checkoutPayment(
+            &self, 
+            address: &ManagedAddress, 
             amount: &BigUint,
-        ) -> SCResult<BigUint>;
+            checkout_id: &BigUint,
+        ) -> SCResult<()>;
     }
 }
 
@@ -28,12 +32,15 @@ pub trait CheckoutDeposit {
         &self,
         marketplace: ManagedAddress,
         amount: BigUint,
+        checkout_id: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         self.marketplace_proxy(marketplace)
-            .try_decrease_deposit(caller, amount)
+            .checkoutPayment(caller, amount, checkout_id)
             .async_call()
+            .with_callback(self.callbacks().pay_checkout_callback())
             .call_and_exit();
+        self.status(&checkout_id).set(CheckoutStatus::Pending);
     }
 
     #[callback]
@@ -42,11 +49,12 @@ pub trait CheckoutDeposit {
         #[call_result] result: ManagedAsyncCallResult<BigUint>,
     ) {
         match result {
-            ManagedAsyncCallResult::Ok(value) => {
-               self.deposit().update(|deposit| *deposit += value);
+            ManagedAsyncCallResult::Ok(checkout_id) => {
+            //    self.deposit().update(|deposit| *deposit += value);
+               self.status(&checkout_id).set(CheckoutStatus::Successful);
             },
             ManagedAsyncCallResult::Err(_) => {
-                todo!();
+                self.status(&checkout_id).set(CheckoutStatus::Failed);
                 // self.err_storage().set(&err.err_msg);
             },
         }
@@ -66,6 +74,9 @@ pub trait CheckoutDeposit {
     // Storages
     #[storage_mapper("deposit")]
     fn deposit(&self) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("status")]
+    fn status(&self, checkout_id: &BigUint) -> SingleValueMapper<CheckoutStatus>;
 
     #[proxy]
     fn marketplace_proxy(&self, sc_address: ManagedAddress) -> marketplace_proxy::Proxy<Self::Api>;
