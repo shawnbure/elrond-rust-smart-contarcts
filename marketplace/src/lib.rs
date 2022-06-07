@@ -5,7 +5,6 @@ elrond_wasm::derive_imports!();
 
 use core::ops::Deref;
 
-
 pub mod config;
 pub mod deposit;
 pub mod events;
@@ -15,6 +14,7 @@ pub mod storage;
 pub mod utils;
 pub mod validation;
 
+use config::BP;
 use storage::{AuctionInfo, NftId, NftSaleInfo, Offer};
 const SECONDS_IN_YEARS: u64 = 31_556_952u64;
 
@@ -44,22 +44,15 @@ pub trait MarketplaceContract:
         dao_address: ManagedAddress,
         staking_sc_address2: ManagedAddress,
         version: ManagedBuffer,
-    ) -> SCResult<()> {  
+    ) -> SCResult<()> {
         self.version().set(&version);
         self.dao().set(&dao_address);
         self.staking_sc_address().set(&staking_sc_address2);
         self.try_set_platform_fee_percent(platform_fee_percent)?;
         self.try_set_royalties_max_fee_percent(royalties_max_fee_percent)?;
         self.try_set_asset_price_range(asset_min_price, asset_max_price)?;
-        self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)        
+        self.try_set_creator_withdrawal_waiting_epochs(creator_withdrawal_waiting_epochs)
     }
-
-
-
-
-
-
-
 
     #[payable("*")]
     #[endpoint(putNftForSale)]
@@ -157,22 +150,23 @@ pub trait MarketplaceContract:
             payment_token.token_nonce,
             &(&creator_cut * &10u64.into()),
         );
-        
         let platform_cut = self.get_platform_cut(&payment);
 
-        let platform_cut_u64 = platform_cut.to_u64().unwrap();
+        // let platform_cut_u64 = platform_cut.to_u64().unwrap();
         //DANGER
-        let stakePercentage: f64 = 0.80;
-        let stakingCut: u64 = ((platform_cut_u64 as f64) * stakePercentage) as u64;
-        let daoCut: u64 = platform_cut_u64 - stakingCut;
+        let stakePercentage: BigUint = BigUint::from(800 as u64);
+        let stakingCut: BigUint = &platform_cut * &stakePercentage / BP;
+        let daoCut: BigUint = &platform_cut - &stakingCut;
 
-        
         // self.increase_platform_royalties(&platform_cut);
         self.send()
             .direct_egld(&self.dao().get(), &BigUint::from(daoCut), b"DAO's Cut");
 
-        self.send()
-            .direct_egld(&self.staking_sc_address().get(), &BigUint::from(stakingCut), b"Staking's Cut");            
+        self.send().direct_egld(
+            &self.staking_sc_address().get(),
+            &BigUint::from(stakingCut),
+            b"Staking's Cut",
+        );
 
         let nft_owner_cut = &payment - &platform_cut - &creator_cut;
         // self.increase_deposit(&nft_sale_info.owner, &nft_owner_cut);
@@ -278,7 +272,7 @@ pub trait MarketplaceContract:
         token_id: TokenIdentifier,
         nonce: u64,
         amount: BigUint,
-         expire_opt: OptionalValue<u64>,
+        expire_opt: OptionalValue<u64>,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -555,7 +549,7 @@ pub trait MarketplaceContract:
         #[payment_amount] amount: BigUint,
         min_bid: BigUint,
         deadline: u64,
-         opt_start_time: OptionalValue<u64>,
+        opt_start_time: OptionalValue<u64>,
     ) -> SCResult<()> {
         self.require_global_op_not_ongoing()?;
 
@@ -706,5 +700,5 @@ pub trait MarketplaceContract:
 
     #[view(getStakingSCAddress)]
     #[storage_mapper("staking_sc_address")]
-    fn staking_sc_address(&self) -> SingleValueMapper<ManagedAddress>;    
+    fn staking_sc_address(&self) -> SingleValueMapper<ManagedAddress>;
 }
