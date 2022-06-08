@@ -11,6 +11,9 @@ path = "src/libs.rs"
 [features]
 wasm-output-mode = [ "elrond-wasm-node"]
 
+[dependencies.marketplace]
+path="../marketplace"
+
 [dependencies.elrond-wasm]
 version = "0.31.1"
 
