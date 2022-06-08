@@ -12,7 +12,7 @@ mod marketplace_proxy {
     #[elrond_wasm::proxy]
     pub trait MarketPlace {
         #[endpoint(checkoutPayment)]
-        fn checkoutPayment(
+        fn checkout_payment(
             &self, 
             address: &ManagedAddress, 
             amount: &BigUint,
@@ -33,14 +33,22 @@ pub trait CheckoutDeposit {
         marketplace: ManagedAddress,
         amount: BigUint,
         checkout_id: BigUint,
+    ) -> SCResult<()>{
+        self.status(&checkout_id).set(CheckoutStatus::Pending);
+        self.proxy_call(marketplace, amount, checkout_id)
+    } 
+
+    fn proxy_call(
+        &self,
+        marketplace: ManagedAddress,
+        amount: BigUint,
+        checkout_id: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         self.marketplace_proxy(marketplace)
-            .checkoutPayment(caller, amount, checkout_id)
+            .checkout_payment(&caller, &amount, &checkout_id)
             .async_call()
-            .with_callback(self.callbacks().pay_checkout_callback())
             .call_and_exit();
-        self.status(&checkout_id).set(CheckoutStatus::Pending);
     }
 
     #[callback]
@@ -54,7 +62,7 @@ pub trait CheckoutDeposit {
                self.status(&checkout_id).set(CheckoutStatus::Successful);
             },
             ManagedAsyncCallResult::Err(_) => {
-                self.status(&checkout_id).set(CheckoutStatus::Failed);
+                // self.status(&checkout_id).set(CheckoutStatus::Failed);
                 // self.err_storage().set(&err.err_msg);
             },
         }
@@ -72,9 +80,11 @@ pub trait CheckoutDeposit {
 
 
     // Storages
+    #[view(getDeposit)]
     #[storage_mapper("deposit")]
     fn deposit(&self) -> SingleValueMapper<BigUint>;
 
+    #[view(getStatus)]
     #[storage_mapper("status")]
     fn status(&self, checkout_id: &BigUint) -> SingleValueMapper<CheckoutStatus>;
 

@@ -4,12 +4,14 @@ CHAIN_ID="D"
 WASM="../output/pay_checkout.wasm"
 VERSION="0.0.1"
 VERSION_HEX=0x302E302E31
+CHECKOUT_AMOUNT=200000000000000000
+CHECKOUT_ID=5
 
-CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqpgqg3h7rd5r5057ug209hlczez5hmq3upt9k8ks0arkq7"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-CONTRACT_ADDRESS_HEX = "0x00000000000000000500446fe1b683a3e9ee214f2dff816454bec11e0565b1ed"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqkl74d07529024m0qeh02ua3t928g3vyyk8ks65njt2"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+CONTRACT_ADDRESS_HEX="0x00000000000000000500b7fd56bfd4515eaaede0cddeae762b2a8e88b084b1ed"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqjq5wlj36spzvf9ppq2ae242wv9a78avcy4ws8ktslw"             
-MARKETPLACE_ADDRESS_HEX="0x000000000000000005009028efca3a8044c4942102bb95554e617be3f598255d"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqznqdfhrghvmhuzjlg3emess422hpmazrk8ksuvarcd"           #after deploying, the the contract address
+MARKETPLACE_ADDRESS_HEX="0x0000000000000000050014c0d4dc68bb377e0a5f4473bcc21552ae1df443b1ed"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 
 deploy() {
@@ -33,18 +35,25 @@ upgrade() {
 }
 
 payCheckout() {
-    erdpy --verbose contract call erd1qqqqqqqqqqqqqpgqg3h7rd5r5057ug209hlczez5hmq3upt9k8ks0arkq7 \
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} \
         --pem=${MY_WALLET_PEM} \
         --recall-nonce \
         --gas-limit 120000000 \
-        --function "payCheckout" \
-        --arguments ${MARKETPLACE_ADDRESS} $1 $1 \
+        --function payCheckout \
+        --arguments ${MARKETPLACE_ADDRESS} ${CHECKOUT_AMOUNT} ${CHECKOUT_ID} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --send || return
 }
 
+checkDepositStatus() {
+    erdpy --verbose contract query ${CONTRACT_ADDRESS} \
+        --proxy=${PROXY} \
+        --function getStatus \
+        --arguments ${CHECKOUT_ID}
+}
+
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-payCheckout
+checkDepositStatus
 
 #------------------------------------------------
