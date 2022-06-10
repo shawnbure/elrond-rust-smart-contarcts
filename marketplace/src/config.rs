@@ -45,6 +45,18 @@ pub trait ConfigModule: storage::StorageModule {
         self.creator_blacklist(&address).set(&false);
     }
 
+    #[only_owner]
+    #[endpoint(addTrustedSC)]
+    fn add_trusted_sc(&self, address: ManagedAddress) {
+        self.trusted_sc(&address).set(&true);
+    }
+
+    #[only_owner]
+    #[endpoint(removeTrustedSC)]
+    fn remove_trusted_sc(&self, address: ManagedAddress) {
+        self.trusted_sc(&address).set(&false);
+    }
+
     fn try_set_platform_fee_percent(&self, fee_percent: u64) -> SCResult<()> {
         require!(fee_percent < BP, "Fee percent too high");
         require!(fee_percent != 0, "Fee percent cannot be zero");

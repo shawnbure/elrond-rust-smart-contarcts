@@ -233,6 +233,19 @@ pub trait MarketplaceContract:
         Ok(())
     }
 
+    #[endpoint(externalTrustedPaymentSc)]
+    fn external_trusted_payment_sc(
+        &self, 
+        address: &ManagedAddress, 
+        amount: &BigUint,
+    ) -> SCResult<()> {
+        let caller = &self.blockchain().get_caller();
+        require!(self.trusted_sc(&caller).get(), "You are not trusted!");
+        self.try_decrease_deposit(&address, &amount)?;
+        self.send_egld(&caller, &amount); // send egld to the caller which is pay_checkout smart contract
+        Ok(())
+    }
+
     fn withdraw_nft_from_auction(&self, token_id: TokenIdentifier, nonce: u64) -> SCResult<()> {
         let nft_id = NftId::new(token_id.clone(), nonce);
         let caller = self.blockchain().get_caller();
