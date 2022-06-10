@@ -182,5 +182,7 @@ pub trait StorageModule {
     #[storage_mapper("auction")]
     fn auction(&self, nft_id: &NftId<Self::Api>) -> SingleValueMapper<AuctionInfo<Self::Api>>;
 
-
+    #[view(isTrustedSC)]
+    #[storage_mapper("trusted_sc")]
+    fn trusted_sc(&self, address: &ManagedAddress) -> SingleValueMapper<Self::Api, bool>;
 }

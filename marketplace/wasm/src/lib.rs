@@ -8,11 +8,13 @@ elrond_wasm_node::wasm_endpoints! {
     marketplace
     (
         acceptOffer
+        addTrustedSC
         blacklistCreator
         buyNft
         cancelOffer
         deposit
         endAuction
+        externalTrustedPaymentSc
         getAssetMaxPrice
         getAssetMinPrice
         getAuction
@@ -31,10 +33,12 @@ elrond_wasm_node::wasm_endpoints! {
         getStakingSCAddress
         getVersion
         isCreatorBlacklisted
+        isTrustedSC
         makeOffer
         placeBid
         putNftForSale
         removeCreatorFromBlacklist
+        removeTrustedSC
         setAssetPriceRange
         setCreatorWithdrawalWaitingEpochs
         setPlatformFeePercent

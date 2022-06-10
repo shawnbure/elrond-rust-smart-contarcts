@@ -5,12 +5,16 @@ CHAIN_ID="D"
 WASM="../output/marketplace.wasm"
 VERSION="0.0.1"
 VERSION_HEX=0x302E302E31
+DEPOSIT_AMOUNT=200000000000000000
 #SETUP THIS AFTER DEPLOYMENT
 CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqjq5wlj36spzvf9ppq2ae242wv9a78avcy4ws8ktslw"           #after deploying, the the contract address
 CONTRACT_ADDRESS_HEX="0x000000000000000005009028efca3a8044c4942102bb95554e617be3f598255d"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 MY_OTHER_ADDRESS="erd13rp6j2fg5wcqdztuwtt5z2n0ls8u0rplnqhyxd676mjtxd09fk7seef9ug"
 MY_PERSONAL_ADD="0xbf3da1a0d2435dbe1637ec2be31dc9f6c01b76e3eb29646bf06de7d98eddb024"
+
+EXTERNAL_TRUSTED_SC="erd1qqqqqqqqqqqqqpgqxqkm7yn3k9ymv7t0flqkfplwwgmt0n6tk8ksallkyj"
+EXTERNAL_TRUSTED_SC_HEX="0x00000000000000000500302dbf1271b149b6796f4fc16487ee7236b7cf4bb1ed"
 
 DAO_ADDRESS="0x6b3d87c350a9fc286199e186de9e479dc9a2b58808083b7c419afbf358082319"
 deploy() {
@@ -75,8 +79,8 @@ withdrawNft() {
 # $1 amount to deposit
 deposit() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
-        --value=$1 \
-        --pem=${MY_OTHER_WALLET_PEM} \
+        --value=${DEPOSIT_AMOUNT} \
+        --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function deposit \
         --gas-limit=100000000 \
@@ -86,7 +90,7 @@ deposit() {
 # $1 amount to deposit
 withdraw() {
     erdpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
-        --pem=${MY_OTHER_WALLET_PEM} \
+        --pem=${MY_WALLET_PEM} \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
         --function withdraw \
         --gas-limit=100000000 \
@@ -169,11 +173,29 @@ getCreatorLastWithdrawalEpoch() {
         --arguments $1
 }
 
+addTrusted() {
+    erdpy --verbose contract call ${CONTRACT_ADDRESS} \
+        --pem=${MY_WALLET_PEM} \
+        --recall-nonce \
+        --gas-limit 120000000 \
+        --function addTrustedSC \
+        --arguments ${EXTERNAL_TRUSTED_SC}\
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --send || return
+}
+
+checkAddressDeposit() {
+    erdpy --verbose contract query ${CONTRACT_ADDRESS} \
+        --proxy=${PROXY} \
+        --function getEgldDeposit \
+        --arguments ${MY_OTHER_ADDRESS}
+}
+
 
 
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-upgrade
+checkAddressDeposit
 
 #------------------------------------------------

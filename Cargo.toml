@@ -7,5 +7,7 @@ members = [
   "deployer",
   "deployer/meta",
   "staking",
-  "staking/meta",  
+  "staking/meta", 
+  "pay_checkout",
+  "pay_checkout/meta", 
 ]

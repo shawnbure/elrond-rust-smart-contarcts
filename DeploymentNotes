@@ -2,7 +2,27 @@ Deploy SC Process
 
 Note: in VSCode, shift+cmd+p “elrond: setup workplace”
 
+0. PayCheckout
 
+Clean / Build the “youbei-sc/pay_checkout WASM file generated: youbei-sc/pay_checkout/output/pay_checkout.wasm
+
+In youbei-sc/pay_checkout/interaction/devnet.sh,
+Set the following parameters:
+- MY_WALLET_PEM
+- MY_OTHER_WALLET_PEM
+- WASM
+
+Add “deploy” function to the “Shell Executed functions”
+
+Go to directory youbei-sc/pay_checkout/interaction/
+chmod +x devnet.sh. 	//make the shell executable
+
+./devnet.sh.	 		//executes it
+
+//After the deployment, get the pay_checkout contract address and set it to the variable “CONTRACT_ADDRESS”
+
+//CLI, “erdpy wallet bech32 --decode <CONTRACT_ADDRESS>” and
+Set that to the “CONTRACT_ADDRESS_HEX” value
 
 1. MarketPlace
 
@@ -13,6 +33,7 @@ Set the following parameters:
 - MY_WALLET_PEM
 - MY_OTHER_WALLET_PEM
 - WASM
+- EXTERNAL_TRUSTED_SC
 
 Add “deploy” function to the “Shell Executed functions”
 
@@ -25,6 +46,11 @@ chmod +x devnet.sh. 	//make the shell executable
 
 //CLI, “erdpy wallet bech32 --decode <CONTRACT_ADDRESS>” and
 Set that to the “CONTRACT_ADDRESS_HEX” value
+
+Add “addTrusted” to the “Shell Executed functions”
+
+// Go to youbei-sc/pay_checkout/interaction/devnet.sh
+- Update marketplace “CONTRACT_ADDRESS” and “CONTRACT_ADDRESS_HEX” as 
 
 
 // ———————————————————————————————————————
