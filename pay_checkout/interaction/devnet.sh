@@ -4,14 +4,14 @@ CHAIN_ID="D"
 WASM="../output/pay_checkout.wasm"
 VERSION="0.0.1"
 VERSION_HEX=0x302E302E31
-CHECKOUT_AMOUNT=200000000000000000
+CHECKOUT_AMOUNT=100000000000000000
 CHECKOUT_ID=5
 
-CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqkl74d07529024m0qeh02ua3t928g3vyyk8ks65njt2"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
-CONTRACT_ADDRESS_HEX="0x00000000000000000500b7fd56bfd4515eaaede0cddeae762b2a8e88b084b1ed"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
+CONTRACT_ADDRESS="erd1qqqqqqqqqqqqqpgqxqkm7yn3k9ymv7t0flqkfplwwgmt0n6tk8ksallkyj"             #this is from Marketplace contract "CONTRACT_ADDRESS" devnet.sh
+CONTRACT_ADDRESS_HEX="0x00000000000000000500302dbf1271b149b6796f4fc16487ee7236b7cf4bb1ed"     #erdpy wallet bech32 --decode <MY_ADDRESS> to get this value
 
-MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqznqdfhrghvmhuzjlg3emess422hpmazrk8ksuvarcd"           #after deploying, the the contract address
-MARKETPLACE_ADDRESS_HEX="0x0000000000000000050014c0d4dc68bb377e0a5f4473bcc21552ae1df443b1ed"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
+MARKETPLACE_ADDRESS="erd1qqqqqqqqqqqqqpgqasnr44wwyyj8cg7s9ryd5sdhra3tf09zk8kstyek5n"           #after deploying, the the contract address
+MARKETPLACE_ADDRESS_HEX="0x00000000000000000500ec263ad5ce21247c23d028c8da41b71f62b4bca2b1ed"   #erdpy wallet bech32 --decode <CONTRACT_ADDRESS> to get this value
 
 
 deploy() {
@@ -54,6 +54,6 @@ checkDepositStatus() {
 
 #-------- SHELL EXECUTED FUNCTIONS --------------
 
-checkDepositStatus
+payCheckout
 
 #------------------------------------------------

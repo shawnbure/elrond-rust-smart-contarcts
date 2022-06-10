@@ -8,7 +8,6 @@ elrond_wasm_node::wasm_endpoints! {
     pay_checkout
     (
         callBack
-        getDeposit
         getStatus
         payCheckout
         withdraw

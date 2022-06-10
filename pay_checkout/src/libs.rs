@@ -6,20 +6,7 @@ elrond_wasm::derive_imports!();
 mod status;
 use status::CheckoutStatus;
 
-mod marketplace_proxy {
-    elrond_wasm::imports!();
-
-    #[elrond_wasm::proxy]
-    pub trait MarketPlace {
-        #[endpoint(checkoutPayment)]
-        fn checkout_payment(
-            &self, 
-            address: &ManagedAddress, 
-            amount: &BigUint,
-            checkout_id: &BigUint,
-        ) -> SCResult<()>;
-    }
-}
+use marketplace::ProxyTrait as _;
 
 #[elrond_wasm::contract]
 pub trait CheckoutDeposit {
@@ -33,20 +20,20 @@ pub trait CheckoutDeposit {
         marketplace: ManagedAddress,
         amount: BigUint,
         checkout_id: BigUint,
-    ) -> SCResult<()>{
+    ) -> SCResult<()> {
         self.status(&checkout_id).set(CheckoutStatus::Pending);
-        self.proxy_call(marketplace, amount, checkout_id)
+        let scResult = self.proxy_call(marketplace, amount);
+        scResult
     } 
 
     fn proxy_call(
         &self,
         marketplace: ManagedAddress,
         amount: BigUint,
-        checkout_id: BigUint,
     ) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         self.marketplace_proxy(marketplace)
-            .checkout_payment(&caller, &amount, &checkout_id)
+            .external_trusted_payment_sc(&caller, &amount)
             .async_call()
             .call_and_exit();
     }
@@ -72,22 +59,17 @@ pub trait CheckoutDeposit {
     fn withdraw(&self) -> SCResult<()> {
         let caller = self.blockchain().get_caller();
         require!(caller == self.blockchain().get_owner_address(), "Only owner can withdraw!");
-        let sc_balance = self.deposit().get();
+        let sc_balance = self.blockchain().get_sc_balance(&TokenIdentifier::egld(), 0);
         self.send().direct(&caller, &TokenIdentifier::egld(), 0, &sc_balance, b"withdraw");
-        self.deposit().clear();
         Ok(())
     }
 
 
     // Storages
-    #[view(getDeposit)]
-    #[storage_mapper("deposit")]
-    fn deposit(&self) -> SingleValueMapper<BigUint>;
-
     #[view(getStatus)]
     #[storage_mapper("status")]
     fn status(&self, checkout_id: &BigUint) -> SingleValueMapper<CheckoutStatus>;
 
     #[proxy]
-    fn marketplace_proxy(&self, sc_address: ManagedAddress) -> marketplace_proxy::Proxy<Self::Api>;
+    fn marketplace_proxy(&self, sc_address: ManagedAddress) -> marketplace::Proxy<Self::Api>;
 }
